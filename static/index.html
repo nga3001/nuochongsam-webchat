@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Trung tâm huấn luyện chatbot AI Thái Minh</title>
+<style>
+  :root{
+    --fb-blue:#0084ff; --bg:#ffffff; --gray:#f0f0f0; --text:#050505; --sub:#65676b; --brand:#1f4e79;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:#e4e6eb; min-height:100dvh; display:flex; justify-content:center; align-items:stretch;
+       gap:16px; padding:12px;}
+  /* ---------- cửa sổ CHAT ---------- */
+  .phone{width:100%; max-width:480px; height:calc(100dvh - 24px); background:var(--bg);
+         display:flex; flex-direction:column; box-shadow:0 0 24px rgba(0,0,0,.15); border-radius:14px; overflow:hidden;}
+  .hdr{display:flex; align-items:center; gap:10px; padding:10px 14px;
+       border-bottom:1px solid #e4e6eb; background:#fff; flex:0 0 auto;}
+  .ava{width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#1f4e79,#3aa66b);
+       color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px;}
+  .hdr .name{font-weight:700; font-size:15px; color:var(--text);}
+  .hdr .status{font-size:12px; color:var(--sub);}
+  .hdr .dot{display:inline-block; width:8px; height:8px; border-radius:50%; background:#31a24c; margin-right:4px;}
+  .msgs{flex:1 1 auto; overflow-y:auto; padding:14px 12px 8px; display:flex; flex-direction:column; gap:2px; background:#fff;}
+  .row{display:flex; margin-top:8px; align-items:flex-end; gap:6px;}
+  .row.user{justify-content:flex-end;}
+  .row .mini{width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,#1f4e79,#3aa66b);
+             color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .bub{max-width:76%; padding:9px 13px; border-radius:18px; font-size:15px; line-height:1.38; white-space:pre-wrap; word-wrap:break-word;}
+  .bot .bub{background:var(--gray); color:var(--text); border-bottom-left-radius:5px;}
+  .user .bub{background:var(--fb-blue); color:#fff; border-bottom-right-radius:5px;}
+  .bub.imgbub{padding:3px; background:var(--gray); max-width:76%;}
+  .bub.imgbub img{display:block; width:100%; max-width:320px; border-radius:15px; cursor:zoom-in;}
+  .meta{font-size:11px; color:#8a8d91; margin:3px 36px;}
+  .fb{display:flex; gap:6px; margin:4px 0 0 36px;}
+  .fb button{border:1px solid #e0e0e0; background:#fff; border-radius:12px; padding:2px 9px;
+             font-size:13px; cursor:pointer; color:#65676b;}
+  .fb button.on-up{background:#e7f3ff; border-color:var(--fb-blue); color:var(--fb-blue);}
+  .fb button.on-down{background:#ffe9e9; border-color:#e04b4b; color:#e04b4b;}
+  .fb .note-tag{font-size:12px; color:#c0392b; align-self:center; max-width:220px; overflow:hidden;
+                text-overflow:ellipsis; white-space:nowrap;}
+  .qrs{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 2px 36px;}
+  .qrs button{border:1px solid var(--fb-blue); color:var(--fb-blue); background:#fff;
+              border-radius:18px; padding:6px 14px; font-size:14px; cursor:pointer;}
+  .qrs button:active{background:#e7f3ff;}
+  .typing{display:flex; gap:4px; padding:12px 14px; background:var(--gray); border-radius:18px;
+          border-bottom-left-radius:5px; width:fit-content;}
+  .typing i{width:7px; height:7px; border-radius:50%; background:#90949c; animation:blink 1.2s infinite;}
+  .typing i:nth-child(2){animation-delay:.2s;} .typing i:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,80%,100%{opacity:.25} 40%{opacity:1}}
+  .cmp{display:flex; gap:8px; padding:10px 12px; border-top:1px solid #e4e6eb; background:#fff; flex:0 0 auto;}
+  .cmp input{flex:1; border:none; background:var(--gray); border-radius:20px; padding:10px 16px;
+             font-size:15px; outline:none;}
+  .cmp button{border:none; background:none; color:var(--fb-blue); font-size:22px; cursor:pointer; padding:0 6px;}
+  /* ---------- cửa sổ HUẤN LUYỆN ---------- */
+  .train{width:360px; flex:0 0 auto; height:calc(100dvh - 24px); background:#fff; border-radius:14px;
+         box-shadow:0 0 24px rgba(0,0,0,.12); display:flex; flex-direction:column; overflow:hidden;}
+  .train .thdr{background:var(--brand); color:#fff; padding:14px 16px; font-weight:700; font-size:15px; line-height:1.35;}
+  .train .tbody{flex:1 1 auto; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:14px;}
+  .note{background:#fff8e1; color:#7a5b00; font-size:13px; padding:10px 12px; border-radius:10px; line-height:1.45;}
+  .sec{display:flex; flex-direction:column; gap:6px;}
+  .sec label{font-size:12px; font-weight:700; color:var(--brand); text-transform:uppercase; letter-spacing:.3px;}
+  .sec .hint{font-size:12px; color:var(--sub); line-height:1.4;}
+  select, .sec input{border:1px solid #ccd0d5; border-radius:8px; padding:8px 10px; font-size:14px; color:var(--text); background:#fff; outline:none; width:100%;}
+  .tester-row{display:flex; gap:8px; align-items:center;}
+  .tester-row .who{flex:1; font-size:14px; font-weight:600;}
+  .tester-row button{border:1px solid #ccd0d5; background:#fff; border-radius:8px; padding:5px 10px; font-size:12px; cursor:pointer; color:var(--sub);}
+  textarea{width:100%; border:1px solid #ccd0d5; border-radius:8px; padding:9px 11px; font-size:14px;
+           outline:none; font-family:inherit; resize:vertical;}
+  .btn{border:none; border-radius:8px; padding:9px 16px; font-size:14px; cursor:pointer; font-weight:600;}
+  .btn.primary{background:var(--brand); color:#fff;}
+  .btn.primary:disabled{opacity:.5; cursor:default;}
+  .sug-sent{display:flex; flex-direction:column; gap:8px;}
+  .sug-item{background:#f6f8fa; border-left:3px solid var(--brand); border-radius:6px; padding:8px 10px;
+            font-size:13px; color:var(--text); white-space:pre-wrap;}
+  .sug-item .st{font-size:11px; color:#8a8d91; margin-top:3px;}
+  .toast{font-size:13px; color:#1e7d43; min-height:18px;}
+  .toast.err{color:#c0392b;}
+  /* ---------- modal ---------- */
+  .modal{position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center;
+         justify-content:center; z-index:10;}
+  .card{background:#fff; border-radius:14px; padding:22px; width:min(92vw,360px);}
+  .card h3{font-size:16px; margin-bottom:6px;}
+  .card p{font-size:13px; color:var(--sub); margin-bottom:12px;}
+  .card input, .card textarea{width:100%; border:1px solid #ccd0d5; border-radius:8px; padding:9px 11px;
+        font-size:14px; outline:none; font-family:inherit;}
+  .card .act{display:flex; gap:8px; justify-content:flex-end; margin-top:14px;}
+  .card .act button{border:none; border-radius:8px; padding:8px 16px; font-size:14px; cursor:pointer;}
+  .primary{background:var(--fb-blue); color:#fff;} .ghost{background:#e4e6eb; color:var(--text);}
+  .hidden{display:none !important;}
+  /* ---------- responsive ---------- */
+  @media (max-width: 900px){
+    body{flex-direction:column; align-items:center; overflow-y:auto;}
+    .phone{height:78dvh;}
+    .train{width:100%; max-width:480px; height:auto; max-height:none;}
+    .train .tbody{overflow:visible;}
+  }
+</style>
+</head>
+<body>
+<!-- CỬA SỔ CHAT -->
+<div class="phone">
+  <div class="hdr">
+    <div class="ava">SAM</div>
+    <div>
+      <div class="name">Sâm Thái Minh</div>
+      <div class="status"><span class="dot"></span>Đang hoạt động · Bản test nội bộ</div>
+    </div>
+  </div>
+  <div class="msgs" id="msgs"></div>
+  <div class="cmp">
+    <input id="inp" placeholder="Aa" autocomplete="off">
+    <button id="send" title="Gửi">➤</button>
+  </div>
+</div>
+
+<!-- CỬA SỔ HUẤN LUYỆN -->
+<div class="train">
+  <div class="thdr">Trung tâm huấn luyện chatbot AI Thái Minh</div>
+  <div class="tbody">
+    <div class="note">Môi trường test nội bộ Thái Minh — đừng nhập thông tin khách thật. Chấm 👍👎 từng câu trả lời giúp bot tốt lên nhé!</div>
+    <div class="sec">
+      <label>Người test</label>
+      <div class="tester-row">
+        <div class="who" id="whoami">—</div>
+        <button id="renameBtn">Đổi tên</button>
+      </div>
+    </div>
+    <div class="sec">
+      <label>Model AI</label>
+      <select id="model" title="Model AI">
+        <option value="">Model mặc định (theo cài đặt Railway — đang Gemini Flash-Lite)</option>
+        <option value="gemini_lite">Gemini 3.5 Flash-Lite (bản anh Huy chốt)</option>
+        <option value="gemini">Gemini 3.8 Flash (mạnh hơn)</option>
+      </select>
+      <div class="hint" id="modelHint">Chọn model trước khi gửi tin — áp dụng cho các câu trả lời tiếp theo. Khách thật trên page luôn dùng model mặc định.</div>
+    </div>
+    <div class="sec">
+      <label>Góp ý chỉnh sửa chatbot</label>
+      <div class="hint">Thấy bot cần sửa gì (kịch bản, giọng điệu, thiếu kiến thức, sai quy trình...) thì ghi vào đây. Góp ý được chuyển cho quản trị viên duyệt — bot KHÔNG tự thay đổi theo góp ý.</div>
+      <textarea id="sugText" rows="4" maxlength="1500" placeholder="VD: Khách hỏi mua ở Đà Nẵng thì bot nên chỉ nhà thuốc gần nhất..."></textarea>
+      <button class="btn primary" id="sugSend">Gửi góp ý</button>
+      <div class="toast" id="sugToast"></div>
+    </div>
+    <div class="sec">
+      <label>Góp ý đã gửi (phiên này)</label>
+      <div class="sug-sent" id="sugList"><div class="hint">Chưa có góp ý nào.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- modal tên người test -->
+<div class="modal" id="nameModal">
+  <div class="card">
+    <h3>Chào bạn 👋</h3>
+    <p>Nhập tên của bạn để log test và góp ý được ghi đúng người (phục vụ tổng hợp lỗi & huấn luyện bot).</p>
+    <input id="testerName" placeholder="VD: Hùng - Sale online" maxlength="60">
+    <div class="act"><button class="primary" id="startBtn">Bắt đầu test</button></div>
+  </div>
+</div>
+
+<!-- modal ghi chú lỗi -->
+<div class="modal hidden" id="noteModal">
+  <div class="card">
+    <h3>Câu này bot trả lời chưa ổn ở đâu?</h3>
+    <p>Ghi ngắn gọn: sai giá / sai liều / giọng điệu / thiếu ý / vi phạm quảng cáo...</p>
+    <textarea id="noteText" rows="3" placeholder="VD: báo sai giá lọ 80 viên"></textarea>
+    <div class="act">
+      <button class="ghost" id="noteCancel">Bỏ qua</button>
+      <button class="primary" id="noteSave">Lưu ghi chú</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SECRET = location.pathname.split('/').pop();
+let convId = null, tester = null, pendingNoteMsg = null;
+const msgs = document.getElementById('msgs');
+const inp = document.getElementById('inp');
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+function parseQR(text){
+  const m = text.match(/\[QR:\s*([^\]]+)\]\s*$/);
+  if(!m) return {clean:text, qrs:[]};
+  return {clean:text.replace(m[0],'').trim(), qrs:m[1].split('|').map(s=>s.trim()).filter(Boolean).slice(0,3)};
+}
+
+function addUser(text){
+  const r=document.createElement('div'); r.className='row user';
+  r.innerHTML=`<div class="bub">${esc(text)}</div>`;
+  msgs.appendChild(r); scroll();
+}
+
+function parseIMG(text){
+  const ids=[];
+  const clean=text.replace(/\[IMG:\s*([a-z0-9-]+)\s*\]/gi,(m,id)=>{ids.push(id.toLowerCase());return '';})
+                  .replace(/\n{3,}/g,'\n\n').trim();
+  return {clean, ids};
+}
+
+function addBotImage(id){
+  const r=document.createElement('div'); r.className='row bot';
+  const img=document.createElement('img');
+  img.src='/img/'+SECRET+'/'+id; img.alt='Ảnh: '+id; img.loading='lazy';
+  img.onclick=()=>window.open(img.src,'_blank');
+  img.onerror=()=>r.remove();
+  const bub=document.createElement('div'); bub.className='bub imgbub'; bub.appendChild(img);
+  const mini=document.createElement('div'); mini.className='mini'; mini.textContent='SAM';
+  r.appendChild(mini); r.appendChild(bub);
+  msgs.appendChild(r); img.onload=scroll; scroll();
+}
+
+function addBot(text, msgId, meta){
+  clearQRs();
+  const qr = parseQR(text);
+  const {clean, ids} = parseIMG(qr.clean);
+  const qrs = qr.qrs;
+  const r=document.createElement('div'); r.className='row bot';
+  r.innerHTML=`<div class="mini">SAM</div><div class="bub">${esc(clean)}</div>`;
+  if(clean) msgs.appendChild(r);
+  ids.forEach(addBotImage);
+  if(msgId){
+    const fb=document.createElement('div'); fb.className='fb'; fb.dataset.msg=msgId;
+    fb.innerHTML=`<button class="up" title="Trả lời tốt">👍</button>
+                  <button class="down" title="Có lỗi">👎</button>
+                  <span class="note-tag"></span>`;
+    fb.querySelector('.up').onclick=()=>rate(fb,msgId,'up');
+    fb.querySelector('.down').onclick=()=>{pendingNoteMsg={fb,msgId};rate(fb,msgId,'down');
+      document.getElementById('noteText').value='';
+      document.getElementById('noteModal').classList.remove('hidden');};
+    msgs.appendChild(fb);
+  }
+  if(meta){const m=document.createElement('div');m.className='meta';m.textContent=meta;msgs.appendChild(m);}
+  if(qrs.length){
+    const q=document.createElement('div'); q.className='qrs';
+    qrs.forEach(t=>{const b=document.createElement('button');b.textContent=t;
+      b.onclick=()=>{clearQRs();send(t);};q.appendChild(b);});
+    msgs.appendChild(q);
+  }
+  scroll();
+}
+
+function clearQRs(){document.querySelectorAll('.qrs').forEach(e=>e.remove());}
+function scroll(){msgs.scrollTop=msgs.scrollHeight;}
+
+let typingEl=null;
+function showTyping(){
+  const r=document.createElement('div'); r.className='row bot';
+  r.innerHTML=`<div class="mini">SAM</div><div class="typing"><i></i><i></i><i></i></div>`;
+  msgs.appendChild(r); typingEl=r; scroll();
+}
+function hideTyping(){if(typingEl){typingEl.remove();typingEl=null;}}
+
+/* hiện từng tin nhắn lần lượt như người thật đang gõ */
+function typeDelay(t){return Math.min(2200, 450 + t.length*16);}
+async function renderParts(parts, msgId, meta){
+  // Nút chấm 👍👎 hiện trên MỌI tin của bot (sửa lỗi vòng 2: nút chỉ hiện ở tin cuối).
+  // Các tin cùng một lượt chia sẻ chung msgId — chấm ở bất kỳ tin nào đều tính cho lượt đó.
+  for(let i=0;i<parts.length;i++){
+    const last=(i===parts.length-1);
+    if(i>0){showTyping(); await new Promise(r=>setTimeout(r, typeDelay(parts[i]))); hideTyping();}
+    addBot(parts[i], msgId, last?meta:null);
+  }
+}
+
+async function rate(fb,msgId,rating){
+  fb.querySelector('.up').className='up'+(rating==='up'?' on-up':'');
+  fb.querySelector('.down').className='down'+(rating==='down'?' on-down':'');
+  await fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({secret:SECRET,conv_id:convId,message_id:msgId,rating})});
+}
+
+document.getElementById('noteSave').onclick=async()=>{
+  const note=document.getElementById('noteText').value.trim();
+  if(pendingNoteMsg){
+    await fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({secret:SECRET,conv_id:convId,message_id:pendingNoteMsg.msgId,rating:'down',note})});
+    if(note) pendingNoteMsg.fb.querySelector('.note-tag').textContent='📝 '+note;
+  }
+  document.getElementById('noteModal').classList.add('hidden');
+};
+document.getElementById('noteCancel').onclick=()=>document.getElementById('noteModal').classList.add('hidden');
+
+async function send(text){
+  text=(text||inp.value).trim();
+  if(!text) return;
+  if(Date.now()-_lastSentAt<1500 && text.split(/\s+/).length<=2 && _lastSent.toLowerCase().endsWith(text.toLowerCase())){inp.value='';return;}
+  _lastSent=text; _lastSentAt=Date.now();
+  inp.value=''; addUser(text); showTyping();
+  document.getElementById('send').disabled=true;
+  try{
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({secret:SECRET,conv_id:convId,tester,message:text,
+        model:document.getElementById('model').value||undefined})});
+    const data=await res.json();
+    hideTyping();
+    if(data.error){addBot('Xin lỗi, hệ thống gặp lỗi: '+data.error+'\nBạn thử gửi lại nhé.',null,null);}
+    else{
+      convId=data.conv_id;
+      // data.model dạng "sonnet:claude-sonnet-4-5" / "gpt:gpt-4o-mini" / "demo"
+      const key=(data.model||'').split(':')[0];
+      const nice={sonnet:'Sonnet',haiku:'Haiku',gpt:'ChatGPT',deepseek:'DeepSeek',demo:'demo',gemini:'Gemini Flash',gemini_lite:'Gemini Flash-Lite'};
+      const mdl=nice[key]||key||'gemini_lite';
+      const parts=(data.parts&&data.parts.length)?data.parts:[data.reply];
+      await renderParts(parts,data.message_id,`${(data.latency_ms/1000).toFixed(1)}s · ${mdl}`);
+    }
+  }catch(e){hideTyping();addBot('Mất kết nối máy chủ. Bạn thử lại nhé.',null,null);}
+  document.getElementById('send').disabled=false;
+  inp.focus();
+}
+
+document.getElementById('send').onclick=()=>send();
+// v0.1.30 (17/10, chị Nga): bộ gõ tiếng Việt (Telex/Mac) — bấm Enter khi chữ cuối còn đang "giữ dấu"
+// thì trình duyệt thả chữ đó ra thêm 1 lần → gửi lặp ("máy"). Bỏ qua Enter trong lúc đang ghép chữ,
+// và chặn tin chỉ là chữ cuối của tin vừa gửi (trong 1,5 giây).
+let _lastSent='', _lastSentAt=0;
+inp.addEventListener('keydown',e=>{
+  if(e.key!=='Enter') return;
+  if(e.isComposing || e.keyCode===229) return;
+  e.preventDefault(); send();
+});
+inp.addEventListener('compositionend',()=>{
+  const v=inp.value.trim();
+  if(v && Date.now()-_lastSentAt<1500 && _lastSent.toLowerCase().endsWith(v.toLowerCase())) inp.value='';
+});
+
+/* ---------- góp ý huấn luyện ---------- */
+const sugToast=document.getElementById('sugToast');
+document.getElementById('sugSend').onclick=async()=>{
+  const t=document.getElementById('sugText').value.trim();
+  sugToast.className='toast';
+  if(!tester){sugToast.className='toast err';sugToast.textContent='Bạn nhập tên người test trước nhé.';return;}
+  if(t.length<5){sugToast.className='toast err';sugToast.textContent='Góp ý hơi ngắn — ghi rõ hơn giúp mình nhé.';return;}
+  const btn=document.getElementById('sugSend'); btn.disabled=true;
+  try{
+    const res=await fetch('/api/suggest',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({secret:SECRET,conv_id:convId,tester,content:t})});
+    const d=await res.json();
+    if(d.ok){
+      sugToast.textContent='Đã gửi — cảm ơn bạn! Góp ý sẽ được admin duyệt.';
+      document.getElementById('sugText').value='';
+      const list=document.getElementById('sugList');
+      if(list.querySelector('.hint')) list.innerHTML='';
+      const item=document.createElement('div'); item.className='sug-item';
+      item.textContent=t;
+      const st=document.createElement('div'); st.className='st';
+      st.textContent=new Date().toLocaleTimeString('vi-VN')+' · chờ duyệt';
+      item.appendChild(st);
+      list.prepend(item);
+    }else{
+      sugToast.className='toast err'; sugToast.textContent=d.error||'Không gửi được, thử lại nhé.';
+    }
+  }catch(e){sugToast.className='toast err'; sugToast.textContent='Mất kết nối máy chủ.';}
+  btn.disabled=false;
+};
+
+/* ---------- tên người test ---------- */
+function setTester(name){
+  tester=name;
+  document.getElementById('whoami').textContent=name;
+  localStorage.setItem('bv_tester',name);
+}
+document.getElementById('startBtn').onclick=()=>{
+  setTester(document.getElementById('testerName').value.trim()||'khách test');
+  document.getElementById('nameModal').classList.add('hidden');
+  addBot('Dạ Sâm Thái Minh chào anh/chị ạ. Anh/chị đang tìm sản phẩm bồi bổ cho bản thân hay mua cho người thân ạ?\n[QR: Cho bố mẹ | Cho bản thân | Xem giá sản phẩm]',null,null);
+  inp.focus();
+};
+document.getElementById('renameBtn').onclick=()=>{
+  document.getElementById('nameModal').classList.remove('hidden');
+};
+const saved=localStorage.getItem('bv_tester');
+if(saved){document.getElementById('testerName').value=saved;}
+
+/* ---------- nạp model ngoài (ChatGPT/DeepSeek) nếu đã cấu hình key ---------- */
+(async()=>{
+  try{
+    const m=await fetch('/api/models?secret='+SECRET).then(r=>r.json());
+    const sel=document.getElementById('model');
+    const av=m.available||{};
+    const names={gpt:'ChatGPT (OpenAI)',deepseek:'DeepSeek'};
+    ['gpt','deepseek'].forEach(k=>{
+      if(av[k]){
+        const o=document.createElement('option');o.value=k;o.textContent=av[k]||names[k];
+        sel.insertBefore(o, sel.querySelector('option[value="auto"]'));
+      }
+    });
+    if(m.has_external){
+      const h=document.getElementById('modelHint');
+      h.textContent+=m.pii_mask_external
+        ? ' Model ngoài Anthropic (ChatGPT/DeepSeek): số điện thoại & địa chỉ khách được TÁCH (che) trước khi gửi API.'
+        : ' (Lưu ý: tách PII đang TẮT cho model ngoài.)';
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

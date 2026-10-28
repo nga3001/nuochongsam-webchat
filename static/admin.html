@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin - Trung tâm huấn luyện Chatbot AI Thái Minh</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f0f2f5;color:#050505;}
+  header{background:#1f4e79;color:#fff;padding:14px 22px;display:flex;align-items:center;gap:14px;}
+  header h1{font-size:17px;font-weight:700;}
+  header .sp{flex:1;}
+  header a,header label{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
+    padding:7px 14px;font-size:13px;cursor:pointer;text-decoration:none;}
+  .wrap{max-width:1200px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:380px 1fr;gap:16px;}
+  .stats{grid-column:1/3;display:flex;gap:12px;flex-wrap:wrap;}
+  .stat{background:#fff;border-radius:12px;padding:14px 20px;box-shadow:0 1px 2px rgba(0,0,0,.08);min-width:140px;}
+  .stat .v{font-size:24px;font-weight:800;color:#1f4e79;}
+  .stat .l{font-size:12px;color:#65676b;margin-top:2px;}
+  .panel{background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.08);overflow:hidden;}
+  .panel h2{font-size:14px;padding:12px 16px;border-bottom:1px solid #eee;color:#1f4e79;}
+  .panel .search{padding:10px 16px;border-bottom:1px solid #eee;}
+  .panel .search input{width:100%;border:1px solid #ccd0d5;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;}
+  .list{max-height:70vh;overflow-y:auto;}
+  .conv{padding:11px 16px;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:13px;}
+  .conv:hover{background:#f6f8fa;} .conv.sel{background:#e7f3ff;}
+  .conv .t{font-weight:700;} .conv .s{color:#65676b;font-size:12px;margin-top:2px;}
+  .badge{display:inline-block;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700;}
+  .b-down{background:#ffe9e9;color:#c0392b;} .b-up{background:#e6f7ec;color:#1e7d43;}
+  .msgview{max-height:76vh;overflow-y:auto;padding:16px;}
+  .m{margin-bottom:12px;max-width:85%;}
+  .m .bub{padding:9px 13px;border-radius:14px;font-size:14px;white-space:pre-wrap;}
+  .m.user{margin-left:auto;} .m.user .bub{background:#0084ff;color:#fff;}
+  .m.assistant .bub{background:#f0f0f0;}
+  .m.system .bub{background:#fff3cd;color:#7a5b00;font-size:12px;}
+  .m .info{font-size:11px;color:#8a8d91;margin-top:3px;}
+  .m .fbk{font-size:12px;margin-top:3px;}
+  .m .fbk.down{color:#c0392b;} .m .fbk.up{color:#1e7d43;}
+  details{margin-top:4px;} details summary{font-size:11px;color:#1f4e79;cursor:pointer;}
+  details pre{font-size:11px;background:#f6f8fa;border-radius:8px;padding:8px;overflow-x:auto;max-width:640px;}
+  .kbnote{grid-column:1/3;background:#fff8e1;border-radius:12px;padding:12px 18px;font-size:13px;color:#7a5b00;}
+  .tabs{display:flex;gap:0;border-bottom:1px solid #eee;}
+  .tabs button{flex:0 0 auto;border:none;background:none;padding:10px 18px;font-size:13px;font-weight:700;
+    color:#65676b;cursor:pointer;border-bottom:2px solid transparent;}
+  .tabs button.on{color:#1f4e79;border-bottom-color:#1f4e79;}
+  .sug-item{background:#f6f8fa;border-left:3px solid #1f4e79;border-radius:6px;padding:10px 12px;
+    font-size:13px;margin-bottom:10px;white-space:pre-wrap;}
+  .sug-item .st{font-size:11px;color:#8a8d91;margin-top:4px;}
+  .b-sug{background:#e8eef7;color:#1f4e79;}
+  .empty{padding:40px;text-align:center;color:#8a8d91;font-size:14px;}
+  input[type=file]{display:none;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Admin - Trung tâm huấn luyện Chatbot AI Thái Minh</h1>
+  <div class="sp"></div>
+  <label for="kbfile">⬆ Cập nhật KB (JSON)</label>
+  <input type="file" id="kbfile" accept=".json">
+  <a id="kbdl" href="#">⬇ Tải KB hiện tại</a>
+  <a id="xlsx" href="#">📊 Xuất Excel</a>
+</header>
+<div class="wrap">
+  <div class="stats" id="stats"></div>
+  <div class="kbnote" id="kbnote"></div>
+  <div class="panel" style="grid-column:1/3" id="pkpanel">
+    <h2>🥞 Pancake — page "Sâm Thái Minh"</h2>
+    <div id="pkstatus" style="margin:6px 0 10px;font-size:14px;line-height:1.7">Đang tải...</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+      <button id="pkKill" style="border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:700;color:#fff;background:#c0392b">⛔ KILL SWITCH</button>
+      <button id="pkEnable" style="border:none;border-radius:6px;padding:8px 16px;cursor:pointer;color:#fff;background:#2c7a3f">▶ Gửi thật</button>
+      <button id="pkTest" style="border:none;border-radius:6px;padding:8px 16px;cursor:pointer;color:#fff;background:#1f6feb">🎯 Chế độ thử</button>
+      <button id="pkPoll" style="border:none;border-radius:6px;padding:8px 16px;cursor:pointer;color:#fff;background:#7a5c2c">🔁 Polling dự phòng</button>
+      <button id="pkFu" style="border:none;border-radius:6px;padding:8px 16px;cursor:pointer;color:#fff;background:#6b3fa0">🔔 Nhịp theo đuổi</button>
+      <a id="pkReport" href="#">📈 Báo cáo ngày</a>
+      <a id="pkAB" href="#">🧪 A/B bot vs người</a>
+      <a id="pkABset" href="#" style="color:#8a6d1a">⚖ Đổi tỉ lệ A/B</a>
+    </div>
+    <div class="list" id="pklog" style="max-height:22vh;font-size:12.5px"></div>
+  </div>
+  <div class="panel" style="grid-column:1/3" id="hopanel">
+    <h2>📞 Ca chuyển nhân viên — cần gọi lại cho khách (Rule 7-9)</h2>
+    <div class="list" id="handoffs" style="max-height:32vh"></div>
+  </div>
+  <div class="panel">
+    <h2>Hội thoại</h2>
+    <div class="search"><input id="q" placeholder="Lọc theo tên người test..."></div>
+    <div class="list" id="convs"></div>
+  </div>
+  <div class="panel">
+    <h2 id="mtitle">Chọn một hội thoại để xem</h2>
+    <div class="tabs">
+      <button id="tabChat" class="on">💬 Chat</button>
+      <button id="tabSug">📝 Góp ý <span id="sugCount"></span></button>
+    </div>
+    <div class="msgview" id="mview"><div class="empty">Chưa chọn hội thoại nào</div></div>
+    <div class="msgview" id="sview" style="display:none"><div class="empty">Chưa chọn hội thoại nào</div></div>
+  </div>
+</div>
+<script>
+const KEY = location.pathname.split('/').pop();
+const api = (p, params={}) => fetch(p+'?'+new URLSearchParams({key:KEY,...params})).then(r=>r.json());
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function fmtTime(ts){return new Date(ts*1000).toLocaleString('vi-VN',{timeZone:'Asia/Bangkok'});}
+
+document.getElementById('xlsx').href='/api/admin/export.xlsx?key='+KEY;
+document.getElementById('kbdl').onclick=async e=>{
+  e.preventDefault();
+  const kb=await api('/api/admin/kb');
+  const blob=new Blob([JSON.stringify(kb,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='samthaiminh_kb.json';a.click();
+};
+document.getElementById('kbfile').onchange=async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const fd=new FormData(); fd.append('file',f);
+  const r=await fetch('/api/admin/kb?key='+KEY,{method:'POST',body:fd});
+  const d=await r.json();
+  alert(d.ok?'KB đã cập nhật — bot dùng ngay.':'Lỗi: '+(d.error||'không rõ'));
+  loadStats();
+};
+
+async function loadStats(){
+  const s=await api('/api/admin/stats');
+  const pct=s.up+s.down>0?Math.round(100*s.up/(s.up+s.down)):null;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="v">${s.conversations}</div><div class="l">Hội thoại</div></div>
+    <div class="stat"><div class="v">${s.bot_messages}</div><div class="l">Câu bot trả lời</div></div>
+    <div class="stat"><div class="v">${s.up} / ${s.down}</div><div class="l">👍 / 👎</div></div>
+    <div class="stat"><div class="v">${s.suggestions??0}</div><div class="l">Góp ý huấn luyện</div></div>
+    <div class="stat"><div class="v">${s.handoffs_open??0}</div><div class="l">📞 Ca chờ gọi lại</div></div>
+    <div class="stat"><div class="v">${pct===null?'—':pct+'%'}</div><div class="l">Tỷ lệ 👍 (mục tiêu ≥90%)</div></div>
+    <div class="stat"><div class="v">${s.avg_latency_ms?(s.avg_latency_ms/1000).toFixed(1)+'s':'—'}</div><div class="l">Độ trễ TB (mục tiêu <10s)</div></div>
+    <div class="stat"><div class="v">${s.demo_mode?'DEMO':'LIVE'}</div><div class="l">Chế độ API</div></div>`;
+  document.getElementById('kbnote').textContent='Trạng thái KB: '+(s.kb_status||'—');
+}
+
+async function loadHandoffs(){
+  const list=await api('/api/admin/handoffs');
+  const el=document.getElementById('handoffs');
+  const open=list.filter(h=>h.status!=='done');
+  document.getElementById('hopanel').style.display=list.length?'':'none';
+  el.innerHTML=list.length?'':'<div class="empty">Chưa có ca nào</div>';
+  list.forEach(h=>{
+    const d=document.createElement('div');d.className='conv';
+    const done=h.status==='done';
+    const LV={1:['1·Chốt đơn','#31a24c'],2:['2·CSKH 15p','#1f6feb'],3:['3·Chuyên viên 10p','#d29922'],4:['4·RED FLAG 3p','#e03b3b']};
+    const lv=LV[h.level||2]||['2·CSKH','#1f6feb'];
+    d.innerHTML=`<div class="t" style="${done?'opacity:.5':''}">${done?'✅':'🔔'}
+        <span class="badge" style="background:${lv[1]}22;color:${lv[1]};border:1px solid ${lv[1]}">${lv[0]}</span>
+        ${esc(h.reason)}
+        ${h.phone?`<span class="badge b-sug">📱 ${esc(h.phone)}</span>`:'<span class="badge b-down">chưa có SĐT</span>'}</div>
+      <div class="s">${esc(h.tester)} · ${fmtTime(h.ts)} · hội thoại ${esc(h.conv_id||'')}
+        <button style="margin-left:8px;border:1px solid #ccd0d5;background:#fff;border-radius:6px;padding:2px 10px;cursor:pointer;font-size:12px">${done?'Mở lại':'Đã xử lý'}</button></div>`;
+    d.querySelector('button').onclick=async e=>{
+      e.stopPropagation();
+      await fetch('/api/admin/handoff_done',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({key:KEY,id:h.id,done:!done})});
+      loadHandoffs();
+    };
+    el.appendChild(d);
+  });
+}
+
+let selEl=null;
+async function loadConvs(){
+  const q=document.getElementById('q').value.trim();
+  const list=await api('/api/admin/conversations', q?{tester:q}:{});
+  const el=document.getElementById('convs');
+  el.innerHTML=list.length?'':'<div class="empty">Chưa có hội thoại</div>';
+  list.forEach(c=>{
+    const d=document.createElement('div');d.className='conv';
+    d.innerHTML=`<div class="t">${esc(c.tester)} <span style="color:#8a8d91;font-weight:400">· ${c.n_messages} tin</span></div>
+      <div class="s">${fmtTime(c.started_at)} · ${esc(c.model||'')}
+      ${c.n_up?`<span class="badge b-up">👍 ${c.n_up}</span>`:''}
+      ${c.n_down?`<span class="badge b-down">👎 ${c.n_down}</span>`:''}
+      ${c.n_suggest?`<span class="badge b-sug">📝 ${c.n_suggest}</span>`:''}
+      ${c.n_handoff?`<span class="badge b-down">📞 cần gọi lại</span>`:''}</div>`;
+    d.onclick=()=>{if(selEl)selEl.classList.remove('sel');d.classList.add('sel');selEl=d;loadMsgs(c);};
+    el.appendChild(d);
+  });
+}
+document.getElementById('q').addEventListener('input',()=>loadConvs());
+
+function showTab(which){
+  const chat=which==='chat';
+  document.getElementById('tabChat').className=chat?'on':'';
+  document.getElementById('tabSug').className=chat?'':'on';
+  document.getElementById('mview').style.display=chat?'':'none';
+  document.getElementById('sview').style.display=chat?'none':'';
+}
+document.getElementById('tabChat').onclick=()=>showTab('chat');
+document.getElementById('tabSug').onclick=()=>showTab('sug');
+
+async function loadMsgs(c){
+  document.getElementById('mtitle').textContent=`${c.tester} — ${fmtTime(c.started_at)}`;
+  showTab('chat');
+  const rows=await api('/api/admin/messages',{conv_id:c.id});
+  const v=document.getElementById('mview'); v.innerHTML='';
+  rows.forEach(m=>{
+    const d=document.createElement('div');d.className='m '+m.role;
+    let extra='';
+    if(m.role==='assistant'){
+      extra=`<div class="info">${m.latency_ms?(m.latency_ms/1000).toFixed(1)+'s':''} ${esc(m.model||'')}</div>`;
+      if(m.rating)extra+=`<div class="fbk ${m.rating}">${m.rating==='down'?'👎 Lỗi':'👍 Tốt'}${m.note?': '+esc(m.note):''}</div>`;
+      if(m.tool_trace&&m.tool_trace!=='[]')extra+=`<details><summary>tool calls</summary><pre>${esc(m.tool_trace)}</pre></details>`;
+    }
+    const bubs=(m.role==='assistant'?m.content.split(/\n\s*\n/):[m.content]).map(x=>x.trim()).filter(Boolean);
+    d.innerHTML=bubs.map(b=>`<div class="bub" style="margin-bottom:4px">${esc(b)}</div>`).join('')+extra;
+    v.appendChild(d);
+  });
+  v.scrollTop=v.scrollHeight;
+  // tab góp ý của hội thoại này
+  const sugs=await api('/api/admin/suggestions',{conv_id:c.id});
+  document.getElementById('sugCount').textContent=sugs.length?`(${sugs.length})`:'';
+  const sv=document.getElementById('sview'); sv.innerHTML='';
+  if(!sugs.length){sv.innerHTML='<div class="empty">Hội thoại này chưa có góp ý nào</div>';}
+  sugs.forEach(s=>{
+    const d=document.createElement('div');d.className='sug-item';
+    d.innerHTML=`${esc(s.content)}<div class="st">${esc(s.tester)} · ${fmtTime(s.ts)}</div>`;
+    sv.appendChild(d);
+  });
+}
+
+// ---- Buồng lái Pancake (hướng B) ----
+let pkS=null;
+async function loadPancake(){
+  const s=await api('/api/admin/pancake');
+  if(s.error)return;
+  pkS=s;
+  const on=(b,lbl)=>`<b style="color:${b?'#2c7a3f':'#c0392b'}">${b?'BẬT':'TẮT'}</b> ${lbl}`;
+  const mode = s.kill ? '⛔ KILL' : (!s.enabled ? 'chỉ nghe/log' : (s.test_only ? `gửi thật CHỈ hội thoại thử (${esc(s.test_keyword)})` : 'GỬI THẬT TOÀN BỘ'));
+  document.getElementById('pkstatus').innerHTML=
+    `${s.kill?'<b style="color:#c0392b">⛔ ĐANG KILL — bot im hoàn toàn</b>':'✅ Kill switch: chưa kích hoạt'} &nbsp;·&nbsp; `+
+    `Chế độ: <b>${mode}</b> &nbsp;·&nbsp; ${on(s.polling,'polling')} &nbsp;·&nbsp; `+
+    `gom tin ${s.batch_seconds}s (${s.pending_batches} đang chờ) &nbsp;·&nbsp; token ${s.token_set?'✅ có':'❌ THIẾU'} &nbsp;·&nbsp; `+
+    `A/B: <b>${s.ab_percent}%</b> hội thoại mới vào bot${s.ab_percent<100?' / '+(100-s.ab_percent)+'% người':''} &nbsp;·&nbsp; `+
+    `webhook: <code>${esc(s.webhook_url)}</code>`+
+    hubLine(s);
+  const kb=document.getElementById('pkKill');
+  kb.textContent=s.kill?'✅ MỞ LẠI BOT':'⛔ KILL SWITCH';
+  kb.style.background=s.kill?'#555':'#c0392b';
+  document.getElementById('pkEnable').textContent=s.enabled?'⏸ Tắt gửi thật':'▶ Bật gửi thật (đang chỉ nghe/log)';
+  document.getElementById('pkTest').textContent=s.test_only?`🎯 Đang CHỈ trả lời hội thoại thử ${esc(s.test_keyword)}`:'⚠ Đang gửi thật TOÀN BỘ — bấm để về chế độ thử';
+  document.getElementById('pkTest').style.background=s.test_only?'#1f6feb':'#d29922';
+  document.getElementById('pkPoll').textContent=s.polling?'⏸ Tắt polling':'🔁 Bật polling dự phòng';
+  document.getElementById('pkFu').textContent=s.followup?`🔔 Nhịp theo đuổi ĐANG BẬT (${s.fu_pending} ca đang đếm)`:'🔕 Nhịp theo đuổi đang tắt';
+  document.getElementById('pkFu').style.background=s.followup?'#6b3fa0':'#555';
+  const el=document.getElementById('pklog');
+  el.innerHTML=(s.webhook_log||[]).length?'':'<div class="empty">Chưa có sự kiện webhook/polling nào</div>';
+  (s.webhook_log||[]).forEach(w=>{
+    const d=document.createElement('div');d.className='conv';
+    d.innerHTML=`<div class="s">${pkLine(w)} <span style="color:#8a8d91">· ${fmtTime(w.ts)}</span></div>`;
+    el.appendChild(d);
+  });
+}
+// v0.5.6: hub phân luồng — 1 URL webhook chung cả gói cước, bot chuyển tiếp sự kiện page khác
+function hubLine(s){
+  const map=s.forward_map||{}, ids=Object.keys(map);
+  if(!ids.length)return ' &nbsp;·&nbsp; hub: <span style="color:#8a8d91">không có tuyến chuyển tiếp (PANCAKE_FORWARD_MAP trống)</span>';
+  const st=s.forward_stats||{};
+  return ' &nbsp;·&nbsp; hub: '+ids.map(pid=>{
+    const x=st[pid]||{ok:0,err:0};
+    const err=x.err?` <b style="color:#c0392b">lỗi ${x.err}</b>`:'';
+    return `page <code>…${esc(pid.slice(-6))}</code> → <b>${esc(map[pid])}</b> (đã chuyển ${x.ok}${err})`;
+  }).join(' · ');
+}
+// Dịch log kỹ thuật thành câu dễ đọc
+function pkLine(w){
+  let j=null; try{j=JSON.parse(w.result);}catch(e){}
+  const cid=x=>x?`<code>…${esc(String(x).slice(-8))}</code>`:'';
+  if(w.event_type==='no_text_msg')return `🖼 <b>Tin không có chữ</b> — ${esc(String(w.result||''))}`;
+  if(w.event_type==='attach_handoff')return `🖼 <b>Khách gửi ảnh → chuyển người</b> — ${esc(String(w.result||''))}`;
+  if(w.event_type==='fu_sent')return `🔔 <b>Nhịp theo đuổi ĐÃ GỬI</b> — ${esc(String(w.result||''))}`;
+  if(w.event_type==='fu_handoff')return `📞 <b>Giao TV gọi ra</b> — ${esc(String(w.result||''))}`;
+  if(w.event_type==='fu_close')return `🚪 <b>Đóng ca không phản hồi</b> — ${esc(String(w.result||''))}`;
+  if(w.event_type==='poll_baseline')return `🔁 <b>Bắt đầu canh tin mới</b> — ghi mốc ${j?j.polled:''} hội thoại hiện có (backlog cũ được BỎ QUA)`;
+  if(w.event_type==='poll')return `🔁 Quét thấy <b>${j?j.queued:'?'}</b> tin khách mới (trong ${j?j.polled:'?'} hội thoại)`;
+  if(w.event_type==='sale_typed')return `🧑 Sale đang chăm hội thoại ${cid(w.result.split(' ').pop())} — <b>bot rút</b>`;
+  if(w.event_type==='human_tag')return `🏷 Có thẻ "Người xử lý" ${cid(w.result.split(' ').pop())} — <b>bot rút</b> (nhân viên im quá 24 giờ thì khách nhắn lại bot tiếp nhận lại)`;
+  if(w.event_type==='reopen')return `🔓 <b>Bot tiếp nhận lại khách cũ</b> — ${esc(String(w.result||''))}`;
+  if(w.event_type==='no_reopen')return `🙋 <b>Khách muốn chat với người</b> — bot không tự tiếp nhận lại — ${esc(String(w.result||''))}`;
+  if(w.event_type==='img_sent')return `🖼 Đã gửi ảnh — ${esc(String(w.result||''))}`;
+  if(w.event_type==='img_send_fail'||w.event_type==='img_upload_fail')return `❌ <b>Gửi ảnh lỗi</b> — ${esc(String(w.result||''))}`;
+  if(w.event_type==='test_conv')return `🎯 <b>Hội thoại THỬ nội bộ</b> ${cid(w.result.split(' ').pop())} — bot được phép gửi thật ở đây`;
+  if(w.event_type==='sla_overdue')return `⏰ <b>QUÁ SLA</b> — ${esc(w.result)}`;
+  if(w.event_type==='toggle')return `🎚 Đổi công tắc: ${esc(w.result)}`;
+  if(w.event_type==='error')return `❌ Lỗi: ${esc(w.result)}`;
+  if(w.event_type==='forward_ok')return `📮 <b>Chuyển tiếp</b> sự kiện ${j?esc(j.event||''):''} của page <code>…${j?esc(String(j.page_id||'').slice(-6)):''}</code> → <b>${j?esc(j.to||''):''}</b> (HTTP ${j?j.http:''})`;
+  if(w.event_type==='forward_err')return `❌ <b>CHUYỂN TIẾP LỖI</b> — page <code>…${j?esc(String(j.page_id||'').slice(-6)):''}</code> → ${j?esc(j.to||''):''}: ${j?esc(j.error||''):esc(w.result)} <i>(đã thử lại 1 lần; luồng bên nhận đang KHÔNG nhận được tin)</i>`;
+  if(w.event_type==='forward_none')return `⚠️ Nhận sự kiện của <b>page lạ</b> <code>…${j?esc(String(j.page_id||'').slice(-6)):''}</code> — chưa khai tuyến trong PANCAKE_FORWARD_MAP, đã bỏ qua`;
+  if(j&&j.skip){
+    const m={kill_switch:'kill switch đang bật',human_or_returned:'sale/người đang xử lý',dup:'tin trùng (đã xử lý rồi)',dup_page:'tin trang trùng',empty_text:'tin không có chữ và không nhận ra loại',from_page:'tin do trang gửi'};
+    return `⏭ Bỏ qua ${cid(j.conv_id)} — ${m[j.skip]||esc(j.skip)}${String(j.skip).startsWith('type=')?'là bình luận, không phải inbox':''}`;
+  }
+  if(j&&j.ab==='human')return `🧑 Hội thoại ${cid(j.conv_id)} thuộc <b>nhóm NGƯỜI</b> (A/B) — bot không đụng${j.first?', đã chuyển sale':''}`;
+  if(j&&j.ab==='human_reply')return `🧑 Sale trả lời hội thoại nhóm người ${cid(j.conv_id)} — đã ghi giờ để so A/B`;
+  if(j&&j.queued)return `📥 Nhận tin khách ${cid(j.conv_id)} — chờ gom tin (${j.queued} tin trong lượt)`;
+  if(j&&j.ok&&j.parts!=null){
+    const sent=(j.sent||[]).filter(x=>x==='ok').length;
+    return sent?`🤖 <b>Bot ĐÃ GỬI ${sent} tin</b> tới khách ${cid(j.conv_id)}${j.handoffs?` · chuyển người (${j.handoffs} cờ)`:''}`
+              :`📝 Bot <b>soạn xong trả lời (chưa gửi)</b> cho ${cid(j.conv_id)}${j.handoffs?` · sẽ cần chuyển người`:''} — xem nội dung ở cột Hội thoại`;
+  }
+  return `${esc(w.event_type)} — ${esc(w.result)}`;
+}
+async function pkToggle(field,value,confirmMsg){
+  if(confirmMsg&&!confirm(confirmMsg))return;
+  await fetch('/api/admin/pancake_toggle',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({key:KEY,field,value})});
+  loadPancake();
+}
+document.getElementById('pkKill').onclick=()=>pkToggle('kill',!(pkS&&pkS.kill),
+  pkS&&pkS.kill?'Mở lại bot?':'TẮT KHẨN toàn bộ bot trên Pancake? Sale tiếp quản lại ngay.');
+document.getElementById('pkEnable').onclick=()=>pkToggle('enabled',!(pkS&&pkS.enabled),
+  pkS&&pkS.enabled?'Tắt gửi thật (về chế độ chỉ nghe/log)?':'BẬT GỬI THẬT tới khách trên page?');
+document.getElementById('pkPoll').onclick=()=>pkToggle('poll',!(pkS&&pkS.polling),null);
+document.getElementById('pkFu').onclick=()=>pkToggle('followup',!(pkS&&pkS.followup),
+  pkS&&pkS.followup?'Tắt nhịp theo đuổi? Khách im lặng sẽ KHÔNG được nhắc lại nữa.':'Bật nhịp theo đuổi: khách im 30 phút bot nhắc 1 câu; có SĐT mà vẫn im thì giao TV gọi. Bật?');
+document.getElementById('pkTest').onclick=()=>pkToggle('test_only',!(pkS&&pkS.test_only),
+  pkS&&pkS.test_only?'TẮT chế độ thử → bot sẽ gửi thật cho TOÀN BỘ hội thoại nhóm bot. Chắc chắn?':'Về chế độ thử: bot chỉ trả lời hội thoại có mã thử?');
+document.getElementById('pkReport').onclick=async e=>{
+  e.preventDefault();
+  const r=await api('/api/admin/pancake_report');
+  alert(r.length?r.map(d=>`${d.date}: ${d.conversations} hội thoại · ${d.bot_messages} tin bot · lead ${d.leads} · lỗi rỗng ${d.fallbacks}`).join('\n'):'Chưa có dữ liệu Pancake');
+};
+document.getElementById('pkAB').onclick=async e=>{
+  e.preventDefault();
+  const r=await api('/api/admin/ab_report');
+  const f=(g,t)=>{const x=r[g]||{};return `${t}: ${x.conversations??0} hội thoại · trả lời ${x.replied_pct??'—'}% · `+
+    `phản hồi đầu (trung vị) ${x.median_first_reply_sec!=null?(x.median_first_reply_sec<120?x.median_first_reply_sec+'s':(x.median_first_reply_sec/60).toFixed(1)+' phút'):'—'} · `+
+    `SĐT ${x.phone_pct??'—'}% (${x.phone_n??0}) · loại ${x.contaminated_excluded??0} ca lai tạp`;};
+  alert('🧪 A/B TEST — BOT vs NGƯỜI\n\n'+f('bot','🤖 Nhóm BOT')+'\n'+f('human','🧑 Nhóm NGƯỜI'));
+};
+document.getElementById('pkABset').onclick=async e=>{
+  e.preventDefault();
+  const cur=pkS?pkS.ab_percent:100;
+  const v=prompt('Bao nhiêu % hội thoại MỚI vào nhóm BOT? (0-100)\n100 = bot tiếp quản toàn phần · 50 = A/B một nửa\nHội thoại đã chia nhóm giữ nguyên nhóm cũ.',cur);
+  if(v===null)return;
+  const r=await fetch('/api/admin/pancake_toggle',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({key:KEY,field:'ab_percent',value:v})});
+  const d=await r.json();
+  if(d.error)alert('Lỗi: '+d.error);
+  loadPancake();
+};
+
+loadStats(); loadConvs(); loadHandoffs(); loadPancake();
+setInterval(()=>{loadStats();loadConvs();loadHandoffs();loadPancake();},30000);
+</script>
+</body>
+</html>
