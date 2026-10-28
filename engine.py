@@ -1,5 +1,13 @@
 """Engine hội thoại (v0.1.59 — 23/10 bản đầy đủ: lưới đủ ý + bám tài liệu, chặn "mã lạ"; CTKM khách cũ chỉ khi đã dùng đúng sản phẩm; v0.1.58 — 23/10 bản đầy đủ: không nói toàn bộ sâm trồng ở Sìn Hồ; tên/địa chỉ, giao hàng sau chốt, lời chúc đúng buổi, cảm ơn ngắn; lời chúc đúng buổi, cảm ơn lại → 1 câu ngắn; v0.1.56 — 23/10: quà mua 1 hộp chỉ khi khách tự hỏi; v0.1.54 — 23/10: giờ mở cửa + quà tại cửa hàng 92 Trung Kính, không bán nợ; v0.1.53 — 23/10: chặn phí ship/tổng tiền sai, bán chịu ≠ rượu; v0.1.52 — 23/10: khách muốn qua cửa hàng 92 Trung Kính vẫn dẫn tới chốt; v0.1.50 — 22/10: lưới chặn giá _fix_prices; bắt thêm câu \"xin lại số điện thoại\"): Claude API tool-use + não Sâm Thái Minh (nhân bản từ Bình Vị v1.0).
 Kiến trúc kế thừa KingsUp: LLM lo hội thoại/judgment, tool lo fact/tính toán/safety gate.
+v0.5.2 (28/10/2026, chạy thử 22 câu): 3 lưới dùng chung sửa lỗi — (1) lời chúc đúng buổi không còn thay 'ngủ ngon hơn' (công dụng) thành 'nhiều sức khỏe'; (2) không xóa câu mời mua làm quà cho bố mẹ/người thân trong câu chuẩn cho con bú / có thai; (3) tin đang xin SĐT hoặc báo không dùng được thì không chèn thêm câu mời báo giá.
+v0.5.1 (28/10/2026, chị Nga): khách cũ Nước Hồng sâm hưởng CT tốt nhất giữa CT khách cũ và khách mới (bảng gộp 2/3/6/10/12 hộp); khách cũ 1 hộp không quà + phí ship.
+v0.5.0 (28/10/2026): bot Nước Hồng sâm dựng lại trên nền v0.1.107 — học luồng báo giá mới của Hồng sâm lát: báo giá lần đầu chủ yếu giá 1 hộp + câu khuyên + 1 câu hỏi sức khỏe (3/4 khách), bảng combo 2/4/6 hộp xoay vòng 8 kiểu, 9 câu chốt theo tình huống, câu khai thác/khơi gợi riêng, quà khách cũ đúng bảng Nước Hồng sâm, sửa thời gian dùng (1 hộp 20 túi = 10–20 ngày), báo giá dự phòng chỉ hộp 20 túi.
+v0.4.2 (26/10/2026): chuyển 3 sửa lỗi v0.1.82–84 của bot Hồng sâm lát + lỗi tương tự riêng bot Nước Hồng sâm — đơn Nước Hồng sâm mặc định hộp 20 túi (hộp 10 túi / chai chỉ khi khách nhắc hoặc đồng ý lời mời), lưới tầng sản phẩm khớp NGUYÊN TỪ ('Nguyen Lan' không còn bị hiểu là 'nguyên lá').
+v0.1.84 (26/10/2026, chị Nga): 'ĐT/đt/dt/sđt' của khách = điện thoại, không phải Đông trùng.
+v0.1.83 (26/10/2026, ca Trần Hữu Dũng): nhận diện chủ đề sức khỏe khớp NGUYÊN TỪ ('dùng thử' không còn bị hiểu là 'ung thư') — khách chốt 'dùng thử combo 1 tháng' bot đi đúng bước chốt đơn.
+v0.1.82 (26/10/2026, ca anh Vũ): đơn Hồng sâm lát mặc định hộp 14 gói; hộp 50 gói chỉ khi khách tự nhắc (code ép lại nếu AI tự chọn).
+v0.4.0 (26/10/2026): chế độ BOT NƯỚC HỒNG SÂM (ENV PAGE_FOCUS_PRODUCT=hsmo_tui) — bộ não brain/nuochongsam/, NHS_BLOCK, 3 tầng sản phẩm, lưới chặn nhắc dòng khác khi khách không hỏi, gói 2/4/6 hộp đúng giá/quà.
 v0.1.14 (13/10/2026 chiều, chị Nga): bộ quy tắc định dạng/hội thoại mới (rule 8), MR2 theo nghiên cứu Kyoto,
 ung thư đang hóa trị dùng được Hồng sâm, suy thận 1–2 / 3–4, viêm khớp dạng thấp, tuyến giáp, câu mẫu mới.
 v0.1.107 (28/10/2026, chị Nga): câu hỏi sức khỏe hỏi thẳng "anh/chị" (K1/K2/K5/K5b/D2 bỏ "người dùng sâm", "(hoặc người nhà)"); chưa rõ người dùng → mặc định anh/chị; khách mua cho bố/mẹ/ông/bà → hỏi "bác/ông/bà".
@@ -100,6 +108,7 @@ PAGE_FOCUS_PRODUCT = (os.environ.get("PAGE_FOCUS_PRODUCT") or "hsvn_lat").strip(
 if PAGE_FOCUS_PRODUCT not in PRODUCT_IDS:
     PAGE_FOCUS_PRODUCT = "hsvn_lat"
 IS_DS = PAGE_FOCUS_PRODUCT == "duong_sam"   # v0.3.0: service của page Dương Sâm Linh Đan
+IS_NHS = PAGE_FOCUS_PRODUCT in ("hsmo_tui", "hsmo_chai")   # v0.4.0 (26/10): service của bot Nước Hồng sâm
 BRAND = "Dương Sâm Linh Đan" if IS_DS else "Sâm Thái Minh"
 FOCUS_NAMES = {
     "hsvn_lat": "Hồng sâm Việt Nam Thái Minh dạng lát", "hsmo_chai": "Nước Hồng sâm Thái Minh mật ong dạng chai 175ml",
@@ -405,7 +414,9 @@ def _referent(user_texts: list) -> str:
     return "anh/chị"
 
 
-_RE_FIT_SENT = re.compile(r"(đặc biệt phù hợp|rất hợp) với người ngủ kém, ăn không ngon|lớn tuổi hay ngủ chập chờn, ăn kém|"
+_RE_FIT_SENT = re.compile(r"Nước Hồng sâm rất hợp với người hay mệt mỏi|Nước Hồng sâm dễ uống, tiện mang theo, rất hợp|"   # v0.5.0: đoạn phù hợp Nước Hồng sâm
+                          r"lớn tuổi hay mệt, ngủ không sâu thì dùng Nước Hồng sâm|"
+                          r"(đặc biệt phù hợp|rất hợp) với người ngủ kém, ăn không ngon|lớn tuổi hay ngủ chập chờn, ăn kém|"
                           r"chỉ sau khoảng 2 hộp đầu|Sau khoảng 2 hộp đầu, nhiều người|Dùng đều mỗi sáng, cơ thể sẽ dần", re.I)
 
 
@@ -470,7 +481,8 @@ def _fix_known(text: str, user_texts: list, bot_texts: list) -> tuple:
             n += 1
             text = new
     # đoạn "phù hợp…" (câu kịch bản Ⓐ/Ⓑ/Ⓒ) đã gửi trong hội thoại → không gửi lại (trừ tin báo giá đầy đủ có bảng combo — đã chọn Ⓑ ngắn)
-    if any(_RE_FIT_SENT.search(b or "") for b in bot_texts or []) and len(_RE_COMBO_ROW.findall(text)) < 3 and _RE_FIT_SENT.search(text):
+    if any(_RE_FIT_SENT.search(b or "") for b in bot_texts or []) and len(_RE_COMBO_ROW.findall(text)) < 3 \
+            and len(_RE_NHS_COMBO_ROW.findall(text)) < 3 and _RE_FIT_SENT.search(text):
         out = []
         for ln in text.split("\n"):
             sents = re.split(r"(?<=[.!?…])\s+", ln)
@@ -544,7 +556,7 @@ def _shape_lat_quote(text: str, user_texts: list, bot_texts: list) -> tuple:
     _prev_quotes = sum(1 for b in bot_texts or [] if re.search(r"combo\s*1\s*tháng", b, re.I))
     _seed = sum(ord(c) for c in " ".join((user_texts or [""])[:1]))   # mỗi khách bắt đầu ở 1 kiểu khác nhau
     # v0.1.93: quyết định khơi gợi TRƯỚC — lượt khơi gợi không gửi combo thì KHÔNG được tiêu bộ đếm kiểu combo / câu chốt
-    q = _first_probe(user_texts, bot_texts, _prev_quotes, _seed) if _RE_LAT_QUOTE.search(text) else ""
+    q = _first_probe(user_texts, bot_texts, _prev_quotes, _seed) if _RE_LAT_QUOTE.search(text) and not IS_NHS else ""
     if styles and len(rows) >= 3 and not q:
         _used = [i for i, (h, _l) in enumerate(styles) if any(h[:35] in (b or "") for b in bot_texts or [])]
         if _used:
@@ -662,9 +674,188 @@ def _shape_lat_quote(text: str, user_texts: list, bot_texts: list) -> tuple:
     return text, n
 
 
+# ---- v0.5.0 (28/10/2026): BOT NƯỚC HỒNG SÂM học theo luồng báo giá Hồng sâm lát (v0.1.87–0.1.107) ----
+# Cấu hình chữ dùng chung cho lưới khai thác / khơi gợi: bot lát giữ NGUYÊN chữ cũ; bot Nước Hồng sâm dùng bảng combo 2/4/6 hộp.
+_Q = ({"quoted": r"combo\s*2\s*hộp", "table": "bảng combo Nước Hồng sâm 2/4/6 hộp (price_quote_nhs phần 2, giá + quà từ tool)",
+       "close_E": "Ⓔ (mua cho cả nhà / biếu bố mẹ)", "close_B": "Ⓑ (gợi ý combo 6 hộp)", "close_C": "Ⓒ (2 hộp hay 6 hộp)"}
+      if IS_NHS else
+      {"quoted": r"combo\s*1\s*tháng", "table": "bảng combo Hồng sâm lát (price_quote_hsvn phần 2, giá + quà từ tool)",
+       "close_E": "Ⓔ (biếu bố mẹ)", "close_B": "Ⓑ (gợi ý combo 3 tháng)", "close_C": "Ⓒ (1 tháng hay 3 tháng)"})
+_RE_NHS_COMBO_ROW = re.compile(r"(?im)^[^\n]*combo\s*[246]\s*hộp[^\n]*?\d{1,3}(?:[.,]\d{3})+\s*(?:đ|vnđ|đồng)[^\n]*$")
+
+
+def _nhs_quote_parts():
+    """Đọc đoạn phù hợp Ⓐ/Ⓑ/Ⓒ, 8 kiểu bảng combo, 9 câu chốt, câu khuyên của Nước Hồng sâm từ kb.json (price_quote_nhs)."""
+    try:
+        q = tools_core.load_kb()["scripts_approved"].get("price_quote_nhs", "")
+    except Exception:  # noqa: BLE001
+        return {}, [], {}, ""
+    fit = {k: m.group(1) for k, tag in (("A", "Ⓐ MẶC ĐỊNH"), ("B", "Ⓑ NGẮN"), ("C", "Ⓒ MUA CHO BỐ MẸ"))
+           for m in [re.search(re.escape(tag) + r":\s*'([^']+)'", q)] if m}
+    styles = [(m.group(1), re.findall(r"'([^']+)'", m.group(2)))
+              for m in re.finditer(r"KIỂU \d+: '([^']+)' \+ ((?:'[^']+'(?: / )?)+)", q)]
+    closes = {m.group(1): m.group(2) for m in re.finditer(r"([ⒶⒷⒸⒹⒺⒻⒼⒽⒾ])[^:'|]*:\s*'([^']+)'", q.split("(3)", 1)[-1])}
+    closes = {"ⒶⒷⒸⒹⒺⒻⒼⒽⒾ".index(k) and "ABCDEFGHI"["ⒶⒷⒸⒹⒺⒻⒼⒽⒾ".index(k)] or "A": v for k, v in closes.items()}
+    m = re.search(r"CÂU KHUYÊN:\s*'([^']+)'", q)
+    return fit, styles, closes, (m.group(1) if m else "")
+
+
+def _nhs_price_txt() -> str:
+    try:
+        _, pkg = tools_core.find_package(tools_core.load_kb(), "hsmo-tui")
+        return tools_core.fmt_vnd(pkg["price_retail"])
+    except Exception:  # noqa: BLE001
+        return "620.000đ"
+
+
+def _shape_nhs_quote(text: str, user_texts: list, bot_texts: list) -> tuple:
+    """Bản Nước Hồng sâm của _shape_lat_quote: (1) đúng 1 đoạn phù hợp, (2) bảng combo 2/4/6 hộp xoay vòng 8 kiểu,
+    (3) câu chốt xoay vòng theo tình huống, (4) báo giá LẦN ĐẦU: chủ yếu giá 1 hộp + câu khuyên + 1 câu hỏi sức khỏe (bỏ bảng combo)."""
+    if not IS_NHS or not text:
+        return text, 0
+    rows = _RE_NHS_COMBO_ROW.findall(text)
+    if len(rows) < 3 or "1.420.000đ" in text:
+        return text, 0          # chỉ định hình BÁO GIÁ ĐẦY ĐỦ Nước Hồng sâm (có bảng 3 combo)
+    fit, styles, closes, adv = _nhs_quote_parts()
+    price = _nhs_price_txt()
+    n = 0
+    said = " ".join(bot_texts or [])
+    _is_price_p = lambda p_: price in p_ and not _RE_NHS_COMBO_ROW.search(p_)
+    # (1) đoạn phù hợp
+    if fit:
+        if any(_RE_WHO_PARENTS.search(u or "") for u in user_texts or []) and "C" in fit:
+            pick = fit["C"]
+        elif fit.get("A") and fit["A"][:40] in said:
+            pick = fit.get("B") or fit["A"]
+        else:
+            pick = fit.get("A")
+        paras = re.split(r"\n\s*\n", text)
+        fit_idx = [k for k, p_ in enumerate(paras) if (_RE_FIT_SENT.search(p_) or re.search(r"rất hợp|phù hợp với", p_, re.I))
+                   and not _is_price_p(p_) and not _RE_NHS_COMBO_ROW.search(p_) and not p_.rstrip().endswith("?")]
+        if fit_idx:
+            if paras[fit_idx[0]].strip() not in fit.values():
+                paras[fit_idx[0]] = pick
+                n += 1
+            for k in reversed(fit_idx[1:]):
+                del paras[k]
+                n += 1
+        elif pick:
+            i = next((k for k, p_ in enumerate(paras) if _is_price_p(p_)), 0)
+            paras.insert(i + 1, pick)
+            n += 1
+        text = "\n\n".join(paras)
+    rows = _RE_NHS_COMBO_ROW.findall(text)
+    _prev_quotes = sum(1 for b in bot_texts or [] if re.search(r"combo\s*2\s*hộp", b, re.I) and re.search(r"\d{1,3}\.\d{3}\.\d{3}\s*đ", b))
+    q = _first_probe(user_texts, bot_texts, _prev_quotes, 0)
+    # (2) bảng combo xoay vòng
+    if styles and len(rows) >= 3 and not q:
+        _used = [i for i, (h, _l) in enumerate(styles) if any(h[:35] in (b or "") for b in bot_texts or [])]
+        if _used:
+            k = (_used[-1] + 1) % len(styles)
+            while k in _used and len(_used) < len(styles):
+                k = (k + 1) % len(styles)
+        else:
+            k = _rr_next("style", len(styles))
+        head, lines = styles[k]
+        first = text.find(rows[0])
+        last_row = rows[-1] if len(rows) == 3 else rows[2]
+        last_end = text.find(last_row) + len(last_row)
+        bl = text[:first].rstrip("\n").split("\n")
+        if bl and bl[-1].strip().endswith(":") and len(bl[-1]) < 160:
+            bl = bl[:-1]
+        before = "\n".join(bl).rstrip()
+        _tail = text[last_end:]
+        if re.search(r"miễn phí vận chuyển", head, re.I):      # tiêu đề đã nói freeship → bỏ dòng ✅ lặp lại
+            _tail = re.sub(r"(?im)^[ \t]*✅?[ \t]*từ 2 hộp[^\n]*miễn phí vận chuyển[^\n]*\n?", "", _tail)
+        text = (before + "\n\n" if before else "") + head + "\n" + "\n".join(lines[:3]) + _tail
+        # bỏ tiêu đề combo cũ treo lơ lửng (không đứng ngay trên bảng)
+        _out = []
+        _ls = text.split("\n")
+        for _i, _ln in enumerate(_ls):
+            _nxt = next((x for x in _ls[_i + 1:] if x.strip()), "")
+            if _ln.strip() != head.strip() and not _RE_NHS_COMBO_ROW.search(_nxt):
+                _ss = re.split(r"(?<=[.!?])\s+", _ln)
+                if _ss and _ss[-1].rstrip().endswith(":") and re.search(r"ưu đãi|chương trình|combo|quà|tri ân|như sau", _ss[-1], re.I) \
+                        and len(_ss[-1]) < 160:
+                    _ss = _ss[:-1]
+                    n += 1
+                    if not any(x.strip() for x in _ss):
+                        continue
+                    _ln = " ".join(_ss)
+            _out.append(_ln)
+        text = re.sub(r"\n{3,}", "\n\n", "\n".join(_out))
+        n += 1
+    # (3) câu chốt
+    paras = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
+    if not q and closes and paras and not _RE_NHS_COMBO_ROW.search(paras[-1]) and len(paras[-1]) < 300 \
+            and (paras[-1].rstrip().endswith(("?", "nhé.", "nhé")) or not paras[-1].strip().endswith(("ạ.", "ạ"))):
+        parents = any(_RE_WHO_PARENTS.search(u or "") for u in user_texts or [])
+        sick = any(re.search(r"mệt|ngủ kém|ngủ không|mất ngủ|ốm|bệnh|tiểu đường|huyết áp|căng thẳng|nên mua gói nào|gói nào tốt", u or "", re.I)
+                   for u in user_texts or [])
+        if parents or any(re.search(r"cả nhà|gia đình|biếu|tặng", u or "", re.I) for u in user_texts or []):
+            order = ["E", "B", "F"]
+        elif sick:
+            order = ["B", "C", "F"]
+        elif _prev_quotes or _RE_HURRY.search((user_texts or [""])[-1] or ""):
+            order = ["F", "I", "D", "H", "C"]
+        elif any(re.search(r"online|lừa|giả|tin tưởng|uy tín|chính hãng|nhận hàng", u or "", re.I) for u in user_texts or []):
+            order = ["I", "A", "C"]
+        else:
+            base = ["A", "C", "G", "H", "I"]
+            k0 = _rr_next("close", len(base))
+            order = base[k0:] + base[:k0]
+            if any(re.search(r"bản thân|cho tôi|cho em|cho anh|cho chị|người thân|biếu|tặng", u or "", re.I) for u in user_texts or []):
+                order = [x for x in order if x != "G"]
+        pick = next((closes[k_] for k_ in order if k_ in closes and closes[k_][:30] not in said), None)
+        if pick and pick[:30] not in paras[-1]:
+            if paras[-1].rstrip().endswith(("?", "nhé.", "nhé")):
+                sents = re.split(r"(?<=[.!?])\s+", paras[-1])
+                head_s = " ".join(s_ for s_ in sents[:-1] if not re.search(r"combo|ưu đãi|lên đơn|gói", s_, re.I))
+                paras[-1] = (head_s + " " + pick).strip() if head_s else pick
+            else:
+                paras.append(pick)
+            text = "\n\n".join(paras)
+            n += 1
+    # (4) báo giá lần đầu → giá 1 hộp + câu khuyên + 1 câu hỏi sức khỏe, CHƯA gửi bảng combo
+    if q:
+        keep = []
+        for p in [p for p in re.split(r"\n\s*\n", text) if p.strip()]:
+            ls = [l for l in p.split("\n") if not _RE_NHS_COMBO_ROW.search(l)
+                  and not re.match(r"\s*\W*\s*từ 2 hộp[^\n]*miễn phí vận chuyển", l, re.I)]
+            ls = [l for l in ls if not (l.strip().endswith(":") and len(l) < 160
+                                        and re.search(r"ưu đãi|chương trình|combo|quà|tri ân|như sau", l, re.I))]
+            if ls:
+                ss = re.split(r"(?<=[.!?…])\s+", ls[-1])
+                while ss and re.search(r"\?\s*\W*$|nhé\.?\s*$", ss[-1].strip()):
+                    ss = ss[:-1]
+                ls[-1] = " ".join(ss)
+            _ls = [l for l in ls if l.strip()]
+            while _ls and re.search(r"(chương trình|ưu đãi|combo|quà|tri ân|như sau|miễn phí vận chuyển)[^\n]{0,80}:\s*$", _ls[-1].strip(), re.I):
+                _ss = re.split(r"(?<=[.!?])\s+", _ls[-1])
+                if len(_ss) > 1:
+                    _ls[-1] = " ".join(_ss[:-1])
+                    break
+                _ls = _ls[:-1]
+            if _ls:
+                keep.append("\n".join(_ls).rstrip())
+        keep = [k_ for k_ in keep if not re.match(r"\s*✅\s*từ 2 hộp", k_, re.I)]
+        if adv and keep and not re.search(r"nên dùng đều", " ".join(keep), re.I):
+            _j = next((i_ for i_, p_ in enumerate(keep) if price in p_), 0)
+            keep[_j] = keep[_j].rstrip() + " " + adv
+        if not any(price in k_ for k_ in keep):
+            keep.insert(0, price_sentence("", "hsmo_tui"))
+        K1 = _probe_texts().get("K1", "")
+        if K1 and _RE_FIT_SENT.search(" ".join(keep)) and re.search(r"mệt mỏi, căng thẳng hay ngủ không sâu", q):
+            q = K1                  # đoạn phù hợp đã nói mệt mỏi / ngủ không sâu → hỏi bệnh nền thay vì hỏi lại cùng ý
+        text = "\n\n".join(keep + [q])
+        n += 1
+    return text, n
+
+
 def _probe_texts() -> dict:
     try:
-        s_ = tools_core.load_kb()["scripts_approved"].get("price_probe_hsvn", "")
+        _sa = tools_core.load_kb()["scripts_approved"]
+        s_ = (_sa.get("price_probe_nhs") if IS_NHS else None) or _sa.get("price_probe_hsvn", "")   # v0.5.0: bot Nước Hồng sâm
     except Exception:  # noqa: BLE001
         return {}
     return {k: v for k, v in re.findall(r"Ⓚ(K\d+b?) '([^']+)'", s_)}
@@ -732,7 +923,7 @@ def probe_followup_note(user_texts: list, bot_texts: list) -> str:
     """Lượt trước bot hỏi khai thác (chưa gửi combo) → quyết định: hỏi tiếp 1 câu (tối đa 2) hay gửi bảng combo + câu chốt hợp nhu cầu."""
     K = _probe_texts()
     allq = list(K.values()) + _discovery_questions()
-    if not allq or not bot_texts or re.search(r"combo\s*1\s*tháng", " ".join(bot_texts), re.I):
+    if not allq or not bot_texts or re.search(_Q["quoted"], " ".join(bot_texts), re.I):
         return ""
     last_b = " ".join(bot_texts[-3:])
     if not any(q[:40] in last_b for q in allq):
@@ -764,21 +955,22 @@ def probe_followup_note(user_texts: list, bot_texts: list) -> str:
         return ("\n\nLƯU Ý LƯỢT NÀY (TH khai thác, chị Nga 26/10): ghi nhận ngắn 1 câu đúng ý khách vừa nói, rồi hỏi ĐÚNG câu: '" + nxt +
                 "' — CHƯA gửi bảng combo, KHÔNG nhắc lại giá.")
     if _RE_WHO_PARENTS.search(allu):
-        close = "Ⓔ (biếu bố mẹ)"
+        close = _Q["close_E"]
     elif _RE_DISEASE.search(allu) or _RE_SLEEP.search(allu) or _RE_TIRED.search(allu):
-        close = "Ⓑ (gợi ý combo 3 tháng)"
+        close = _Q["close_B"]
     elif _RE_HURRY.search(last):
         close = "Ⓕ (chốt nhẹ)"
     else:
-        close = "Ⓒ (1 tháng hay 3 tháng)"
+        close = _Q["close_C"]
     return ("\n\nLƯU Ý LƯỢT NÀY (TH khai thác, chị Nga 26/10): đã khai thác xong. Ghi nhận ngắn 1 câu đúng ý khách (khách kể bệnh nền / thuốc → "
-            "compliance_check và nói cách dùng an toàn trước), rồi gửi bảng combo Hồng sâm lát (price_quote_hsvn phần 2, giá + quà từ tool) và ĐÚNG 1 câu chốt "
+            "compliance_check và nói cách dùng an toàn trước), rồi gửi " + _Q["table"] + " và ĐÚNG 1 câu chốt "
             + close + ". KHÔNG nhắc lại câu giá 1 hộp, KHÔNG hỏi thêm.")
 
 
 def _discovery_questions() -> list:
     try:
-        s = tools_core.load_kb()["scripts_approved"].get("price_discovery_hsvn", "")
+        _sa = tools_core.load_kb()["scripts_approved"]
+        s = (_sa.get("price_discovery_nhs") if IS_NHS else None) or _sa.get("price_discovery_hsvn", "")   # v0.5.0
     except Exception:  # noqa: BLE001
         return []
     return re.findall(r"ⓀD\d '([^']+)'", s)
@@ -790,10 +982,10 @@ def discovery_followup_note(user_texts: list, bot_texts: list) -> str:
     if not disc or not bot_texts:
         return ""
     last = " ".join(bot_texts[-3:])
-    if not any(q[:40] in last for q in disc) or re.search(r"combo\s*1\s*tháng", " ".join(bot_texts), re.I):
+    if not any(q[:40] in last for q in disc) or re.search(_Q["quoted"], " ".join(bot_texts), re.I):
         return ""
     return ("\n\nLƯU Ý LƯỢT NÀY: lượt trước em đã hỏi khơi gợi nhu cầu, CHƯA gửi bảng combo. Khách vừa trả lời → ghi nhận ngắn 1 câu đúng ý khách, "
-            "rồi gửi bảng combo Hồng sâm lát (price_quote_hsvn phần 2, giá + quà từ tool) và ĐÚNG 1 câu chốt hợp nhu cầu vừa nghe "
+            "rồi gửi " + _Q["table"] + " và ĐÚNG 1 câu chốt hợp nhu cầu vừa nghe "
             "(bố mẹ/biếu → Ⓔ; có tình trạng/bệnh nền → Ⓑ; dùng thử/lần đầu → Ⓓ). KHÔNG nhắc lại câu giá 1 hộp. "
             "Nếu khách nói bệnh nền / thai sản / trẻ em → gọi compliance_check trước.")
 
@@ -989,7 +1181,7 @@ def _looks_address(u: str) -> bool:
 _RE_ADDR_WORDS = re.compile(r"(?i)\b(phường|xã|thị trấn|quận|huyện|thị xã|thành phố|tp\.?|tỉnh|đường|phố|ngõ|ngách|hẻm|thôn|xóm|ấp|tổ|khu|chung cư|toà|tòa|kđt|p\.|q\.)\b")
 
 
-def check_order_fields(args: dict, user_texts: list, profile: str = "") -> tuple:
+def check_order_fields(args: dict, user_texts: list, profile: str = "", bot_texts: list = None) -> tuple:
     """Trả (args_đã_lọc, ghi_chú[]). SĐT phải xuất hiện trong tin khách; địa chỉ phải có ≥ 60% chữ
     nằm trong tin khách. Không khớp → bỏ trường đó (build_order báo thiếu, bot hỏi lại)."""
     args = dict(args or {})
@@ -1000,10 +1192,21 @@ def check_order_fields(args: dict, user_texts: list, profile: str = "") -> tuple
     _items = args.get("items")
     if isinstance(_items, list):
         _asked50 = re.search(r"50\s*gói|hộp\s*50|loại\s*50|hộp (to|lớn)|5\s*(triệu|tr)\b|5\.000\.000", blob, re.I)
+        # v0.4.2 (bot Nước Hồng sâm, lỗi tương tự): Nước Hồng sâm MẶC ĐỊNH hộp 20 túi — hộp nhỏ 10 túi chỉ khi khách nhắc
+        # (10 túi / hộp nhỏ / 330k) hoặc bot đã mời hộp 10 túi trước đó; dạng chai chỉ khi khách nhắc chai / 175ml (trừ service hsmo_chai).
+        _bots = "\n".join(str(b or "") for b in (bot_texts or []))
+        _asked10 = re.search(r"10\s*túi|hộp\s*(nhỏ|bé|10)|loại\s*(nhỏ|10)|330\s*(k|nghìn|ngàn)|330\.000", blob, re.I) \
+            or re.search(r"10\s*túi", _bots, re.I)
+        _askedchai = PAGE_FOCUS_PRODUCT == "hsmo_chai" or re.search(r"(?<![A-Za-zÀ-ỹĐđ])chai(?![A-Za-zÀ-ỹĐđ])|175\s*ml", blob, re.I)
         _fixed = []
         for it in _items:
-            if isinstance(it, dict) and str(it.get("sku") or "").lower() == "hsvn-lat-50" and not _asked50:
+            _sku = str(it.get("sku") or "").lower() if isinstance(it, dict) else ""
+            if _sku == "hsvn-lat-50" and not _asked50:
                 it = dict(it, sku="hsvn-lat-14")
+            elif _sku == "hsmo-tui-10" and not _asked10:
+                it = dict(it, sku="hsmo-tui")
+            elif _sku == "hsmo-chai" and not _askedchai:
+                it = dict(it, sku="hsmo-tui")
             _fixed.append(it)
         args["items"] = _fixed
     # v0.1.57 (23/10, ca Thuý Hằng): khách gửi "Picenra2 đồng bẩm thành phố thái nguyên…" (tên toà nhà đầu địa chỉ)
@@ -1523,7 +1726,7 @@ KHÔNG tư vấn gói lẻ 1 hộp (và quà mốc 1 hộp) trừ khi khách ch�
 KHÁCH KHEN SẢN PHẨM DÙNG TỐT (khách đã dùng) → KHÔNG vội báo giá, KHÔNG ép combo: scripts_approved.positive_feedback. \
 Khách hỏi giá chung chung → báo giá SẢN PHẨM TRỌNG TÂM. \
 KHÁCH CŨ = ĐÚNG SẢN PHẨM (chốt 23/10, chị Nga): CHỈ áp CTKM khách hàng cũ thân thiết khi khách TỰ nói đã từng dùng/mua ĐÚNG sản phẩm đang muốn mua (vd đã dùng Hồng sâm lát, nay mua lại Hồng sâm lát). Khách từng dùng sản phẩm KHÁC (vd từng dùng Dương Sâm, Nước Hồng sâm, Bình Vị…) nay mua Hồng sâm lát → vẫn là KHÁCH MỚI của sản phẩm này: báo CTKM khách mới (combo) và build_order customer_type=new. Chưa rõ khách từng dùng sản phẩm nào → hỏi 1 câu ngắn. \
-Khách TỰ nói đã từng mua ĐÚNG sản phẩm này (khách CŨ, chốt 14/10) → KHÔNG nêu combo khách mới; Hồng sâm lát: báo ưu đãi khách cũ (scripts_approved.returning_quote, quà lấy từ kb_lookup programs → returning_customer) và chốt đơn với build_order customer_type="returning"; sản phẩm khác chưa có bảng khách cũ → build_order trả handoff, làm theo action.
+Khách TỰ nói đã từng mua ĐÚNG sản phẩm này (khách CŨ, chốt 14/10) → KHÔNG nêu combo khách mới; Hồng sâm lát: báo ưu đãi khách cũ (scripts_approved.returning_quote, quà lấy từ kb_lookup programs → returning_customer) và chốt đơn với build_order customer_type="returning"; Nước Hồng sâm dạng túi (chốt 26/10): báo theo scripts_approved.returning_quote_nhs, chốt build_order customer_type="returning"; sản phẩm khác chưa có bảng khách cũ → build_order trả handoff, làm theo action.
 5r. DÙNG THỬ (chốt 25/09): khách xin dùng thử / mẫu thử → khéo léo từ chối theo scripts_approved.trial_request; KHÔNG hứa mẫu thử, KHÔNG mời khách bóc hàng dùng thử (chốt 14/10), \
 KHÔNG hứa hoàn tiền; gợi ý bắt đầu 1 hộp (được kiểm tra hàng khi nhận) hoặc Nước Hồng sâm mật ong giá nhẹ hơn.
 5s. CHỐT ĐƠN (brief 25/09): xin họ tên, SĐT, địa chỉ nhận hàng, số lượng (và tên sản phẩm nếu khách đã hỏi từ 2 sản phẩm trở lên). \
@@ -1547,6 +1750,7 @@ ghi chú, gạch đầu dòng "Khách nói / Xử lý / Xưng hô / Ý 1…", kh
 Khách chê / trêu ("mồm xấu quá", "nói như máy") → 1–2 câu nhún nhường, lịch sự rồi hỏi khách cần hỗ trợ gì, không tranh cãi.
 5w2. VIẾT TẮT CỦA KHÁCH (chốt 26/10, chị Nga): 'ĐT', 'đt', 'dt', 'sđt', 'sdt' = SỐ ĐIỆN THOẠI — KHÔNG phải Đông trùng hạ thảo (Đông trùng chỉ khi khách viết rõ 'đông trùng' / 'ĐTHT'). 'đc', 'dc' thường là 'được' (hoặc 'địa chỉ' khi đứng cạnh số nhà/phường). \
 5y. HỘP 50 GÓI (chốt 16/10, nhắc lại 26/10): Hồng sâm lát MẶC ĐỊNH là hộp 14 gói (1.420.000đ). Hộp 50 gói (5.000.000đ) CHỈ khi khách TỰ nhắc ('50 gói', 'hộp lớn', 'loại 5 triệu'); KHÔNG tự hỏi 'lấy hộp 50 gói đúng không'. Số lượng lên đơn = ĐÚNG số khách nói; không chắc thì hỏi lại trong tổng hợp đơn, KHÔNG tự đổi số hộp. \
+Tương tự (v0.4.2) Nước Hồng sâm MẶC ĐỊNH hộp 20 túi; hộp nhỏ 10 túi CHỈ khi khách nhắc ('10 túi', 'hộp nhỏ') hoặc khách đồng ý lời mời hộp 10 túi; dạng chai CHỈ khi khách nhắc chai / 175ml. \
 5x. ẢNH SẢN PHẨM KHÁCH GỬI (chốt 24/10, ca Đông Đao): CHỈ nói ảnh là sản phẩm của Thái Minh khi ĐỌC RÕ được tên/logo trên bao bì \
 (Hồng sâm Thái Minh, Dương Sâm Linh Đan, Long Sâm Linh Đan…). Không đọc rõ / bao bì khác (lọ, màu, kiểu dáng lạ) → KHÔNG đoán tên sản phẩm, hỏi lại khách \
 "Dạ sản phẩm anh/chị đang dùng tên là gì ạ?". Khách đang dùng sản phẩm của hãng KHÁC → KHÔNG chê, KHÔNG nói hàng giả / không chính hãng / trôi nổi, \
@@ -2093,6 +2297,25 @@ def _fix_order_summary(text: str, bo: dict = None) -> tuple:
     return "\n".join(lines), fixed
 
 
+# ---- v0.4.2 (lỗi tương tự v0.1.82, bot Nước Hồng sâm): tổng hợp đơn ghi "hộp 10 túi" dù khách không hỏi hộp nhỏ ----
+_RE_ASK_10TUI = re.compile(r"10\s*túi|hộp\s*(nhỏ|bé|10)|loại\s*(nhỏ|10)|330\s*(k|nghìn|ngàn)|330\.000", re.I)
+
+
+def _fix_nhs_summary_pack(text: str, user_texts: list, bot_texts: list = None) -> tuple:
+    if not text or len(_RE_CONFIRM_BLOCK.findall(text)) < 2 or not re.search(r"10\s*túi", text):
+        return text, 0
+    if _RE_ASK_10TUI.search("\n".join(u or "" for u in user_texts or [])) \
+            or any(re.search(r"10\s*túi", b or "") for b in bot_texts or []):
+        return text, 0
+    n = 0
+    lines = text.split("\n")
+    for i, ln in enumerate(lines):
+        if re.match(r"\W*sản phẩm", ln, re.I) and re.search(r"10\s*túi", ln):
+            lines[i] = re.sub(r"(?<!\d)10(\s*túi)", r"20\1", ln)
+            n += 1
+    return "\n".join(lines), n
+
+
 # ---- v0.1.53 (23/10, ca Quan Tran Van): khách hỏi "bán chịu" → bot tưởng "rượu" và mời Rượu sâm ----
 # Rượu sâm là sản phẩm CHỈ-KHI-KHÁCH-HỎI: khách chưa hề nhắc "rượu" và hội thoại không đến từ bài rượu → bỏ đoạn nói về rượu.
 def _drop_unasked_ruou(text: str, user_texts: list, focus: str = "") -> tuple:
@@ -2129,7 +2352,8 @@ def _now_block() -> str:
 
 _DAYPART_PHRASES = [  # (regex, các buổi được phép)
     (re.compile(r"(một |có một )?buổi tối[^.!?\n]{0,30}?(an lành|vui vẻ|ấm áp|ấm cúng|thư giãn)( và ngon giấc)?", re.I), {"tối", "đêm"}),
-    (re.compile(r"(và )?(ngủ ngon|ngon giấc)", re.I), {"tối", "đêm"}),
+    # v0.5.2: chỉ bắt LỜI CHÚC — "ngủ ngon hơn", "ăn ngon, ngủ ngon", "giúp/hỗ trợ ngủ ngon" là công dụng, giữ nguyên
+    (re.compile(r"(?<!ăn ngon, )(?<!ăn ngon )(?<!giúp )(?<!hỗ trợ )(?<!dễ )(và )?(ngủ ngon|ngon giấc)(?!\s*(?:hơn|giấc hơn))", re.I), {"tối", "đêm"}),
     (re.compile(r"(một |có một )?buổi sáng[^.!?\n]{0,30}?(tốt lành|vui vẻ|năng động|an lành)", re.I), {"sáng"}),
     (re.compile(r"(một |có một )?buổi trưa[^.!?\n]{0,30}?(vui vẻ|an lành|tốt lành)", re.I), {"trưa"}),
     (re.compile(r"(một |có một )?buổi chiều[^.!?\n]{0,30}?(vui vẻ|an lành|tốt lành)", re.I), {"chiều"}),
@@ -2207,6 +2431,100 @@ hỏi giao hàng kín đáo → discreet_delivery; vỏ hộp ghi cao huyết á
 CHỈ nói đúng thông tin trong KB/FAQ; không có trong tài liệu → nói sẽ nhờ chuyên viên kiểm tra, không tự suy diễn.
 - KHÔNG nói "toàn bộ sâm đều trồng ở Sìn Hồ"; chỉ nói Sâm Lai Châu (sâm Việt Nam) đúng như KB.
 """
+
+# ---- v0.4.0 (26/10/2026): BOT NƯỚC HỒNG SÂM (ENV PAGE_FOCUS_PRODUCT=hsmo_tui) ----
+# Đặt SAU providers.CACHE_SPLIT (như DS_BLOCK) → ưu tiên hơn luật chung khi mâu thuẫn. Bộ não riêng: brain/nuochongsam/.
+NHS_BLOCK = """
+
+CHẾ ĐỘ BOT NƯỚC HỒNG SÂM (v0.5.0 — ƯU TIÊN HƠN các quy tắc chung ở trên khi mâu thuẫn, kể cả luật 0, 5c, 5o(g)):
+- SẢN PHẨM CHỦ LỰC: Nước Hồng sâm Thái Minh mật ong DẠNG TÚI (hsmo_tui). Khách hỏi chung chung → trả lời về Nước Hồng sâm dạng túi. \
+Dạng chai 175ml chỉ tư vấn khi khách hỏi chai hoặc đến từ bài viết dạng chai (không tự nói chai sắp hết).
+- 3 TẦNG SẢN PHẨM: (1) Nước Hồng sâm — chủ động tư vấn, báo giá, chốt đơn. \
+(2) Dòng cao cấp hơn: Hồng sâm Việt Nam Thái Minh dạng lát, Long Sâm Linh Đan, Dương Sâm Linh Đan — CHỈ giới thiệu khi khách CHỦ ĐỘNG hỏi sản phẩm khác \
+("còn loại nào khác", "có loại nào tốt hơn / cao cấp hơn / đậm đặc hơn / hàm lượng cao hơn", "sâm nguyên củ", "loại để biếu sang hơn", \
+hỏi đích danh lát / Long Sâm / Dương Sâm, hoặc hỏi sản phẩm cho nhu cầu Nước Hồng sâm không đáp ứng như sinh lý nam) → scripts_approved.upgrade_premium; \
+khách hỏi "bên em có những sản phẩm gì" → scripts_approved.product_overview_nhs (KHÔNG dùng product_overview 4 dòng). \
+Khách KHÔNG hỏi → KHÔNG nhắc 3 dòng này, kể cả khi khách là người lớn tuổi, có bệnh nền hay mua biếu (Nước Hồng sâm dùng được cho các đối tượng này). \
+(3) Trà sâm (1700, nguyên lá), Tam Sâm Đan, Đông trùng hạ thảo, Rượu sâm, Sâm tươi — CHỈ khi khách hỏi ĐÍCH DANH (luật 5j). Trà sâm vẫn được nhắc khi báo QUÀ TẶNG.
+- LỜI CHÀO + câu định hướng lượt đầu (khách vãng lai): scripts_approved.greeting_nhs. Lượt đầu kèm ảnh [IMG: nuoc-hong-sam].
+- BÁO GIÁ (v0.5.0, học theo luồng Hồng sâm lát v0.1.106): theo ĐÚNG scripts_approved.price_quote_nhs. BÁO GIÁ LẦN ĐẦU: chủ yếu câu dẫn giá \
+620.000đ/hộp 20 túi + câu khuyên "nên dùng đều… sau khoảng 2 hộp đầu" + đoạn phù hợp + ĐÚNG 1 câu hỏi tình hình sức khỏe (price_probe_nhs / price_discovery_nhs), \
+CHƯA gửi bảng combo; khách hỏi thẳng combo / ưu đãi / vội / hỏi lại giá → gửi luôn bảng 3 combo 2/4/6 hộp + 1 câu chốt (code tự xoay vòng kiểu trình bày \
+và câu chốt; giá & quà lấy từ tool). Khách trả lời câu hỏi sức khỏe → ghi nhận 1 câu rồi gửi bảng combo. \
+KHÔNG gọi combo là "1 tháng / 2 tháng / 3 tháng" (1 hộp 20 túi dùng 10–20 ngày). Mua 1 hộp: không quà, có phí ship (kb_lookup shipping); từ 2 hộp miễn phí ship.
+- CHÊ ĐẮT: lần 1 scripts_approved.price_why_nhs → lần 2 ý khác → sau đó (hoặc khách chê kèm ý thôi không mua) mời HỘP NHỎ 10 TÚI \
+theo scripts_approved.price_objection_nhs → vẫn từ chối thì soft ask SĐT. KHÔNG mời Trà sâm, KHÔNG dùng price_objection_switch. \
+Quà mua 1 hộp Hồng sâm lát (luật 5o-g) chỉ áp khi khách đang hỏi chính Hồng sâm lát.
+- QUY CÁCH LÊN ĐƠN (v0.4.2, như luật 5y hộp 50 gói): khách nói "lấy 1 hộp / 2 hộp / dùng thử combo…" = hộp 20 túi (hsmo-tui). \
+Hộp nhỏ 10 túi (hsmo-tui-10) CHỈ khi khách nhắc "10 túi / hộp nhỏ" hoặc đồng ý lời mời hộp 10 túi; dạng chai CHỈ khi khách nhắc chai / 175ml. \
+"Dùng thử" + số hộp/combo = khách CHỐT số đó → xin tên, SĐT, địa chỉ lên đơn (không phải hỏi về bệnh, không gửi lại bảng giá).
+- MẸ SAU SINH: khách nói đang "hút sữa", "vắt sữa", "cho bé bú", "bé còn bú" = ĐANG CHO CON BÚ → flag breastfeeding, câu chuẩn breastfeeding (không dùng sản phẩm nào). \
+KHÔNG dùng hình ảnh "mẹ đêm dậy hút sữa / cho bé bú" khi tư vấn (chốt 26/10, chị Nga). \
+Khách ngủ đủ giấc mà dậy vẫn mệt → câu FAQ nhóm 1b, KHÔNG tự chẩn đoán nguyên nhân (tiền mãn kinh, khí huyết suy...).
+- DÙNG THỬ: scripts_approved.trial_request_nhs (gợi ý hộp 10 túi). MỜI LÊN GÓI: theo upsell_hint của build_order + scripts_approved.upsell_nhs, đúng 1 lần.
+- Khách CŨ (tự nói đã từng dùng ĐÚNG Nước Hồng sâm; dùng sản phẩm khác → khách mới): báo ưu đãi khách cũ theo scripts_approved.returning_quote_nhs \
+(mốc 2 / 3 / 6 / 10 / 12 hộp — đã gộp ưu đãi TỐT NHẤT giữa CT khách cũ và khách mới, chốt 28/10; quà lấy từ kb_lookup programs → returning_customer), KHÔNG báo bảng combo khách mới; chốt build_order customer_type="returning". \
+Khách cũ khen sản phẩm (positive_feedback) muốn mua tiếp → báo luôn bảng này, không cần chuyển nhân viên.
+- AN TOÀN Nước Hồng sâm: không dùng cho phụ nữ có thai, đang cho con bú, trẻ dưới 3 tuổi; tiểu đường dùng được (1 túi buổi sáng trước ăn 30 phút, \
+câu chuẩn diabetes_honey); mẹ sau sinh KHÔNG cho con bú dùng được ngay; buổi tối dùng được khi cần năng lượng vận động, thể thao; \
+trẻ từ 3 tuổi trở lên: tài liệu chưa có liều riêng → gọi compliance_check, làm đúng kết quả. Mọi ca khác theo compliance_check(hsmo_tui, flags).
+"""
+
+# v0.4.0: dòng gói Nước Hồng sâm "Combo K hộp (… túi): … – tặng …" → giá K × giá hộp 20 túi, quà đúng bảng
+_RE_NHS_LINE = re.compile(r"(?im)^(?P<pre>[^\n]*?combo\s*(?P<n>\d+)\s*hộp(?:\s*\(\s*\d+\s*túi\s*\))?\s*:?\s*)(?P<price>[\d.]+\s*(?:đ|vnđ|đồng))?(?P<mid>\s*(?:–|-)\s*tặng\s*)(?P<gift>[^\n]+)$")
+
+
+def _fix_nhs_packages(text: str, bot_texts: list = None) -> str:
+    if not IS_NHS or not text or is_returning_ctx(text, bot_texts or []):   # v0.5.0: khách cũ → bảng khách cũ, không ép quà khách mới
+        return text
+    sku = "hsmo-chai" if PAGE_FOCUS_PRODUCT == "hsmo_chai" else "hsmo-tui"
+    try:
+        kb = tools_core.load_kb()
+        _, pkg = tools_core.find_package(kb, sku)
+        rules = {r["min_qty"]: r.get("gift") or "" for r in kb["programs"]["new_customer"]["rules"]
+                 if r.get("if_sku") == sku and not r.get("condition")}
+    except Exception:  # noqa: BLE001
+        return text
+
+    def _sub(m):
+        line = m.group(0)
+        if re.search(r"lát|14 gói|tháng", line, re.I):   # dòng combo Hồng sâm lát — để lưới của lát xử lý
+            return line
+        n = int(m.group("n"))
+        if n not in rules or not rules[n] or not pkg:
+            return line
+        price = tools_core.fmt_vnd(pkg["price_retail"] * n)
+        return f"{m.group('pre')}{price if m.group('price') else ''}{m.group('mid')}{rules[n]}"
+    return _RE_NHS_LINE.sub(_sub, text)
+
+
+# v0.4.0: bot Nước Hồng sâm — lưới chặn nhắc sản phẩm khác khi khách KHÔNG hỏi (tầng 2 và tầng 3)
+_RE_NHS_ASK_OTHER = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(?:"   # v0.4.2: khớp NGUYÊN TỪ (lỗi tương tự 'dung thu' ⊃ 'ung thu')
+    r"lát(?!\s*(?:nữa|nua))|long sâm|dương sâm|linh đan|sâm nguyên củ|nguyên chất|cao cấp|đậm đặc|hàm lượng cao|"
+    r"loại (nào )?(khác|tốt hơn|xịn|mạnh hơn|đậm hơn)|tốt hơn không|sản phẩm (nào |gì )?khác|"
+    r"(có|còn) (những )?(sản phẩm|loại|dòng) (gì|nào)|bên em (có|bán) (những )?(gì|sản phẩm)|"
+    r"sinh lý|xuất tinh|cương|biếu sếp|biếu đối tác|quà sang)(?![A-Za-zÀ-ỹĐđ])", re.I)
+_RE_NHS_TIER2_OUT = re.compile(r"hồng sâm[^.\n]{0,40}(dạng )?lát|sâm lát|long sâm|dương sâm", re.I)
+_RE_NHS_TIER3_OUT = re.compile(r"tam sâm đan|đông trùng|sâm tươi|trà sâm[^.\n]{0,15}nguyên lá", re.I)
+_RE_NHS_TIER3_ASK = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(?:tam sâm|tam sam|đông trùng|dong trung|đtht|dtht|sâm tươi|sam tuoi|nguyên lá|nguyen la)(?![A-Za-zÀ-ỹĐđ])", re.I)
+
+
+def _drop_unasked_tiers(text: str, user_texts: list, focus: str = "") -> tuple:
+    if not IS_NHS or not text or (focus and not str(focus).startswith("hsmo")):
+        return text, 0
+    users = " ".join(u or "" for u in user_texts)
+    allow2 = bool(_RE_NHS_ASK_OTHER.search(users))
+    allow3 = bool(_RE_NHS_TIER3_ASK.search(users))
+    paras = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
+    keep = [p for p in paras
+            if not ((not allow2 and _RE_NHS_TIER2_OUT.search(p)) or (not allow3 and _RE_NHS_TIER3_OUT.search(p)))]
+    n = len(paras) - len(keep)
+    if not n:
+        return text, 0
+    if not keep:
+        return text, 0   # cả tin đều nói sản phẩm khác (vd khách hỏi kiểu lạ) → giữ nguyên, không trả tin rỗng
+    return "\n\n".join(keep), n
+
 
 # v0.3.0: dòng gói Dương Sâm "Liệu trình N tháng (K hộp): ... – tặng ..." → giá K×giá hộp, quà đúng bảng
 _RE_DS_LINE = re.compile(r"(?im)^(?P<pre>[^\n]*?liệu trình\s*\d+\s*tháng\s*\(\s*(?P<n>\d+)\s*hộp\s*\)\s*:?\s*)(?P<price>[\d.]+\s*(?:đ|vnđ|đồng))?(?P<mid>\s*(?:–|-)\s*tặng\s*)(?P<gift>[^\n]+)$")
@@ -2317,7 +2635,9 @@ def _drop_unsaid_parents(text: str, user_texts: list) -> tuple:
             continue
         sents = re.split(r"(?<=[.!?…]) +", line)
         # v0.1.100 (ca Quay Trở Về): KHÔNG xóa câu HỎI ("Chị đang tìm hiểu cho bố mẹ hay ông bà ạ?") — chỉ xóa câu khẳng định / chúc
-        keep = [s_ for s_ in sents if "?" in s_ or not re.search(r"bố mẹ|ba mẹ|ông bà", s_, re.I)]
+        # v0.5.2: giữ câu mời "mua làm quà bồi bổ cho bố mẹ hoặc người thân" (câu chuẩn breastfeeding — mẹ cho con bú / có thai)
+        keep = [s_ for s_ in sents if "?" in s_ or not re.search(r"bố mẹ|ba mẹ|ông bà", s_, re.I)
+                or re.search(r"làm quà|biếu|người thân", s_, re.I)]
         n += len(sents) - len(keep)
         if keep:
             out_lines.append(" ".join(keep))
@@ -2601,9 +2921,12 @@ _RE_RETURNING_CTX = re.compile(r"khách hàng thân thiết|tri ân dành riêng
 
 
 def _lat_gift_tables():
+    """Bảng quà khách cũ + biến thể quà khách mới. v0.5.0: bot Nước Hồng sâm dùng bảng hsmo-tui (mã 2026/TP-TBBL.NHS-C06)."""
     kb = tools_core.load_kb()["programs"]
-    ret = sorted(((r["min_qty"], r.get("gift") or "") for r in kb["returning_customer"]["rules"] if r.get("if_sku") == "hsvn-lat-14"))
-    new = [re.sub(r"\s*\(trị giá[^)]*\)", "", r.get("gift") or "").strip() for r in kb["new_customer"]["rules"] if r.get("if_sku") == "hsvn-lat-14"]
+    sku = "hsmo-tui" if IS_NHS else "hsvn-lat-14"
+    ret = sorted(((r["min_qty"], r.get("gift") or "") for r in kb["returning_customer"]["rules"] if r.get("if_sku") == sku))
+    new = [re.sub(r"\s*\(trị giá[^)]*\)", "", r.get("gift") or "").strip() for r in kb["new_customer"]["rules"] if r.get("if_sku") == sku]
+    new = [g for g in new if g]
     var = []
     for g in new:   # v0.1.94: cả dạng viết tắt AI hay dùng ("5 hộp Trà sâm 10 gói", "Trà sâm 1700 10 gói")
         for v in (g, g.replace("1700 loại ", ""), g.replace("loại ", ""), g.replace(" 1700 loại", "")):
@@ -2671,6 +2994,8 @@ def _fix_returning_gifts(text: str, user_texts: list, bot_texts: list) -> tuple:
     text = "\n".join(lines)
     if n_fix:
         text = re.sub(r"(chương trình\s+)?ưu đãi\s+combo\s+\d\s*tháng(\s+rất lớn)?(?!\s*\()", "ưu đãi tri ân khách hàng thân thiết", text, flags=re.I)
+        if IS_NHS:
+            text = re.sub(r"khách hàng mới", "khách hàng thân thiết", text, flags=re.I)
     return text, n_fix
 
 
@@ -2718,6 +3043,28 @@ def _fix_duration(text: str) -> tuple:
     return "\n".join(out), fixed[0]
 
 
+def _fix_duration_nhs(text: str) -> tuple:
+    """v0.5.0: Nước Hồng sâm hộp 20 túi, 1–2 túi/ngày → 1 hộp dùng 10–20 ngày. AI ghi 'N hộp … dùng M tháng' sai tỉ lệ
+    → code sửa thành 'khoảng N×10–N×20 ngày'. Không động tới dòng Hồng sâm lát / Trà sâm / hộp 10 túi."""
+    if not IS_NHS or not text:
+        return text, 0
+    fixed = [0]
+
+    def _a(m):
+        n, mo = int(m.group("n")), int(m.group("m"))
+        if n * 10 <= mo * 30 <= n * 20:
+            return m.group(0)
+        fixed[0] += 1
+        return m.group(0)[:m.start("m") - m.start()] + f"{n * 10}–{n * 20} ngày" + m.group(0)[m.end("t") - m.start():]
+    out = []
+    for ln in text.split("\n"):
+        if not re.search(r"lát|14 gói|trà sâm|10 túi|dương sâm|long sâm|đông trùng", ln, re.I):
+            ln = re.sub(r"(?<![\d.])(?P<n>\d{1,2})\s*hộp(?:(?!hộp)[^\n]){0,70}?(?:dùng|đủ dùng|sử dụng)\s*(?:trong|được|khoảng|đủ)?\s*"
+                        r"(?P<m>\d{1,2})(?P<t>\s*tháng(?:\s*rưỡi)?)", _a, ln, flags=re.I)
+        out.append(ln)
+    return "\n".join(out), fixed[0]
+
+
 def returning_note(user_texts: list, bot_texts: list) -> str:
     if IS_DS or not is_returning_ctx("", bot_texts):
         return ""
@@ -2725,7 +3072,13 @@ def returning_note(user_texts: list, bot_texts: list) -> str:
         ret, _ = _lat_gift_tables()
     except Exception:  # noqa: BLE001
         return ""
-    tbl = "; ".join(f"{q} hộp: {g}" for q, g in ret)
+    tbl = "; ".join(f"{q} hộp: {g}" for q, g in ret if g)
+    if IS_NHS:   # v0.5.0: bảng khách cũ Nước Hồng sâm
+        return ("\n\nLƯU Ý LƯỢT NÀY: đây là KHÁCH CŨ (đang báo ưu đãi tri ân khách hàng thân thiết) → quà Nước Hồng sâm (hộp 20 túi) lấy ĐÚNG bảng "
+                "khách cũ (đã gộp sẵn ưu đãi TỐT NHẤT giữa CT khách cũ và khách mới, chốt 28/10), số hộp nằm giữa 2 mốc thì áp mốc thấp hơn: " + tbl +
+                ". Mua 1 hộp: không quà, phí ship như thường; trên 12 hộp → quà mốc 12 hộp + chuyển nhân viên xin thêm ưu đãi. "
+                "KHÔNG dùng quà combo 2 / 4 hộp khách mới (1 / 3 hộp Trà sâm — khách cũ được nhiều hơn hoặc bằng), KHÔNG gọi là 'khách hàng mới'. "
+                "Liệt kê ĐỦ từng mốc, không viết tắt 'các mức quà hấp dẫn khác'.")
     return ("\n\nLƯU Ý LƯỢT NÀY: đây là KHÁCH CŨ (đang báo ưu đãi tri ân khách hàng thân thiết) → quà Hồng sâm lát lấy ĐÚNG bảng khách cũ, "
             "số hộp nằm giữa 2 mốc thì áp mốc thấp hơn: " + tbl + ". TUYỆT ĐỐI KHÔNG dùng quà combo khách mới (Trà sâm 20 gói / 5 hộp Trà sâm 10 gói…), "
             "KHÔNG gọi là 'combo 3 tháng'. Liệt kê ĐỦ từng mốc, không viết tắt 'các mức quà hấp dẫn khác'.")
@@ -3277,6 +3630,16 @@ def auto_answer(last_user: str, focus: str = "") -> tuple:
                     parts.append(head + "\n" + "\n".join(lines[:3]))
                 parts.append(closes.get("A") or "Anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?")
                 return "\n\n".join(parts), None
+            if pid == "hsmo_tui" and IS_NHS:      # v0.5.0: báo giá dự phòng Nước Hồng sâm (chỉ hộp 20 túi + combo 2/4/6)
+                fit, styles, closes, adv = _nhs_quote_parts()
+                head, lines = styles[_rr_next("style", len(styles))] if styles else ("", [])
+                parts = [price_sentence("", "hsmo_tui") + (" " + adv if adv else "")]
+                if fit.get("A"):
+                    parts.append(fit["A"])
+                if head and lines:
+                    parts.append(head + "\n" + "\n".join(lines[:3]))
+                parts.append(closes.get("A") or "Anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?")
+                return "\n\n".join(parts), None
             pk = [k for k in prod.get("packages", []) if k.get("in_stock", True)]
             rows = "\n".join(f"• {k.get('label') or k.get('name')}: {tools_core.fmt_vnd(k['price_retail'])}" for k in pk)
             return (f"Dạ {prod['name']} có giá như sau ạ:\n{rows}\n\nAnh/chị muốn em gửi thêm chương trình ưu đãi khi mua theo liệu trình không ạ?"), None
@@ -3322,6 +3685,9 @@ def price_sentence(last_user: str, focus: str = "") -> str:
         return ""
     if pid == "hsvn_lat":
         return "Dạ Hồng sâm Việt Nam Thái Minh dạng lát có giá 1.420.000đ/hộp 14 gói ạ."
+    if pid == "hsmo_tui":   # v0.5.0: mặc định hộp 20 túi, không liệt kê hộp 10 túi (chỉ mời khi khách chê đắt)
+        return (f"Dạ Nước Hồng sâm Thái Minh mật ong dạng túi giá {_nhs_price_txt()}/hộp 20 túi, mỗi ngày anh/chị dùng 1–2 túi, "
+                "ăn trực tiếp hoặc pha với 100ml nước ấm khoảng 60°C ạ.")
     pk = [k for k in prod.get("packages", []) if k.get("in_stock", True)][:2]
     if not pk:
         return ""
@@ -3422,6 +3788,8 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
     system_text += focus_block(focus, focus_source)
     if IS_DS:
         system_text += DS_BLOCK
+    if IS_NHS:
+        system_text += NHS_BLOCK   # v0.4.0: bot Nước Hồng sâm
     _bot_texts = [str(m.get("text") or "") for m in transcript if m["role"] == "assistant"]
     # v0.1.105 (28/10, chị Nga "báo giá chưa luân chuyển"): tin QUẢNG CÁO / lời chào tự động của page nằm TRƯỚC tin đầu của khách
     # ("📢 THONG BAO… Combo 1 tháng…") bị tính là "bot đã báo giá" → bước khơi gợi không bao giờ chạy, câu chốt luôn kiểu "hỏi lại".
@@ -3483,7 +3851,7 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
                 if do_mask:
                     args = pmap.restore_deep(args)
                 if tc["name"] == "build_order":
-                    args, _n = check_order_fields(args, user_texts_real, profile or "")
+                    args, _n = check_order_fields(args, user_texts_real, profile or "", _bot_texts)
                 try:
                     out = fn(args) if fn else {"error": "unknown tool"}
                 except Exception as ex:  # noqa: BLE001
@@ -3641,9 +4009,15 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         if _rg:
             debug["returning_gift_fixed"] = _rg   # v0.1.91: khách cũ → quà bảng khách cũ
         text, _du = _fix_duration(text)
+        _tdn, _dun = _fix_duration_nhs(text)      # v0.5.0
+        if _dun:
+            text, _du = _tdn, (_du or 0) + _dun
         if _du:
             debug["duration_fixed"] = _du        # v0.1.92: số tháng dùng đúng theo số hộp
         text, _qs = _shape_lat_quote(text, user_texts_real, _bot_after)   # v0.1.105: không tính tin quảng cáo / chào tự động
+        _qn, _qsn = _shape_nhs_quote(text, user_texts_real, _bot_after)   # v0.5.0: báo giá Nước Hồng sâm theo luồng mới
+        if _qsn:
+            text, _qs = _qn, (_qs or 0) + _qsn
         if _qs:
             debug["quote_shaped"] = _qs
         text, _bm = _drop_unsaid_parents(text, user_texts_real)   # v0.1.73/77: không tự cho là mua cho bố mẹ (trước bước kiểm tin rỗng)
@@ -3653,6 +4027,10 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         if _bm:
             debug["parents_dropped"] = _bm
         text = _fix_ds_packages(text)   # v0.3.0: gói Dương Sâm đúng giá/quà
+        text = _fix_nhs_packages(text, [str(m.get("text") or "") for m in transcript_orig if m.get("role") == "assistant"])   # v0.4.0: gói Nước Hồng sâm đúng giá/quà
+        text, _ut = _drop_unasked_tiers(text, user_texts_real, focus or "")   # v0.4.0: không tự nhắc dòng khác khi khách không hỏi
+        if _ut:
+            debug["other_tier_dropped"] = _ut
         text, _dp = _fix_daypart(text)   # v0.1.57: lời chúc đúng buổi
         if _dp:
             debug["daypart_fixed"] = _dp
@@ -3663,6 +4041,9 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         if _p50 != text:
             text = _p50
             debug["pack50_fixed"] = True
+        text, _nf = _fix_nhs_summary_pack(text, user_texts_real, _bot_texts)   # v0.4.2: tổng hợp đơn Nước Hồng sâm mặc định hộp 20 túi
+        if _nf:
+            debug["nhs_pack_fixed"] = _nf
         text, _pf = _fix_prices(text)   # v0.1.50: giá luôn đúng KB (ca anh Hoai: 950.000đ thay vì 1.420.000đ)
         if _pf:
             debug["price_fixed"] = _pf
@@ -3730,7 +4111,9 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         # v0.1.100: khách vừa hỏi mà tin không còn câu hỏi / không chuyển người / không kết thúc → thêm câu dẫn tiếp
         if (text.strip() and not is_fb and not ended and not pharmacy and not handoffs and "?" not in text
                 and (_RE_USER_Q.search((user_texts_real or [""])[-1] or "") or _RE_PRICE_Q.search((user_texts_real or [""])[-1] or ""))
-                and not _RE_STICKER_MARK.match(last_user or "")):
+                and not _RE_STICKER_MARK.match(last_user or "")
+                # v0.5.2: tin đang xin SĐT / báo KHÔNG dùng được (có thai, cho con bú…) → không chèn câu mời báo giá
+                and not re.search(r"xin (lại )?(số điện thoại|sđt|số đt)|chưa nên dùng|không (nên )?dùng (được )?(sản phẩm|nước hồng sâm|hồng sâm|các sản phẩm)", text, re.I)):
             text = text.rstrip() + "\n\n" + follow_up_question([str(m.get("text") or "") for m in transcript_orig if m.get("role") == "assistant"], text, focus or "")
             debug["continuity_added"] = True
         # v0.1.72 (25/10, ca Nguyễn Tường): XƯNG HÔ LÀ BƯỚC CUỐI — mọi câu do code chèn/thay (hỏi lại dạng viên, câu gừng,
@@ -3820,7 +4203,7 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
                 order_notes = []
                 if tc["name"] == "build_order":
                     args, order_notes = check_order_fields(
-                        args, user_texts_real, profile or "")
+                        args, user_texts_real, profile or "", _bot_texts)
                 try:
                     out = fn(args) if fn else {"error": "unknown tool"}
                 except Exception as ex:  # noqa: BLE001

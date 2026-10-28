@@ -274,7 +274,7 @@ def _save_origin(conv_id: str, conv: dict):
 # v0.1.42 (21/10, chị Nga): quảng cáo "CTKM - Biếu quà" ghi "TẶNG MIỄN PHÍ 1 HỘP TRÀ SÂM 1700 KHI MUA HỒNG SÂM VIỆT NAM THÁI MINH"
 # → khách đến từ các quảng cáo này mua 1 hộp Hồng sâm lát được tặng 1 hộp Trà sâm 1700 (10 gói) như quảng cáo hứa.
 # Thêm/bớt quảng cáo: biến Railway AD_GIFT_1BOX_IDS (Ad ID cách nhau dấu phẩy).
-AD_GIFT_1BOX_IDS = {x.strip() for x in os.environ.get("AD_GIFT_1BOX_IDS", "" if engine.IS_DS else "120252524881450596").replace(";", ",").split(",") if x.strip()}
+AD_GIFT_1BOX_IDS = {x.strip() for x in os.environ.get("AD_GIFT_1BOX_IDS", "" if (engine.IS_DS or engine.IS_NHS) else "120252524881450596").replace(";", ",").split(",") if x.strip()}
 
 
 def _ad_gift_line(conv_id: str) -> str:
@@ -439,6 +439,28 @@ _FU3_DS = ("Dạ em xin gửi lại chương trình tri ân khách hàng mới c
            "{who} muốn bắt đầu liệu trình nào thì {p} cứ để lại tin nhắn, hoặc liên hệ Tổng đài 1800 8308 của bên em nha.\n"
            "Chúc {p} nhiều sức khỏe ạ! 🌿")
 
+# v0.4.0: bot Nước Hồng sâm — nhịp 3 gửi lại 3 combo 2/4/6 hộp + tổng đài 1800 1120
+_FU3_NHS = ("Dạ em xin gửi lại chương trình tri ân khách hàng mới của Nước Hồng sâm Thái Minh mật ong ạ:\n"
+            "{combos}\n"
+            "✅ Từ 2 hộp miễn phí vận chuyển, nhận hàng kiểm tra rồi mới thanh toán.\n\n"
+            "{who} muốn lấy combo nào thì {p} cứ để lại tin nhắn, hoặc liên hệ Tổng đài 1800 1120 của bên em nha.\n"
+            "Chúc {p} nhiều sức khỏe ạ! 🌿")
+
+
+def _nhs_combo_lines() -> str:
+    try:
+        kb = tools_core.load_kb()
+        sku = "hsmo-chai" if engine.PAGE_FOCUS_PRODUCT == "hsmo_chai" else "hsmo-tui"
+        unit = "chai" if sku == "hsmo-chai" else "hộp"
+        _, pkg = tools_core.find_package(kb, sku)
+        rules = {r["min_qty"]: r.get("gift") or "" for r in kb["programs"]["new_customer"]["rules"]
+                 if r["if_sku"] == sku and not r.get("condition")}
+        return "\n".join(f"🎁 Combo {q} {unit}: {tools_core.fmt_vnd(pkg['price_retail'] * q)} – tặng {rules[q]}"
+                         for q in (2, 4, 6) if rules.get(q))
+    except Exception as ex:  # noqa: BLE001
+        db.log_webhook("error", f"fu nhs combo: {ex}")
+        return "🎁 Combo 2 – 4 – 6 hộp đang có quà Trà sâm tặng kèm"
+
 
 def _ds_combo_lines() -> str:
     try:
@@ -543,6 +565,9 @@ def _fu_text(key: str, conv_id: str) -> str:
             db.log_webhook("error", f"fu1 pick {conv_id}: {ex}")
     if key.endswith("3") and txt == _FU3 and (_focus_of(conv_id)[0] or engine.PAGE_FOCUS_PRODUCT) == "duong_sam":
         txt = _FU3_DS.replace("{combos}", _ds_combo_lines())
+    elif key.endswith("3") and txt == _FU3 and engine.IS_NHS \
+            and (_focus_of(conv_id)[0] or engine.PAGE_FOCUS_PRODUCT) in ("hsmo_tui", "hsmo_chai"):
+        txt = _FU3_NHS.replace("{combos}", _nhs_combo_lines())   # v0.4.0
     elif key.endswith("3") and (_focus_of(conv_id)[0] or engine.PAGE_FOCUS_PRODUCT) != "hsvn_lat" \
             and txt == _FU3:
         txt = _FU3_OTHER
@@ -3394,6 +3419,8 @@ if engine.IS_DS:
     CMT_PROFILE = CMT_PROFILE.replace("Dạ Sâm Thái Minh chào anh/chị ạ", "Dạ Dương Sâm Linh Đan chào anh ạ").replace(
         "combo theo tháng", "3 gói Liệu trình 1/2/3 tháng theo scripts_approved.price_quote_duongsam")
     CMT_PROFILE_POS = CMT_PROFILE_POS.replace("Dạ Sâm Thái Minh chào anh/chị ạ", "Dạ Dương Sâm Linh Đan chào anh ạ")
+if engine.IS_NHS:   # v0.4.0: bot Nước Hồng sâm — báo giá dưới bình luận theo 3 combo 2/4/6 hộp
+    CMT_PROFILE = CMT_PROFILE.replace("combo theo tháng", "3 combo 2/4/6 hộp theo scripts_approved.price_quote_nhs")
 
 
 def _cmt_post_id(conv: dict, conv_id: str) -> str:

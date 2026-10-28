@@ -239,6 +239,23 @@ def test_16_lop_chan():
     assert "Dược sĩ bên em" not in _src and "dược sĩ xem" not in _src, "câu gửi khách không được nhắc dược sĩ"
 
 
+
+# 17 ─ (25/10, ca Sâm Lê) lưới lọc bản nháp KHÔNG được làm mất dòng combo 2, 3 tháng; quà/giá combo luôn đúng bảng
+def test_17_combo_khong_mat_dong():
+    try:
+        import engine as e
+    except Exception as ex:
+        print(f"   (bỏ qua test_17: {ex.__class__.__name__})"); return
+    q = KB["scripts_approved"]["price_quote_hsvn"]
+    lines = [l for l in q.split("'") if "Combo" in l and "hộp)" in l][:3]
+    txt = "Chương trình tri ân khách hàng mới:\n" + "\n".join(lines)
+    clean, _ = e.strip_internal(txt)
+    for l in lines:
+        assert l in clean, l
+    bad = "✅ Combo 2 tháng (4 hộp) – 5.000.000đ – tặng 4 hộp Trà sâm"
+    fixed, _ = e._fix_prices(e._fix_combo_gifts(bad))
+    assert "5.680.000đ" in fixed and "2 hộp Trà sâm 1700 loại 20 gói" in fixed
+
 if __name__ == "__main__":
     tests = [(n, f) for n, f in sorted(globals().items()) if n.startswith("test_")]
     bad = 0

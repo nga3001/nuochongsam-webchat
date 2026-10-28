@@ -26,12 +26,18 @@ def save_kb(data: dict):
 
 # v0.3.0 (23/10): page Dương Sâm (ENV PAGE_FOCUS_PRODUCT=duong_sam) đọc bộ não riêng brain/duongsam/ nếu có; kb.json dùng chung
 IS_DS = (os.environ.get("PAGE_FOCUS_PRODUCT") or "").strip().lower() == "duong_sam"
+# v0.4.0 (26/10): bot Nước Hồng sâm (ENV PAGE_FOCUS_PRODUCT=hsmo_tui hoặc hsmo_chai) đọc bộ não riêng brain/nuochongsam/
+IS_NHS = (os.environ.get("PAGE_FOCUS_PRODUCT") or "").strip().lower() in ("hsmo_tui", "hsmo_chai")
+# Bot NHS: sản phẩm chính + 3 dòng cao cấp được nói khi khách hỏi sản phẩm khác (tầng 2)
+NHS_PREMIUM = ("hsvn_lat", "long_sam", "duong_sam")
 
 
 def load_brain_file(name: str) -> str:
     path = os.path.join(_BRAIN_DIR, name)
     if IS_DS and os.path.exists(os.path.join(_BRAIN_DIR, "duongsam", name)):
         path = os.path.join(_BRAIN_DIR, "duongsam", name)
+    if IS_NHS and os.path.exists(os.path.join(_BRAIN_DIR, "nuochongsam", name)):
+        path = os.path.join(_BRAIN_DIR, "nuochongsam", name)
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
@@ -233,6 +239,14 @@ def recommend(need_tags: list, budget: str = "normal") -> dict:
         return {"error": "no valid need_tags", "invalid": invalid, "valid": list(need_map)}
     n = need_map[valid[0]]
     pids = [n["core"]] + [x for x in n.get("alt", []) if x != n["core"]]
+    premium_note = None
+    if IS_NHS and n["core"] not in ("duong_sam", "tra_1700", "tra_nguyen_la"):
+        # v0.4.0: bot Nước Hồng sâm — NHS luôn là sản phẩm chính; dòng cao cấp (lát / Long Sâm) chỉ là phương án khi KHÁCH hỏi loại khác
+        main = "hsmo_chai" if (os.environ.get("PAGE_FOCUS_PRODUCT") or "").strip().lower() == "hsmo_chai" else "hsmo_tui"
+        prem = [x for x in pids if x in NHS_PREMIUM]
+        pids = [main] + prem[:1]
+        premium_note = ("Bot Nước Hồng sâm: giới thiệu Nước Hồng sâm là sản phẩm CHÍNH. Phương án cao cấp trong alternatives CHỈ nói khi khách "
+                        "CHỦ ĐỘNG hỏi loại khác / tốt hơn / cao cấp hơn (scripts_approved.upgrade_premium); khách không hỏi → KHÔNG nhắc.")
     out = []
     for pid in pids:
         p = kb["products"][pid]
@@ -251,7 +265,7 @@ def recommend(need_tags: list, budget: str = "normal") -> dict:
         out.append({"product_id": pid, "product": p["name"], "summary": p["summary"], "package": _pkg_view(pkg), "tiers": tiers})
     return {
         "needs_matched": [need_map[t]["label"] for t in valid], "invalid_tags": invalid,
-        "note_for_need": n.get("note"),
+        "note_for_need": " ".join(x for x in (n.get("note"), premium_note) if x) or None,
         "core_product": out[0], "alternatives": out[1:],
         "recommended_tier": "basic" if budget == "low" else ("premium" if budget == "high" else "standard"),
         "rules": "Giới thiệu SẢN PHẨM CHÍNH trước (tối đa 1 sản phẩm thay thế nếu khách chê giá/không hợp). "
@@ -357,7 +371,9 @@ def build_order(items: list, name: str = None, phone: str = None, addr: str = No
         g = _gift_for(kb, li["sku"], li["qty"], price_objection=bool(price_objection) and customer_type == "new", program=prog_key)
         if g:
             if g.get("gift"):
-                promos.append({"sku": li["sku"], "gift": g["gift"], "tier_qty": g["min_qty"]})
+                promos.append({"sku": li["sku"], "gift": g["gift"], "tier_qty": g["min_qty"],
+                               # v0.5.1 (28/10, chị Nga): khách cũ Nước Hồng sâm hưởng CT tốt nhất — ghi CT để nhân viên lên đơn đúng mã
+                               "program": g.get("apply_program") or prog_key, **({"nhanh_code": g["nhanh_code"]} if g.get("nhanh_code") else {})})
             top = max(r["min_qty"] for r in kb["programs"][prog_key]["rules"] if r["if_sku"] == li["sku"])
             # v0.3.0: page Dương Sâm — khách mới từ 10 hộp nhận quà mốc 9 hộp, KHÔNG chuyển nhân viên xin thêm ưu đãi
             if li["qty"] > top and not (IS_DS and li["sku"] == "duongsam-10" and customer_type == "new"):
@@ -440,6 +456,19 @@ def build_order(items: list, name: str = None, phone: str = None, addr: str = No
         if r and dpkg and ds_qty != tq:
             upsell = (f"Page Dương Sâm: đơn {ds_qty} hộp, ĐÃ ĐỦ tên/SĐT/địa chỉ → (chốt 25/10) gửi confirm_text TRƯỚC, KHÔNG mời trong tin đó; khách XÁC NHẬN đúng → lượt sau ghi nhận đơn + [HANDOFF: đơn đã chốt - lên đơn | SĐT | 1] và mời ĐÚNG 1 LẦN lên "
                       f"{r.get('label') or 'liệu trình'} ({tq} hộp {fmt_vnd(dpkg['price_retail'] * tq)} tặng {r['gift']}). "
+                      "('nếu anh/chị giữ đơn cũ thì em gửi đi luôn ạ'). Khách đồng ý → build_order lại + confirm_text mới + [HANDOFF: khách đổi đơn lên gói lớn | SĐT | 2]; không đồng ý → giữ đơn.")
+    nhs_sku = "hsmo-chai" if any(li["sku"] == "hsmo-chai" for li in lines_items) else "hsmo-tui"
+    nhs_qty = sum(li["qty"] for li in lines_items if li["sku"] == nhs_sku)
+    if IS_NHS and customer_type == "new" and 1 <= nhs_qty <= 5:
+        # v0.4.0 (bot Nước Hồng sâm): 1 hộp → mời 2; 2–3 → mời 4; 4–5 → mời 6 (đúng 1 lần, sau khi khách xác nhận đơn)
+        tq = 2 if nhs_qty == 1 else (4 if nhs_qty <= 3 else 6)
+        _, npkg = find_package(kb, nhs_sku)
+        r = next((x for x in kb["programs"]["new_customer"]["rules"]
+                  if x["if_sku"] == nhs_sku and x["min_qty"] == tq and not x.get("condition")), None)
+        if r and npkg:
+            unit = "chai" if nhs_sku == "hsmo-chai" else "hộp"
+            upsell = (f"Bot Nước Hồng sâm: đơn {nhs_qty} {unit}, ĐÃ ĐỦ tên/SĐT/địa chỉ → gửi confirm_text TRƯỚC, KHÔNG mời trong tin đó; khách XÁC NHẬN đúng → lượt sau ghi nhận đơn + [HANDOFF: đơn đã chốt - lên đơn | SĐT | 1] và mời ĐÚNG 1 LẦN lên "
+                      f"combo {tq} {unit} ({fmt_vnd(npkg['price_retail'] * tq)}, tặng {r['gift']}, miễn phí vận chuyển) — scripts_approved.upsell_nhs "
                       "('nếu anh/chị giữ đơn cũ thì em gửi đi luôn ạ'). Khách đồng ý → build_order lại + confirm_text mới + [HANDOFF: khách đổi đơn lên gói lớn | SĐT | 2]; không đồng ý → giữ đơn.")
     return {
         "items": lines_items, "goods_total": goods_total, "ship_fee": ship_fee,

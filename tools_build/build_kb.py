@@ -52,8 +52,11 @@ P["hsmo_chai"] = {
  "aka": ["hồng sâm nước", "hồng sâm mật ong", "nước sâm", "dạng chai", "HSMO"],
  "type": "Thực phẩm (công bố tại Chi cục Quản lý chất lượng Nông lâm sản và Thủy sản Hà Nội) — không phải thuốc",
  "summary": "Tinh chất Hồng sâm Lai Châu trong mật ong, pha nước ấm uống; vị ngọt nhẹ, dễ uống, lựa chọn tiết kiệm cho cả gia đình.",
- "key_ingredients": [{"name": "Tinh chất Hồng sâm Lai Châu trong mật ong", "amount": "11.000mg/10ml (tương đương 1.200mg Hồng sâm Lai Châu)"}, {"name": "Phụ liệu", "amount": "natri benzoat, kali sorbat, nước tinh khiết"}],
- "benefits": ["Hỗ trợ bồi bổ, tăng sức đề kháng", "Hỗ trợ giảm mệt mỏi, căng thẳng, ngủ ngon hơn", "Hỗ trợ cải thiện trí nhớ, minh mẫn", "Hỗ trợ làm chậm lão hóa, chăm sóc làn da", "Hỗ trợ bảo vệ sức khỏe tim mạch, hỗ trợ ổn định huyết áp", "Hỗ trợ ngăn ngừa sự phát triển của tế bào ung thư"],
+ "key_ingredients": [{"name": "Tinh chất Hồng sâm Lai Châu trong mật ong", "amount": "11.000mg/10ml (tương đương 1.200mg Hồng sâm Lai Châu — Red Panax vietnamensis var. fuscidiscus)"}, {"name": "Phụ liệu", "amount": "natri benzoat, kali sorbat, nước tinh khiết vừa đủ"}],
+ "benefits": ["Hỗ trợ bảo vệ và tăng cường sức khỏe toàn diện", "Hỗ trợ tăng cường sức đề kháng, nâng cao hệ thống miễn dịch", "Hỗ trợ ngăn ngừa sự phát triển của tế bào ung thư", "Hỗ trợ tăng cường trí nhớ, cải thiện sự minh mẫn, làm chậm lão hóa", "Hỗ trợ cân bằng, kiểm soát tình trạng căng thẳng kéo dài; hỗ trợ an thần, dễ ngủ", "Hỗ trợ giảm mệt mỏi", "Hỗ trợ bảo vệ sức khỏe tim mạch, phòng ngừa xơ vữa động mạch; hỗ trợ ổn định huyết áp", "Hỗ trợ lưu thông khí huyết, bổ huyết, giúp da dẻ hồng hào, thần sắc tươi tắn (chốt 26/10, chị Nga)", "Hỗ trợ bồi bổ, phục hồi thể lực, dưỡng huyết", "Hỗ trợ chăm sóc làn da"],
+ "benefits_note": "Theo bảng thông tin sản phẩm chị Nga gửi 26/10/2026. Khi nói với khách LUÔN mở bằng 'hỗ trợ' (không nói 'giúp', 'bảo vệ', 'ngăn ngừa' đứng một mình).",
+ "target_users": ["Người trung và cao tuổi, người mới ốm dậy", "Người bình thường muốn bồi bổ sức khỏe, hỗ trợ kéo dài tuổi thọ", "Người đang gặp các vấn đề về tim mạch, huyết áp, thận hư, chức năng sinh lý kém, người chân tay lạnh, cơ thể thường xuyên mệt mỏi", "Phụ nữ mong muốn chăm sóc da khỏe đẹp, làm chậm lão hóa"],
+ "usp": ["Hồng sâm chế biến từ Sâm Việt Nam (Sâm Quốc bảo) đủ 5 năm tuổi kết hợp mật ong", "Hệ thống Saponin phong phú (84 loại) và hoạt chất quý MR2 có trong Sâm Việt Nam (KHÔNG nói hiệu quả vượt trội, không nêu % MR2)", "Sâm Việt Nam tính bình, ôn hòa: không lo lạnh bụng, không gây nóng hay bốc hỏa", "Dạng túi liều chia sẵn: xé túi uống trực tiếp, không cần sắc nấu, pha chế (chốt 26/10)"],
  "packaging": "Chốt 15/10: chai nhựa chuyên dùng trong ngành thực phẩm & dược phẩm, đảm bảo an toàn cho sức khỏe (KHÔNG nói 'cao cấp'); ưu điểm: rất nhẹ, bền, dễ rót, không bị đập vỡ khi vận chuyển, tiện mang theo dùng hằng ngày. (Không phải chai thủy tinh.)",
  "dosage": {"standard": "Khoảng 10ml pha với 100ml nước ấm 60°C, khuấy đều; uống 1–2 lần/ngày.", "diabetes": "Người tiểu đường DÙNG ĐƯỢC (chốt 16/10, chị Nga): 5ml/ngày + 100ml nước ấm 60°C, sáng sớm khi ngủ dậy, trước ăn 30 phút, lúc đường huyết đang ổn định.", "blood_pressure": BP_NOTE, "breastfeeding": "Chốt 15/10: phụ nữ ĐANG CHO CON BÚ không dùng (không dùng bất kỳ sản phẩm nào). Mẹ sau sinh KHÔNG cho con bú: dùng được ngay để bồi bổ (chốt 15/10)."},
  "packages": [pk("hsmo-chai", "Chai nhựa 175ml", 1, 550000, unit_name="chai")],
@@ -65,8 +68,11 @@ P["hsmo_tui"] = {
  "aka": ["hồng sâm túi", "HSMO+", "hồng sâm mật ong plus", "dạng túi"],
  "type": "Thực phẩm (công bố tại Chi cục Quản lý chất lượng Nông lâm sản và Thủy sản Hà Nội) — không phải thuốc",
  "summary": "Hồng sâm mật ong đóng túi 8ml tiện mang theo, ăn trực tiếp hoặc pha nước ấm; phù hợp người bận rộn, người sợ vị đắng.",
- "key_ingredients": [{"name": "Tinh chất Hồng sâm Lai Châu trong mật ong", "amount": "11.000mg/10ml (tương đương 1.200mg Hồng sâm Lai Châu)"}, {"name": "Phụ liệu", "amount": "natri benzoat, kali sorbat, nước tinh khiết"}],
- "benefits": ["Hỗ trợ bồi bổ, tăng sức đề kháng", "Hỗ trợ giảm mệt mỏi, căng thẳng, ngủ ngon hơn", "Hỗ trợ cải thiện trí nhớ, minh mẫn", "Hỗ trợ làm chậm lão hóa, chăm sóc làn da", "Hỗ trợ bảo vệ sức khỏe tim mạch, hỗ trợ ổn định huyết áp", "Hỗ trợ ngăn ngừa sự phát triển của tế bào ung thư"],
+ "key_ingredients": [{"name": "Tinh chất Hồng sâm Lai Châu trong mật ong", "amount": "11.000mg/10ml (tương đương 1.200mg Hồng sâm Lai Châu — Red Panax vietnamensis var. fuscidiscus)"}, {"name": "Phụ liệu", "amount": "natri benzoat, kali sorbat, nước tinh khiết vừa đủ"}],
+ "benefits": ["Hỗ trợ bảo vệ và tăng cường sức khỏe toàn diện", "Hỗ trợ tăng cường sức đề kháng, nâng cao hệ thống miễn dịch", "Hỗ trợ ngăn ngừa sự phát triển của tế bào ung thư", "Hỗ trợ tăng cường trí nhớ, cải thiện sự minh mẫn, làm chậm lão hóa", "Hỗ trợ cân bằng, kiểm soát tình trạng căng thẳng kéo dài; hỗ trợ an thần, dễ ngủ", "Hỗ trợ giảm mệt mỏi", "Hỗ trợ bảo vệ sức khỏe tim mạch, phòng ngừa xơ vữa động mạch; hỗ trợ ổn định huyết áp", "Hỗ trợ lưu thông khí huyết, bổ huyết, giúp da dẻ hồng hào, thần sắc tươi tắn (chốt 26/10, chị Nga)", "Hỗ trợ bồi bổ, phục hồi thể lực, dưỡng huyết", "Hỗ trợ chăm sóc làn da"],
+ "benefits_note": "Theo bảng thông tin sản phẩm chị Nga gửi 26/10/2026. Khi nói với khách LUÔN mở bằng 'hỗ trợ' (không nói 'giúp', 'bảo vệ', 'ngăn ngừa' đứng một mình).",
+ "target_users": ["Người trung và cao tuổi, người mới ốm dậy", "Người bình thường muốn bồi bổ sức khỏe, hỗ trợ kéo dài tuổi thọ", "Người đang gặp các vấn đề về tim mạch, huyết áp, thận hư, chức năng sinh lý kém, người chân tay lạnh, cơ thể thường xuyên mệt mỏi", "Phụ nữ mong muốn chăm sóc da khỏe đẹp, làm chậm lão hóa"],
+ "usp": ["Hồng sâm chế biến từ Sâm Việt Nam (Sâm Quốc bảo) đủ 5 năm tuổi kết hợp mật ong", "Hệ thống Saponin phong phú (84 loại) và hoạt chất quý MR2 có trong Sâm Việt Nam (KHÔNG nói hiệu quả vượt trội, không nêu % MR2)", "Sâm Việt Nam tính bình, ôn hòa: không lo lạnh bụng, không gây nóng hay bốc hỏa", "Dạng túi liều chia sẵn: xé túi uống trực tiếp, không cần sắc nấu, pha chế (chốt 26/10)"],
  "dosage": {"standard": "1 túi ăn trực tiếp hoặc pha 100ml nước ấm 60°C; ngày 1–2 túi.", "diabetes": "Người tiểu đường DÙNG ĐƯỢC (chốt 16/10, chị Nga): 1 túi pha 100ml nước ấm 60°C, sáng sớm trước ăn 30 phút, lúc đường huyết đang ổn định.", "blood_pressure": BP_NOTE, "breastfeeding": "Chốt 15/10: phụ nữ ĐANG CHO CON BÚ không dùng (không dùng bất kỳ sản phẩm nào). Mẹ sau sinh KHÔNG cho con bú: dùng được ngay để bồi bổ (chốt 15/10).", "sport": "Muốn cung cấp năng lượng trước khi vận động, chơi thể thao thì dùng buổi tối được."},
  "packages": [pk("hsmo-tui", "Hộp 2 hộp mềm x 10 túi x 8ml (20 túi)", 20, 620000), pk("hsmo-tui-10", "Hộp 10 túi x 8ml", 10, 330000, note="chỉ báo khi khách hỏi gói nhỏ / muốn dùng thử")],
  "recommended_package": "hsmo-tui", "days_per_unit": {"hsmo-tui": 20, "hsmo-tui-10": 10}, "hotline": "1800 1120 (chính), 1800 8396",
@@ -449,7 +455,25 @@ RET_RULES = [
  R("duongsam-10", 9, "2 chai nước Hồng sâm mật ong", True),
  R("duongsam-10", 10, "1 hộp Dương Sâm Linh Đan + 1 hộp Trà sâm 1700 (10 gói)", True),
  R("duongsam-10", 15, "1 hộp Dương Sâm Linh Đan + 1 chai nước Hồng sâm mật ong", True),
+ # Chốt 26/10 (chị Nga): Nước Hồng sâm dạng túi — CTKM khách cũ, mã QĐ trên Nhanh 2026/TP-TBBL.NHS-C06.
+ # 1 hộp: không quà, tính phí ship như khách mới (chị Nga xác nhận 28/10).
+ # Chốt 28/10 (chị Nga): khách cũ được áp CT khách cũ HOẶC khách mới, lấy CT có khuyến mại TỐT NHẤT cho khách → bảng dưới đã gộp sẵn
+ # (so theo giá trị quà: Trà sâm 1700 10 gói 120.000đ, Nước Hồng sâm hộp 20 túi 620.000đ):
+ #   2–3 hộp: CT khách cũ (2 / 3 Trà sâm > 1 / 2 Trà sâm) · 4–5 hộp: hai CT bằng nhau (3 Trà sâm) → giữ CT khách cũ
+ #   6–9 hộp: CT khách mới (5 Trà sâm) · 10–11 hộp: CT khách mới (1 hộp Nước Hồng sâm + 3 Trà sâm) · từ 12 hộp: CT khách cũ (2 hộp Nước Hồng sâm + 1 Trà sâm)
+ R("hsmo-tui", 1, "", False),
+ R("hsmo-tui", 2, "2 hộp Trà sâm 1700 (10 gói)", True),
+ R("hsmo-tui", 3, "3 hộp Trà sâm 1700 (10 gói)", True),
+ R("hsmo-tui", 6, "5 hộp Trà sâm 1700 (10 gói)", True),
+ R("hsmo-tui", 10, "1 hộp nước Hồng sâm dạng túi cùng loại + 3 hộp Trà sâm 1700 (10 gói)", True),
+ R("hsmo-tui", 12, "2 hộp Nước Hồng sâm dạng túi cùng loại + 1 hộp Trà sâm 1700 (10 gói)", True),
 ]
+for _r in RET_RULES:
+    if _r["if_sku"] == "hsmo-tui":
+        if _r["min_qty"] in (6, 10):
+            _r["apply_program"] = "new_customer"      # mốc này CT khách mới có lợi hơn → nhân viên lên đơn theo CT khách mới
+        else:
+            _r["nhanh_code"] = "2026/TP-TBBL.NHS-C06"
 programs = {
  "new_customer": {"name": "Ưu đãi KHÁCH MỚI (chưa từng mua sản phẩm Sâm Thái Minh) — theo bảng 'Chương trình khuyến mại' (file Sâm Thái Minh 1.xlsx)", "active": True,
    "valid_from": "2026-09-23", "valid_to": "2026-12-31",
@@ -662,6 +686,141 @@ scripts_approved = {
  "trial_request_duongsam": "Page Dương Sâm — khách xin dùng thử: 'Dạ hiện bên em chưa có chương trình dùng thử ạ. Anh có thể bắt đầu với 1 hộp, nhận hàng kiểm tra nguyên hộp rồi mới thanh toán ạ.' KHÔNG gợi ý Nước Hồng sâm, không hứa hoàn tiền.",
  "expert_referral": 'Dạ câu hỏi của anh/chị cần chuyên viên có chuyên môn tư vấn mới chính xác được ạ. Anh/chị cho em xin số điện thoại, chuyên viên bên em sẽ gọi lại hỗ trợ anh/chị sớm ạ.',
 }
+# ---------------- v0.4.0 (26/10/2026): BOT NƯỚC HỒNG SÂM (ENV PAGE_FOCUS_PRODUCT=hsmo_tui) ----------------
+# Mọi câu có giá/quà Nước Hồng sâm sinh từ P["hsmo_tui"] + RULES — đổi giá/quà chỉ sửa 2 chỗ đó rồi chạy lại script.
+NHS_SKU, NHS_SKU10 = "hsmo-tui", "hsmo-tui-10"
+NHS_PRICE = next(k["price_retail"] for k in P["hsmo_tui"]["packages"] if k["sku"] == NHS_SKU)
+NHS10_PRICE = next(k["price_retail"] for k in P["hsmo_tui"]["packages"] if k["sku"] == NHS_SKU10)
+NHS_COMBOS = [2, 4, 6]   # 3 gói chính khi báo giá (mốc 3 hộp và 10 hộp vẫn có quà theo bảng, chỉ nói khi khách hỏi đúng số đó)
+def nhs_rule(q):
+    return next(r for r in RULES if r["if_sku"] == NHS_SKU and r["min_qty"] == q and not r.get("condition"))
+def nhs_line(q, icon="🎁"):
+    return f"{icon} Combo {q} hộp ({q * 20} túi): {vnd(NHS_PRICE * q)} – tặng {nhs_rule(q)['gift']}"
+NHS_COMBO_TXT = " / ".join(f"'{nhs_line(q)}'" for q in NHS_COMBOS)
+NHS_SHIP_TXT = f"mua 1 hộp phí ship {vnd(SHIP_HN_INNER)} nội thành Hà Nội, {vnd(SHIP_OTHER)} nơi khác; từ 2 hộp miễn phí vận chuyển"
+# v0.5.0: kịch bản báo giá Nước Hồng sâm gắn thẻ như Hồng sâm lát (code engine._nhs_quote_parts đọc lại từ kb.json)
+NHS_ADV = "Anh/chị nên dùng đều mỗi ngày, thường sau khoảng 2 hộp đầu sẽ thấy cơ thể thay đổi: ăn ngon, ngủ tốt, cơ thể khỏe khoắn, tỉnh táo ạ."
+NHS_FIT = {
+ "A": "Nước Hồng sâm rất hợp với người hay mệt mỏi, căng thẳng, ngủ không sâu ạ. Vị ngọt nhẹ của mật ong nên dễ uống, túi nhỏ tiện mang theo đi làm, đi xa ạ.",
+ "B": "Nước Hồng sâm dễ uống, tiện mang theo, rất hợp với người hay mệt mỏi, ngủ không sâu ạ.",
+ "C": "Bố mẹ lớn tuổi hay mệt, ngủ không sâu thì dùng Nước Hồng sâm rất hợp, vị ngọt nhẹ dễ uống, không phải nhai hay sắc nấu ạ.",
+}
+_NHS_NOTE = {2: "dùng thử cảm nhận", 4: "dùng đều cả nhà", 6: "quà nhiều nhất"}
+def _nhs_style(q, k):
+    r, pr = nhs_rule(q), vnd(NHS_PRICE * q)
+    return {1: f"🎁 Combo {q} hộp ({q * 20} túi): {pr} – tặng {r['gift']}",
+            2: f"✅ Combo {q} hộp – {pr} – tặng {r['gift']}",
+            3: f"🎁 Combo {q} hộp giá {pr}: tặng ngay {r['gift']}",
+            4: f"🌿 Combo {q} hộp ({q * 20} túi): {pr}, tặng kèm {r['gift']}",
+            5: f"{'⭐' if q == 6 else '▫️'} Combo {q} hộp: {pr} – tặng {r['gift']}",
+            6: f"- Combo {q} hộp → {pr}, tặng {r['gift']}",
+            7: f"🎁 Combo {q} hộp – {_NHS_NOTE[q]}: {pr}, tặng {r['gift']}",
+            8: f"{ {2: '1️⃣', 4: '2️⃣', 6: '3️⃣'}[q] } Combo {q} hộp: {pr} – quà tặng: {r['gift']}"}[k]
+NHS_STYLES = [("Chương trình tri ân khách hàng mới (từ 2 hộp miễn phí vận chuyển):", 1),
+              ("Hiện bên em đang có ưu đãi quà tặng cho khách mới ạ:", 2),
+              ("Anh/chị mua theo combo sẽ được tặng thêm quà và miễn phí vận chuyển ạ:", 3),
+              ("Ưu đãi dành riêng cho khách hàng mới, áp dụng đến hết 31/12/2026:", 4),
+              ("Bên em có 3 gói kèm quà, combo 6 hộp được tặng nhiều quà nhất ạ:", 5),
+              ("Mua theo combo anh/chị được tặng thêm Trà sâm ạ:", 6),
+              ("Anh/chị chọn gói theo nhu cầu nhé ạ:", 7),
+              ("Ưu đãi khách mới đang áp dụng theo từng combo ạ:", 8)]
+NHS_STYLE_TXT = " || ".join(f"KIỂU {i + 1}: '{h}' + " + " / ".join(f"'{_nhs_style(q, k)}'" for q in (list(reversed(NHS_COMBOS)) if k == 5 else NHS_COMBOS))
+                            for i, (h, k) in enumerate(NHS_STYLES))
+NHS_CLOSES = [
+ ("Ⓐ HỎI CHỌN ƯU ĐÃI", "Trong 3 ưu đãi trên, anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?"),
+ ("Ⓑ GỢI Ý ƯU ĐÃI TỐT NHẤT", f"Với tình trạng của anh/chị, em gợi ý combo 6 hộp ạ: dùng đều mỗi ngày được lâu, lại được tặng nhiều quà nhất ({nhs_rule(6)['gift']}). Em lên đơn combo 6 hộp cho anh/chị nhé?"),
+ ("Ⓒ DẪN DẮT 2 HỘP HAY 6 HỘP", "Anh/chị muốn lấy combo 2 hộp dùng trước, hay lấy luôn combo 6 hộp để dùng đều và nhận thêm 5 hộp Trà sâm ạ?"),
+ ("Ⓓ BẮT ĐẦU NHẸ", f"Lần đầu dùng anh/chị có thể bắt đầu combo 2 hộp để cảm nhận trước, vẫn được tặng {nhs_rule(2)['gift']} và miễn phí vận chuyển. Em lên đơn combo 2 hộp cho anh/chị nhé?"),
+ ("Ⓔ MUA CHO CẢ NHÀ / BIẾU BỐ MẸ", "Nước Hồng sâm cả nhà dùng chung được, anh/chị lấy combo 4 hoặc 6 hộp vừa đủ dùng vừa có Trà sâm làm quà nhé?"),
+ ("Ⓕ CHỐT NHẸ", "Anh/chị chọn combo nào thì chỉ cần nhắn em tên, số điện thoại và địa chỉ, em lên đơn ngay ạ. Hàng giao tận nơi, kiểm tra rồi mới thanh toán nên anh/chị yên tâm nhé."),
+ ("Ⓖ HỎI NGƯỜI DÙNG", "Anh/chị định dùng cho bản thân hay mua cho người thân ạ, để em gợi ý gói phù hợp nhất cho anh/chị ạ?"),
+ ("Ⓗ BẮT ĐẦU RỒI DÙNG TIẾP", "Nhiều anh chị bắt đầu combo 2 hộp để cảm nhận, dùng hợp thì lấy tiếp combo lớn hơn ạ. Anh/chị muốn em lên đơn combo nào ạ?"),
+ ("Ⓘ YÊN TÂM NHẬN HÀNG", "Bên em giao tận nhà, anh/chị nhận hàng kiểm tra rồi mới thanh toán ạ. Anh/chị chọn combo 2 hộp hay 6 hộp để em lên đơn luôn ạ?"),
+]
+scripts_approved.update({
+ "price_quote_nhs": (
+   "Bot Nước Hồng sâm (v0.5.0, học theo luồng báo giá Hồng sâm lát v0.1.106) — khách hỏi giá / chương trình Nước Hồng sâm (mặc định DẠNG TÚI). "
+   "BÁO GIÁ LẦN ĐẦU (code tự xoay vòng): CHỦ YẾU (3/4 khách) = câu dẫn giá 1 hộp + câu khuyên dùng đều + ĐÚNG 1 câu hỏi tình hình sức khỏe "
+   "(price_probe_nhs K1 hoặc price_discovery_nhs D2), CHƯA gửi bảng combo; 1/4 khách gửi bảng combo ngay. Khách hỏi thẳng combo / ưu đãi / khách vội → gửi bảng combo luôn. "
+   f"(1) CÂU DẪN: 'Dạ Nước Hồng sâm Thái Minh mật ong dạng túi giá {vnd(NHS_PRICE)}/hộp 20 túi, mỗi ngày anh/chị dùng 1–2 túi, ăn trực tiếp hoặc pha với 100ml nước ấm khoảng 60°C ạ.' "
+   f"+ CÂU KHUYÊN: '{NHS_ADV}' "
+   "NGAY SAU câu dẫn, xuống dòng thành 1 đoạn riêng, thêm ĐÚNG 1 trong 3 đoạn phù hợp (không lặp đoạn đã dùng): "
+   f"Ⓐ MẶC ĐỊNH: '{NHS_FIT['A']}' | Ⓑ NGẮN: '{NHS_FIT['B']}' | Ⓒ MUA CHO BỐ MẸ: '{NHS_FIT['C']}'. "
+   f"(2) BẢNG COMBO (3 gói 2 / 4 / 6 hộp, xoay vòng kiểu trình bày, giữ NGUYÊN giá, số hộp, quà): {NHS_STYLE_TXT}; "
+   "(3) ĐÚNG 1 CÂU CHỐT theo tình huống, xoay vòng không lặp: "
+   + " | ".join(f"{t}: '{c}'" for t, c in NHS_CLOSES) + ". "
+   f"Gói 1 hộp ({vnd(NHS_PRICE)}, không quà, {NHS_SHIP_TXT}) chỉ là câu dẫn giá; KHÔNG chào mời mua 1 hộp. "
+   f"Hộp nhỏ 10 túi ({vnd(NHS10_PRICE)}, chưa có quà) CHỈ nói khi khách hỏi gói nhỏ hoặc vẫn chê đắt sau 2 lần thuyết phục. "
+   f"Mốc 3 hộp ({vnd(NHS_PRICE * 3)} – tặng {nhs_rule(3)['gift']}) và 10 hộp ({vnd(NHS_PRICE * 10)} – tặng {nhs_rule(10)['gift']}) chỉ nói khi khách hỏi đúng số đó. "
+   "KHÔNG gọi các combo là '1 tháng / 2 tháng / 3 tháng' (số ngày dùng tùy 1 hay 2 túi/ngày); KHÔNG quy đổi giá theo ngày khi khách không hỏi; KHÔNG nói 'giảm giá / tiết kiệm' cho combo. "
+   "Khách có liều riêng (tiểu đường: 1 túi buổi sáng trước ăn 30 phút) → câu dẫn ghi đúng liều riêng đó."),
+ "price_discovery_nhs": ("Bot Nước Hồng sâm — câu KHƠI GỢI khi báo giá lần đầu (xoay vòng, tối đa 1 lần/hội thoại): "
+   "ⓀD1 'Để em tư vấn đúng nhu cầu nhất, anh/chị cho em hỏi anh/chị đang muốn bồi bổ sức khỏe cho bản thân hay mua cho người thân ạ?' "
+   "| ⓀD2 'Anh/chị có hay gặp tình trạng mệt mỏi, căng thẳng hay ngủ không sâu không ạ, để em gợi ý cách dùng phù hợp nhất ạ?' "
+   "| ⓀD4 'Trước đây anh/chị đã dùng sâm hay sản phẩm bồi bổ nào chưa ạ, để em tư vấn phù hợp nhất cho anh/chị ạ?' "
+   "KHÔNG dùng khi khách hỏi thẳng combo / khuyến mãi / ưu đãi / bảng giá, khi khách đã nói rõ nhu cầu, hoặc đã hỏi khơi gợi 1 lần."),
+ "price_probe_nhs": ("Bot Nước Hồng sâm — CÂU KHAI THÁC khi khách hỏi giá (theo TH1–TH11 của Hồng sâm lát). Luôn báo giá trước; mỗi lượt 1 câu; "
+   "tối đa 2 câu khai thác (tính cả câu khơi gợi D) trước khi gửi bảng combo; câu hỏi phải bám điều khách vừa nói: "
+   "ⓀK1 'Anh/chị có đang điều trị huyết áp, tiểu đường hay bệnh nền nào không ạ, để em hướng dẫn cách dùng an toàn, đúng liều ạ?' "
+   "| ⓀK2 'Anh/chị có đang dùng thuốc gì hằng ngày không ạ, để em dặn khoảng cách dùng sâm với thuốc cho phù hợp ạ?' "
+   "| ⓀK3 'Giấc ngủ của anh/chị dạo này thế nào ạ: khó vào giấc hay ngủ không sâu, hay thức dậy giữa đêm ạ?' "
+   "| ⓀK4 'Anh/chị thấy mệt nhiều vào thời điểm nào ạ: buổi sáng khó tỉnh hay chiều tối hay đuối sức ạ?' "
+   "| ⓀK5 'Anh/chị năm nay khoảng bao nhiêu tuổi ạ, để em tư vấn cách dùng phù hợp ạ?' "
+   "| ⓀK5b 'Anh/chị năm nay khoảng bao nhiêu tuổi và có đang dùng thuốc gì hằng ngày không ạ, để em tư vấn cách dùng phù hợp ạ?' "
+   "| ⓀK7 'Anh/chị định mua biếu ông bà, bố mẹ hay mua cho cả nhà cùng dùng ạ, để em gợi ý gói phù hợp nhất ạ?' "
+   "| ⓀK8 'Công việc của anh/chị có hay thức khuya, áp lực hay phải đi lại nhiều không ạ, để em gợi ý cách dùng giúp anh/chị tỉnh táo hơn ban ngày ạ?' "
+   "KHÔNG khai thác khi: khách hỏi thẳng combo / khuyến mãi / ưu đãi; khách vội ('giá thôi', 'nhanh', 'ok'); khách hỏi lại giá lần 2; khách đã chốt mua. "
+   "Khách kể bệnh → compliance_check trước. Khai thác xong → bảng combo Nước Hồng sâm + câu chốt hợp nhu cầu (bố mẹ / cả nhà → Ⓔ; tình trạng/bệnh → Ⓑ; lưỡng lự → Ⓓ; vội → Ⓕ)."),
+ "price_why_nhs": (
+   "Bot Nước Hồng sâm — khách chê đắt LẦN 1 (đồng cảm trước, nêu GIÁ TRỊ): 'Dạ em hiểu băn khoăn của anh/chị ạ. Nước Hồng sâm Thái Minh là tinh chất Hồng sâm Lai Châu "
+   "trong mật ong, cứ 10ml có 11.000mg tinh chất, tương đương 1.200mg Hồng sâm Lai Châu ạ. Sâm Việt Nam có hoạt chất MR2 mà sâm Hàn Quốc không có, "
+   "và Hồng sâm Thái Minh là công trình chuyển giao từ Viện Nghiên cứu Sâm và Dược liệu Việt Nam (VIGH) ạ.' + nhắc ưu đãi đang có (từ 2 hộp tặng Trà sâm, miễn phí ship). "
+   "LẦN 2 (ý KHÁC): hỏi khéo còn băn khoăn gì → uy tín Dược phẩm Thái Minh gần 15 năm (Khương Thảo Đan, Vương Bảo, Bình Vị...); "
+   "nhận hàng kiểm tra rồi mới thanh toán; thường khoảng 2 hộp bắt đầu cảm nhận. "
+   f"Sau 2 lần vẫn chê / chê kèm ý thôi không mua → mời HỘP NHỎ 10 TÚI ({vnd(NHS10_PRICE)}) để dùng thử (câu chuẩn price_objection_nhs). "
+   "KHÔNG gợi ý Trà sâm hay sản phẩm khác rẻ hơn, KHÔNG quy đổi giá/ngày khi khách không hỏi."),
+ "price_objection_nhs": (
+   "Bot Nước Hồng sâm — đã thuyết phục 2 lần mà khách vẫn chê đắt, HOẶC khách chê đắt kèm ý thôi không mua: "
+   f"'Dạ em rất hiểu ạ. Để anh/chị trải nghiệm trước cho yên tâm, bên em có hộp nhỏ 10 túi giá {vnd(NHS10_PRICE)} ạ. "
+   "Anh/chị dùng thấy hợp thì lần sau lấy combo để được nhận quà Trà sâm nhé. Anh/chị có muốn em lên đơn hộp 10 túi không ạ?' "
+   f"(hộp 10 túi chưa có quà; {NHS_SHIP_TXT}). Gửi kèm [IMG: nuoc-hong-sam-10tui]. "
+   "Khách vẫn từ chối → soft ask SĐT (S2) rồi cảm ơn. KHÔNG mời Trà sâm."),
+ "trial_request_nhs": (
+   "Bot Nước Hồng sâm — khách xin dùng thử / mẫu thử: 'Dạ em rất hiểu anh/chị muốn dùng thử trước cho yên tâm ạ. Hiện bên em chưa có chương trình dùng thử, "
+   "vì sản phẩm đóng gói nguyên hộp, niêm phong để giữ trọn chất lượng ạ. Anh/chị có thể bắt đầu với hộp nhỏ 10 túi "
+   f"giá {vnd(NHS10_PRICE)}, nhận hàng kiểm tra nguyên hộp, tem niêm phong rồi mới thanh toán ạ.' KHÔNG hứa mẫu thử, không hứa hoàn tiền, không mời bóc hàng dùng thử."),
+ "product_overview_nhs": (
+   "Bot Nước Hồng sâm — khách hỏi 'bên em có những sản phẩm gì / còn loại nào khác': giới thiệu Nước Hồng sâm TRƯỚC, sau đó 3 dòng cao cấp hơn; "
+   "KHÔNG liệt kê Trà sâm, Tam Sâm Đan, Đông trùng hạ thảo, Rượu sâm, Sâm tươi. "
+   "'Dạ ngoài Nước Hồng sâm Thái Minh mật ong dạng túi (dễ uống, tiện mang theo, cả nhà dùng được), bên em còn có các dòng cao cấp hơn ạ:' (xuống dòng) "
+   "'1️⃣ Hồng sâm Việt Nam Thái Minh dạng lát: sâm nguyên củ thái lát, hàm lượng hoạt chất cao, hợp ông bà, cha mẹ, người có bệnh nền cần bồi bổ chuyên sâu.' (xuống dòng) "
+   "'2️⃣ Long Sâm Linh Đan: viên hoàn cao cấp kết hợp Sâm Việt Nam, Đông trùng hạ thảo, Cao ban long, hợp người suy nhược, mới ốm dậy, làm quà biếu.' (xuống dòng) "
+   "'3️⃣ Dương Sâm Linh Đan: dành riêng cho nam giới từ 18 tuổi, hỗ trợ cải thiện sinh lý, đau lưng mỏi gối do thận kém.' (xuống dòng) "
+   "'Anh/chị đang cần bồi bổ cho ai, để em tư vấn đúng sản phẩm phù hợp nhất ạ?'"),
+ "upgrade_premium": (
+   "Bot Nước Hồng sâm — CHỈ dùng khi khách CHỦ ĐỘNG hỏi loại tốt hơn / cao cấp hơn / đậm đặc hơn / hàm lượng cao hơn / nguyên chất / sâm nguyên củ / "
+   "loại để biếu sang hơn, hoặc hỏi đích danh Hồng sâm lát, Long Sâm Linh Đan, Dương Sâm Linh Đan: "
+   "(a) muốn hàm lượng cao, sâm nguyên chất, bồi bổ cho bố mẹ có bệnh nền → Hồng sâm Việt Nam Thái Minh dạng lát (báo giá theo price_quote_hsvn); "
+   "(b) suy nhược nặng, mới ốm dậy, quà biếu cao cấp → Long Sâm Linh Đan; (c) nam giới sinh lý yếu, đau lưng mỏi gối → Dương Sâm Linh Đan. "
+   "So sánh lát và nước: 'Dạng lát là sâm nguyên củ thái lát, hoạt chất cao và nguyên chất, vị sâm đậm; dạng nước là tinh chất sâm trong mật ong, hấp thu nhanh, vị ngọt dễ uống, tiện lợi ạ.' "
+   "Giới thiệu đúng 1 sản phẩm hợp nhu cầu, tối đa 1 phương án thay thế; giá/quà lấy từ tool; vẫn chạy compliance_check cho sản phẩm mới. "
+   "Khách quay lại Nước Hồng sâm → tư vấn tiếp bình thường."),
+ "upsell_nhs": (
+   "Bot Nước Hồng sâm — mời lên gói ĐÚNG 1 LẦN, SAU KHI khách đã xác nhận tổng hợp đơn (theo upsell_hint của build_order): 1 hộp → combo 2 hộp; 2–3 hộp → combo 4 hộp; 4–5 hộp → combo 6 hộp. "
+   f"Câu đệm cho đơn 1 hộp: 'Mua 1 hộp bên em tính phí ship và chưa có quà ạ, lấy 2 hộp là anh/chị được miễn phí vận chuyển và tặng thêm {nhs_rule(2)['gift']} luôn ạ.' "
+   "Câu đệm khác dùng nguyên văn trong upsell_double (1), (2), (6), (7), (8), (9). Kết bằng 'nếu anh/chị giữ đơn cũ thì em gửi đi luôn ạ'. "
+   "Combo giá giữ nguyên, chỉ tặng quà → KHÔNG nói 'giảm giá / giá ưu đãi / tiết kiệm'."),
+ "returning_quote_nhs": (
+   "Bot Nước Hồng sâm (chốt 26/10, cập nhật 28/10: khách cũ hưởng CT TỐT NHẤT giữa CT khách cũ và khách mới, bảng dưới đã gộp sẵn) — khách TỰ nói đã từng dùng/mua ĐÚNG Nước Hồng sâm (từng dùng sản phẩm khác → báo combo khách mới): "
+   "cảm ơn khách đã tin dùng lại → 'Dạ bên em đang có chương trình tri ân dành riêng cho khách hàng thân thiết của Nước Hồng sâm ạ:' + mỗi mốc 1 dòng: "
+   + " / ".join(f"'🎁 Mua {r['min_qty']} hộp: {vnd(NHS_PRICE * r['min_qty'])} – tặng {r['gift']}'"
+                for r in RET_RULES if r["if_sku"] == NHS_SKU and r.get("gift"))
+   + " + dòng '✅ Từ 2 hộp miễn phí vận chuyển, nhận hàng kiểm tra rồi mới thanh toán' → 1 câu chốt hỏi số lượng. "
+   f"KHÔNG báo bảng 'combo khách mới 2/4/6 hộp' (bảng trên đã là ưu đãi tốt nhất cho khách cũ ở từng mốc). Mua 1 hộp: {vnd(NHS_PRICE)}, không quà, {NHS_SHIP_TXT}. "
+   "Số lượng giữa 2 mốc → quà mốc thấp hơn gần nhất (vd 4–5 hộp → quà mốc 3 hộp; 7–9 hộp → quà mốc 6 hộp; 11 hộp → quà mốc 10 hộp); "
+   "trên 12 hộp → quà mốc 12 hộp + chuyển nhân viên xin thêm ưu đãi (build_order tự báo). Chốt đơn bằng build_order customer_type=returning."),
+ "greeting_nhs": "Dạ Sâm Thái Minh chào anh/chị ạ. Anh/chị đang tìm hiểu Nước Hồng sâm Thái Minh để bồi bổ cho bản thân hay mua cho người thân ạ?",
+})
 phone_rules = {"principle": "Không hội thoại nào kết thúc mà chưa thử xin SĐT 1 lần. SĐT là lưới đỡ ở cửa ra, không hỏi sớm.",
  "S1_order": "Chốt đơn: xin tên + SĐT + địa chỉ, validate qua build_order.",
  "S2_exit": "Khách sắp rời: soft_ask_phone ĐÚNG 1 LẦN; từ chối thì cảm ơn và dừng.",
@@ -672,7 +831,14 @@ focus_policy = {
  "rule": "Khách hỏi chung chung, chưa nói rõ sản phẩm (giá bao nhiêu, dùng thế nào, có tốt không...) → trả lời theo SẢN PHẨM TRỌNG TÂM của hội thoại. "
          "Khách đến từ bài viết/quảng cáo của sản phẩm A → sản phẩm trọng tâm là A. Khách vãng lai không rõ nguồn → page Sâm Thái Minh: Hồng sâm Việt Nam Thái Minh dạng lát; "
          "page Dương Sâm Linh Đan: Dương Sâm Linh Đan. Khách nói rõ sản phẩm khác → trả lời đúng sản phẩm khách hỏi.",
- "page_default": {"sam_thai_minh": "hsvn_lat", "duong_sam_linh_dan": "duong_sam"},
+ "page_default": {"sam_thai_minh": "hsvn_lat", "duong_sam_linh_dan": "duong_sam", "nuoc_hong_sam": "hsmo_tui"},
+ # v0.4.0: bot Nước Hồng sâm — 3 tầng sản phẩm
+ "nhs_tiers": {
+   "tier1_chu_dong": ["hsmo_tui"],
+   "tier2_khi_khach_hoi_san_pham_khac": ["hsvn_lat", "long_sam", "duong_sam"],
+   "tier3_chi_khi_khach_hoi_dich_danh": ["tra_1700", "tra_nguyen_la", "tam_sam_dan", "dong_trung", "ruou_sam", "sam_tuoi"],
+   "note": "Dạng chai (hsmo_chai) chỉ tư vấn khi khách hỏi chai hoặc đến từ bài viết dạng chai. Trà sâm vẫn được nhắc khi báo QUÀ TẶNG kèm combo.",
+ },
 }
 
 kb = {"_meta": {"brand": "Sâm Thái Minh", "company": "Công ty Cổ phần Sâm và Dược liệu quý Thái Minh (tên thường gọi: Sâm Thái Minh) — thuộc hệ thống Dược phẩm Thái Minh (hơn 15 năm); sản xuất: Công ty Cổ phần Công nghệ Cao Thái Minh; vườn sâm: Công ty Cổ phần Thái Minh Panax",
