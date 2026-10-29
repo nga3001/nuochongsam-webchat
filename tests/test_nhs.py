@@ -394,6 +394,14 @@ def test_30_khong_lo_ghi_chu():
         assert engine.strip_internal(keep)[0] == keep, keep
 
 
+# 31 ─ (chat thử 29/10) mã SKU nội bộ không lộ ra khách; "chị Nga, 09…" = khách xưng chị
+def test_31_khong_lo_ma_sku():
+    leak = "Sản phẩm chọn: hsmo-tui-10 (hộp nhỏ 10 túi Nước Hồng sâm Thái Minh mật ong), số lượng: 1."
+    assert engine.strip_internal(leak)[0].strip() == ""
+    assert engine.strip_internal("Dạ chị dùng hộp 10 túi nhé ạ.\n[IMG: nuoc-hong-sam-10tui]")[0].count("[IMG: nuoc-hong-sam-10tui]") == 1
+    assert engine.customer_self_gender(["chị Nga, 09768627765 SN23 thôn đông, thanh tùng, thanh miện, hải dương"]) == "female"
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted((k, v) for k, v in globals().items() if k.startswith("test_")):

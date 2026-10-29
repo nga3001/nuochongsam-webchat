@@ -1,5 +1,6 @@
 """Engine hội thoại (v0.1.59 — 23/10 bản đầy đủ: lưới đủ ý + bám tài liệu, chặn "mã lạ"; CTKM khách cũ chỉ khi đã dùng đúng sản phẩm; v0.1.58 — 23/10 bản đầy đủ: không nói toàn bộ sâm trồng ở Sìn Hồ; tên/địa chỉ, giao hàng sau chốt, lời chúc đúng buổi, cảm ơn ngắn; lời chúc đúng buổi, cảm ơn lại → 1 câu ngắn; v0.1.56 — 23/10: quà mua 1 hộp chỉ khi khách tự hỏi; v0.1.54 — 23/10: giờ mở cửa + quà tại cửa hàng 92 Trung Kính, không bán nợ; v0.1.53 — 23/10: chặn phí ship/tổng tiền sai, bán chịu ≠ rượu; v0.1.52 — 23/10: khách muốn qua cửa hàng 92 Trung Kính vẫn dẫn tới chốt; v0.1.50 — 22/10: lưới chặn giá _fix_prices; bắt thêm câu \"xin lại số điện thoại\"): Claude API tool-use + não Sâm Thái Minh (nhân bản từ Bình Vị v1.0).
 Kiến trúc kế thừa KingsUp: LLM lo hội thoại/judgment, tool lo fact/tính toán/safety gate.
+v0.5.7 (29/10/2026, chị Nga chat thử): mã SKU nội bộ không lộ ra khách; khách gửi lại SĐT đúng (địa chỉ ở tin trước) → lên đơn luôn, không dừng; nhận "chị Nga, 09…" là khách xưng chị.
 v0.5.6 (29/10/2026, rà soát tổng thể): NHS_BLOCK ghi đè rõ 12 luật chung của bot lát; lưới giá riêng Nước Hồng sâm; nhận khách tự xưng anh/chị/bác/cô rộng hơn; lưới chống lộ thêm nhãn vai, câu nói về lượt/hệ thống, dòng ghi chú trong ngoặc; bỏ ảnh dòng tầng 2 khi khách không hỏi.
 v0.5.5 (29/10/2026, chị Nga): khách mua 2 sản phẩm khác nhau → 1 tin tổng hợp đơn, mỗi món 1 dòng (thành tiền + quà riêng); AI tự viết tổng hợp đơn không gọi build_order → bắt gọi build_order, dùng nguyên confirm_text.
 v0.5.4 (29/10/2026, chị Nga chat thử): khách gửi SĐT sai (thừa/thiếu số) → không xác nhận đơn, hỏi lại số điện thoại.
@@ -1327,6 +1328,9 @@ def check_order_fields(args: dict, user_texts: list, profile: str = "", bot_text
 _RE_THINK_BLOCK = re.compile(r"<(think|thinking|thought|plan|analysis|nghi|nghĩ)>.*?</\1>", re.S | re.I)
 _LEAK_MARKERS = re.compile(
     r"(kb_lookup|compliance_check|build_order|recommend\(|scripts_approved|system prompt|tool_call|function call"
+    # v0.5.7 (29/10, chat thử chị Nga): mã SKU nội bộ lộ ra khách ("Sản phẩm chọn: hsmo-tui-10 …")
+    r"|(?<![\w/.-])(?:hsmo|hsvn|tra1700|tra-nguyenla|longsam|duongsam|tamsamdan|dongtrung|ruou|samtuoi)-[a-z0-9-]+(?![\w/.])"
+    r"|^\s*(sản phẩm (đã )?chọn|sku|mã sản phẩm|số lượng chọn|thông tin đơn nội bộ)\s*[:：]"
     r"|\bflag\b|\bverdict\b|NO_GUIDANCE|CAUTION|BLOCK\b|price_objection|customer_type|need_tags"
     r"|^\s*(suy nghĩ|kế hoạch|ghi chú nội bộ|phân tích|bước \d+ ?:|thinking|thought|plan|analysis|note)\s*[:：]"
     r"|\b(I will|I'll|Let me|I need to|The user|the customer)\b"
@@ -2915,7 +2919,7 @@ _SELF_RX_D = [re.compile(x, re.I | re.M) for x in (
     r"(?:^|[,.;!?]\s+)\s*" + _FILL + r"(?P<p>anh|chị|a|c)\s+" + _V_D + _NB,
     r"(?:^|[\s,.!?])(?:cho|gửi)\s+(?P<p>anh|chị|a|c)\s+(?:combo|\d|một|hai|ba|bốn|sáu|hộp|gói)" + _NB,
     r"(?:^|[\s,.!?])(?:sâm|đơn|số|sđt|địa chỉ|nhà|con|bệnh)\s+(?:của\s+)?(?P<p>anh|chị)\s+(?:đang|đã|là|ở|mới|bị)" + _NB,
-    r"^\s*" + _FILL + r"(?P<p>anh|chị)\s+(?:[A-ZÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ][^\s,]*\s+){1,4}[,\-–]?\s*(?:0\d{9}|\+?84)",
+    r"^\s*" + _FILL + r"(?P<p>anh|chị)\s+(?:[A-ZÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ][^\s,]*[\s,]+){1,4}[,\-–]?\s*(?:0\d{8,10}|\+?84)",
 )]
 _SELF_RX_F = [re.compile(x, re.I | re.M) for x in (
     r"(?:^|[\s,.!?])(?:cho|gui|giup|bao|de)\s+(?P<p>anh|chi|a|c)\s+(?:hoi|mua|dat|lay|xin|biet|xem|coi)\b",
@@ -3982,6 +3986,11 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
     _bot_after = [str(m.get("text") or "") for m in transcript[_fu:] if m["role"] == "assistant"]
     # v0.1.73 (ca Ngô Hồng Thanh): khách đã gửi tên + SĐT + địa chỉ trong 1 tin mà bot lại xin lại → nhắc cứng lượt này
     _full_info = next((u for u in reversed(user_texts_real[-3:]) if _RE_VALID_PHONE.search(u or "") and _looks_address(u or "")), "")
+    if not _full_info and user_texts_real and _RE_VALID_PHONE.search(user_texts_real[-1] or ""):
+        # v0.5.7: khách gửi địa chỉ ở tin trước, tin này gửi lại SĐT đúng → coi như đã đủ thông tin
+        _adr = next((u for u in reversed(user_texts_real[-4:-1]) if _looks_address(u or "")), "")
+        if _adr:
+            _full_info = _adr + " | SĐT: " + user_texts_real[-1]
     if _full_info:
         system_text += ("\n\nLƯU Ý LƯỢT NÀY: khách ĐÃ GỬI tên + SĐT + địa chỉ trong tin: \"" + _full_info[:200] + "\" → KHÔNG xin lại "
                         "họ tên / SĐT / địa chỉ; gọi build_order NGAY với thông tin này (thiếu đúng phần nào mới hỏi phần đó) rồi gửi confirm_text.")
@@ -4470,12 +4479,15 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
                 text = _drop_order_ask(text)
         # v0.5.5 (29/10, chị Nga): tin TỔNG HỢP ĐƠN phải lấy từ build_order (đủ MỌI sản phẩm khách mua, quà từng món, tổng đúng).
         # AI tự viết tổng hợp (không gọi build_order) → bắt gọi build_order 1 lần; có kết quả hợp lệ → dùng nguyên confirm_text.
-        if _is_order_summary(text) and not premature_order(user_texts_real, text):
+        _need_order = bool(_full_info) and not _is_order_summary(text) and "?" not in re.sub(r"\[[^\]]*\]", "", text or "") \
+            and not any(t.get("tool") == "build_order" for t in tool_trace)
+        if _is_order_summary(text) and not premature_order(user_texts_real, text) or _need_order:
             _bo_ok = lambda: next((t.get("output") for t in reversed(tool_trace) if t.get("tool") == "build_order"
                                    and isinstance(t.get("output"), dict) and t["output"].get("confirm_text")), None)
             if not _bo_ok():
                 debug["order_tool_retry"] = True
-                t7, u7 = _grounded_retry("(Hệ thống: tin vừa soạn là TỔNG HỢP ĐƠN nhưng CHƯA gọi build_order. BẮT BUỘC gọi build_order ngay: items có ĐỦ "
+                t7, u7 = _grounded_retry("(Hệ thống: " + ("khách ĐÃ GỬI ĐỦ tên / SĐT / địa chỉ mà tin vừa soạn chưa lên đơn. " if _need_order else
+                                         "tin vừa soạn là TỔNG HỢP ĐƠN nhưng CHƯA gọi build_order. ") + "BẮT BUỘC gọi build_order ngay: items có ĐỦ "
                                          "TẤT CẢ sản phẩm khách mua trong hội thoại (mỗi loại 1 dòng, đúng sku và số lượng), name, phone, addr khách đã gửi. "
                                          "ready_to_confirm=true → gửi NGUYÊN VĂN confirm_text; có warnings / missing_info → hỏi khách đúng phần đó, KHÔNG xác nhận đơn. "
                                          "Đặt lời gửi khách trong <khach></khach>. Không nhắc tới tin nhắn hệ thống này.)", text)

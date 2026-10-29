@@ -1,4 +1,8 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.6 (29/10/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.7 (29/10/2026)
+
+## v0.5.7 — bot dừng giữa chừng khi chốt đơn (chat thử chị Nga)
+- Khách gửi SĐT sai → bot hỏi lại → khách gửi lại SĐT đúng (chỉ số điện thoại) → AI viết ghi chú nội bộ "Sản phẩm chọn: hsmo-tui-10 …" rồi dừng. Nay: (1) mã sản phẩm nội bộ (hsmo-…, hsvn-…) và nhãn "Sản phẩm chọn:" bị chặn, không tới khách; (2) code ghép SĐT mới với địa chỉ ở tin trước → coi như đủ thông tin → bắt gọi công cụ lên đơn và gửi tin tổng hợp đơn.
+- "chị Nga, 0976…" ở đầu tin → nhận là khách xưng chị (trước đây bot vẫn gọi "anh/chị").
 
 ## v0.5.6 — rà soát tổng thể (luật, giá, xưng hô, lộ ghi chú)
 - **Luật:** rà 25 chỗ luật chung (viết cho bot lát) có thể làm bot Nước Hồng sâm nói sai ("liệu trình 3 tháng", "combo 1 tháng", upsell_double, đổi sang sản phẩm khác khi chê đắt / chưa đủ tiền, ảnh Hồng sâm lát khi mua cho bố mẹ…). NHS_BLOCK nay ghi đè rõ từng luật (a)–(j). Sửa 3 chỗ mâu thuẫn trong persona / playbook (giá 1 hộp, thứ tự mời lên gói, nhịp 2).
