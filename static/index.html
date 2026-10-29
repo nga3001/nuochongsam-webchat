@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Trung tâm huấn luyện chatbot AI Thái Minh</title>
+<title>Nước Hồng Sâm — chat thử</title>
 <style>
   :root{
     --fb-blue:#0084ff; --bg:#ffffff; --gray:#f0f0f0; --text:#050505; --sub:#65676b; --brand:#1f4e79;
@@ -103,9 +103,9 @@
 <!-- CỬA SỔ CHAT -->
 <div class="phone">
   <div class="hdr">
-    <div class="ava">SAM</div>
+    <div class="ava">NHS</div>
     <div>
-      <div class="name">Sâm Thái Minh</div>
+      <div class="name">Nước Hồng Sâm</div>
       <div class="status"><span class="dot"></span>Đang hoạt động · Bản test nội bộ</div>
     </div>
   </div>
@@ -208,7 +208,7 @@ function addBotImage(id){
   img.onclick=()=>window.open(img.src,'_blank');
   img.onerror=()=>r.remove();
   const bub=document.createElement('div'); bub.className='bub imgbub'; bub.appendChild(img);
-  const mini=document.createElement('div'); mini.className='mini'; mini.textContent='SAM';
+  const mini=document.createElement('div'); mini.className='mini'; mini.textContent='NHS';
   r.appendChild(mini); r.appendChild(bub);
   msgs.appendChild(r); img.onload=scroll; scroll();
 }
@@ -219,7 +219,7 @@ function addBot(text, msgId, meta){
   const {clean, ids} = parseIMG(qr.clean);
   const qrs = qr.qrs;
   const r=document.createElement('div'); r.className='row bot';
-  r.innerHTML=`<div class="mini">SAM</div><div class="bub">${esc(clean)}</div>`;
+  r.innerHTML=`<div class="mini">NHS</div><div class="bub">${esc(clean)}</div>`;
   if(clean) msgs.appendChild(r);
   ids.forEach(addBotImage);
   if(msgId){
@@ -249,7 +249,7 @@ function scroll(){msgs.scrollTop=msgs.scrollHeight;}
 let typingEl=null;
 function showTyping(){
   const r=document.createElement('div'); r.className='row bot';
-  r.innerHTML=`<div class="mini">SAM</div><div class="typing"><i></i><i></i><i></i></div>`;
+  r.innerHTML=`<div class="mini">NHS</div><div class="typing"><i></i><i></i><i></i></div>`;
   msgs.appendChild(r); typingEl=r; scroll();
 }
 function hideTyping(){if(typingEl){typingEl.remove();typingEl=null;}}
@@ -366,7 +366,7 @@ function setTester(name){
 document.getElementById('startBtn').onclick=()=>{
   setTester(document.getElementById('testerName').value.trim()||'khách test');
   document.getElementById('nameModal').classList.add('hidden');
-  addBot('Dạ Sâm Thái Minh chào anh/chị ạ. Anh/chị đang tìm sản phẩm bồi bổ cho bản thân hay mua cho người thân ạ?\n[QR: Cho bố mẹ | Cho bản thân | Xem giá sản phẩm]',null,null);
+  addBot('Dạ Sâm Thái Minh chào anh/chị ạ. Anh/chị đang tìm hiểu Nước Hồng sâm Thái Minh để bồi bổ cho bản thân hay mua cho người thân ạ?\n[QR: Cho bố mẹ | Cho bản thân | Xem giá]',null,null);
   inp.focus();
 };
 document.getElementById('renameBtn').onclick=()=>{

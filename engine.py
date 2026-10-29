@@ -1,5 +1,6 @@
 """Engine hội thoại (v0.1.59 — 23/10 bản đầy đủ: lưới đủ ý + bám tài liệu, chặn "mã lạ"; CTKM khách cũ chỉ khi đã dùng đúng sản phẩm; v0.1.58 — 23/10 bản đầy đủ: không nói toàn bộ sâm trồng ở Sìn Hồ; tên/địa chỉ, giao hàng sau chốt, lời chúc đúng buổi, cảm ơn ngắn; lời chúc đúng buổi, cảm ơn lại → 1 câu ngắn; v0.1.56 — 23/10: quà mua 1 hộp chỉ khi khách tự hỏi; v0.1.54 — 23/10: giờ mở cửa + quà tại cửa hàng 92 Trung Kính, không bán nợ; v0.1.53 — 23/10: chặn phí ship/tổng tiền sai, bán chịu ≠ rượu; v0.1.52 — 23/10: khách muốn qua cửa hàng 92 Trung Kính vẫn dẫn tới chốt; v0.1.50 — 22/10: lưới chặn giá _fix_prices; bắt thêm câu \"xin lại số điện thoại\"): Claude API tool-use + não Sâm Thái Minh (nhân bản từ Bình Vị v1.0).
 Kiến trúc kế thừa KingsUp: LLM lo hội thoại/judgment, tool lo fact/tính toán/safety gate.
+v0.5.3 (29/10/2026, chị Nga chat thử): đã báo giá 1 hộp ở lượt trước → lượt sau không nhắc lại câu giá, không báo giá lần đầu lần 2, gửi bảng combo luôn.
 v0.5.2 (28/10/2026, chạy thử 22 câu): 3 lưới dùng chung sửa lỗi — (1) lời chúc đúng buổi không còn thay 'ngủ ngon hơn' (công dụng) thành 'nhiều sức khỏe'; (2) không xóa câu mời mua làm quà cho bố mẹ/người thân trong câu chuẩn cho con bú / có thai; (3) tin đang xin SĐT hoặc báo không dùng được thì không chèn thêm câu mời báo giá.
 v0.5.1 (28/10/2026, chị Nga): khách cũ Nước Hồng sâm hưởng CT tốt nhất giữa CT khách cũ và khách mới (bảng gộp 2/3/6/10/12 hộp); khách cũ 1 hộp không quà + phí ship.
 v0.5.0 (28/10/2026): bot Nước Hồng sâm dựng lại trên nền v0.1.107 — học luồng báo giá mới của Hồng sâm lát: báo giá lần đầu chủ yếu giá 1 hộp + câu khuyên + 1 câu hỏi sức khỏe (3/4 khách), bảng combo 2/4/6 hộp xoay vòng 8 kiểu, 9 câu chốt theo tình huống, câu khai thác/khơi gợi riêng, quà khách cũ đúng bảng Nước Hồng sâm, sửa thời gian dùng (1 hộp 20 túi = 10–20 ngày), báo giá dự phòng chỉ hộp 20 túi.
@@ -739,14 +740,17 @@ def _shape_nhs_quote(text: str, user_texts: list, bot_texts: list) -> tuple:
             for k in reversed(fit_idx[1:]):
                 del paras[k]
                 n += 1
-        elif pick:
+        elif pick and not any(price in (b or "") for b in bot_texts or []):   # v0.5.3: lượt gửi bảng sau khi đã báo giá → không chèn thêm
             i = next((k for k, p_ in enumerate(paras) if _is_price_p(p_)), 0)
             paras.insert(i + 1, pick)
             n += 1
         text = "\n\n".join(paras)
     rows = _RE_NHS_COMBO_ROW.findall(text)
     _prev_quotes = sum(1 for b in bot_texts or [] if re.search(r"combo\s*2\s*hộp", b, re.I) and re.search(r"\d{1,3}\.\d{3}\.\d{3}\s*đ", b))
-    q = _first_probe(user_texts, bot_texts, _prev_quotes, 0)
+    # v0.5.3 (29/10, chat thử chị Nga): lượt trước đã báo giá 1 hộp (dù AI tự viết, không qua lưới) → lượt này là gửi bảng combo,
+    # KHÔNG báo giá lần đầu lại (trước đây bot nhắc lại "giá 620.000đ/hộp 20 túi" + hỏi thêm câu sức khỏe)
+    _price_said = any(price in (b or "") for b in bot_texts or [])
+    q = "" if _price_said else _first_probe(user_texts, bot_texts, _prev_quotes, 0)
     # (2) bảng combo xoay vòng
     if styles and len(rows) >= 3 and not q:
         _used = [i for i, (h, _l) in enumerate(styles) if any(h[:35] in (b or "") for b in bot_texts or [])]
@@ -850,6 +854,35 @@ def _shape_nhs_quote(text: str, user_texts: list, bot_texts: list) -> tuple:
         text = "\n\n".join(keep + [q])
         n += 1
     return text, n
+
+
+def _drop_repeat_price_nhs(text: str, user_texts: list, bot_texts: list) -> tuple:
+    """v0.5.3: bot Nước Hồng sâm đã báo giá 1 hộp ở lượt trước, khách KHÔNG hỏi lại giá → bỏ câu "… giá 620.000đ/hộp 20 túi …"
+    lặp lại (chat thử 29/10: khách kể "mua cho mẹ bị HA cao, tiểu đường" → bot nhắc lại nguyên câu giá)."""
+    if not IS_NHS or not text or not bot_texts:
+        return text, 0
+    price = _nhs_price_txt()
+    last = (user_texts or [""])[-1] or ""
+    if not any(price in (b or "") for b in bot_texts) or _RE_PRICE_Q.search(last):
+        return text, 0
+    n = 0
+    out = []
+    for p in re.split(r"\n\s*\n", text):
+        if _RE_NHS_COMBO_ROW.search(p) or price not in p:
+            out.append(p)
+            continue
+        sents = re.split(r"(?<=[.!?…])\s+", p)
+        keep = [x for x in sents if not re.search(re.escape(price) + r"\s*/\s*hộp", x)]
+        n += len(sents) - len(keep)
+        if keep:
+            out.append(" ".join(keep))
+    if not n:
+        return text, 0
+    res = "\n\n".join(x for x in out if x.strip())
+    if res.strip() and not re.match(r"\s*(Dạ|Vâng)", res) and re.match(r"\s*\w", res) and not _RE_NHS_COMBO_ROW.match(res.lstrip()):
+        r0 = res.lstrip()
+        res = "Dạ " + (r0 if r0.startswith(("Nước Hồng sâm", "Hồng sâm", "Sâm", "Thái Minh", "Trà sâm")) else r0[0].lower() + r0[1:])
+    return (res, n) if res.strip() else (text, 0)
 
 
 def _probe_texts() -> dict:
@@ -4016,6 +4049,10 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
             debug["duration_fixed"] = _du        # v0.1.92: số tháng dùng đúng theo số hộp
         text, _qs = _shape_lat_quote(text, user_texts_real, _bot_after)   # v0.1.105: không tính tin quảng cáo / chào tự động
         _qn, _qsn = _shape_nhs_quote(text, user_texts_real, _bot_after)   # v0.5.0: báo giá Nước Hồng sâm theo luồng mới
+        if _qsn:
+            text, _qs = _qn, (_qs or 0) + _qsn
+            _qsn = 0
+        _qn, _qsn = _drop_repeat_price_nhs(text, user_texts_real, _bot_after)   # v0.5.3: không nhắc lại câu giá đã báo
         if _qsn:
             text, _qs = _qn, (_qs or 0) + _qsn
         if _qs:

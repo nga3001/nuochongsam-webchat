@@ -328,6 +328,17 @@ def test_24_khach_cu_ct_tot_nhat():
     assert "Mua 6 hộp" in rq and "Mua 10 hộp" in rq and "TỐT NHẤT" in rq
 
 
+# 25 ─ (chat thử 29/10) đã báo giá 1 hộp ở lượt trước → lượt sau KHÔNG nhắc lại câu giá, gửi bảng combo luôn
+def test_25_khong_bao_gia_lai():
+    bot = ["Nước Hồng sâm Thái Minh mật ong dạng túi có giá 620.000đ một hộp 20 túi ạ. Anh/chị mua cho bản thân hay người thân ạ?"]
+    users = ["giá bao nhiêu", "mua cho mẹ bị HA cao, tiểu đường"]
+    out, _ = engine._shape_nhs_quote(_FULL_Q, users, bot)
+    out, n = engine._drop_repeat_price_nhs(out, users, bot)
+    assert n == 1 and "620.000đ/hộp" not in out and out.count("Combo") >= 3 and out.startswith("Dạ")
+    # khách HỎI LẠI giá → vẫn giữ câu giá
+    assert engine._drop_repeat_price_nhs(_FULL_Q, ["giá", "giá bao nhiêu em"], bot)[1] == 0
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted((k, v) for k, v in globals().items() if k.startswith("test_")):

@@ -1,4 +1,8 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.2 (28/10/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.3 (29/10/2026)
+
+## v0.5.3 — chạy thật trên Railway (project miraculous-alignment, service "Nước Hồng Sâm")
+- Lỗi chị Nga gặp khi chat thử: khách hỏi giá → bot báo 620.000đ; khách kể "mua cho mẹ bị HA cao, tiểu đường" → bot nhắc lại nguyên câu giá. Nay: đã báo giá ở lượt trước và khách không hỏi lại giá → bỏ câu giá lặp, gửi bảng combo luôn, không hỏi thêm câu sức khỏe.
+- Trang chat thử / quản trị đổi tên thành "Nước Hồng Sâm", câu chào mở đầu của bot Nước Hồng sâm.
 
 ## v0.5.2 — sửa 3 lỗi phát hiện khi chạy thử 22 câu (lỗi có cả ở bot Hồng sâm lát v0.1.107, cùng code)
 1. Lưới "lời chúc đúng buổi" thay "ngủ ngon hơn" (công dụng) thành "nhiều sức khỏe" khi nhắn ban ngày → nay chỉ bắt lời CHÚC ngủ ngon.
