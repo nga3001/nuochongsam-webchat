@@ -422,8 +422,15 @@ def build_order(items: list, name: str = None, phone: str = None, addr: str = No
     lines.append(f"Tên khách hàng: {name or '(chưa có)'}")
     lines.append(f"Số điện thoại: {phone or '(chưa có)'}")
     lines.append(f"Địa chỉ nhận hàng: {addr or '(chưa có)'}")
-    lines.append(f"Sản phẩm + Số lượng: {prod_txt}")
-    lines.append(f"Quà tặng kèm: {gift_txt}")
+    if len(lines_items) > 1:
+        # v0.5.5 (29/10, chị Nga): khách mua ≥ 2 sản phẩm khác nhau → MỘT đơn, mỗi món 1 dòng (số lượng, thành tiền, quà riêng từng món)
+        lines.append("Sản phẩm + Số lượng:")
+        for i in lines_items:
+            g = "; ".join(pr["gift"] for pr in promos if pr["sku"] == i["sku"])
+            lines.append(f"- {i['short_name']} x {i['qty']} {i['unit']}: {i['subtotal_display']}" + (f" (tặng {g})" if g else ""))
+    else:
+        lines.append(f"Sản phẩm + Số lượng: {prod_txt}")
+        lines.append(f"Quà tặng kèm: {gift_txt}")
     lines.append(f"Tổng tiền đơn hàng: {fmt_vnd(total)} ({ship_text})")
     lines.append("")
     lines.append("Anh/chị kiểm tra giúp em thông tin đã đúng chưa ạ?")

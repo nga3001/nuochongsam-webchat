@@ -339,6 +339,61 @@ def test_25_khong_bao_gia_lai():
     assert engine._drop_repeat_price_nhs(_FULL_Q, ["giá", "giá bao nhiêu em"], bot)[1] == 0
 
 
+# 26 ─ (chat thử 29/10) khách gửi SĐT sai (12 số) → bot KHÔNG xác nhận đơn, hỏi lại số
+def test_26_sdt_sai_hoi_lai():
+    c = "Dạ em gửi thông tin xác nhận đơn hàng của chị Nga ạ:\n- Tổng thanh toán: 1.240.000đ\n- Người nhận: Nguyễn Thị Nga - 009876862776"
+    out, n = engine._fix_invalid_phone(c, ["Nguyễn Thị Nga, 009876862776, đội 3, Thanh Tùng, Thanh Miện, Hải Dương"])
+    assert n == 1 and "chưa đúng" in out and "12 chữ số" in out and "xác nhận đơn" not in out
+    assert engine._fix_invalid_phone(c, ["Nga 0987686277 Hải Dương"])[1] == 0          # số đúng → giữ xác nhận
+    assert engine._fix_invalid_phone(c, ["Nga +84987686277 Hải Dương"])[1] == 0
+    assert engine._fix_invalid_phone(c, ["Nga 098768627 Hải Dương"])[1] == 1           # thiếu 1 số
+
+
+# 27 ─ (chị Nga 29/10) khách mua 2 sản phẩm khác nhau → MỘT tin tổng hợp, mỗi món 1 dòng, quà từng món, tổng đúng
+def test_27_don_nhieu_san_pham():
+    r = t.build_order([{"sku": "hsmo-tui", "qty": 2}, {"sku": "hsvn-lat-14", "qty": 2}], "Nguyễn Thị Nga", PHONE, ADDR, "new")
+    c = r["confirm_text"]
+    assert r["ready_to_confirm"] and r["total"] == 2 * NHS_PRICE + 2 * 1420000
+    assert "- Hồng sâm dạng nước (hộp 20 túi) x 2 hộp: 1.240.000đ (tặng 1 hộp Trà sâm 1700 (10 gói))" in c
+    assert "- Hồng sâm dạng lát x 2 hộp: 2.840.000đ (tặng" in c and "4.080.000đ" in c
+    assert engine._is_order_summary(c) and engine._is_order_summary("Dạ em xác nhận đơn hàng ạ: 2 hộp. Tổng thanh toán: 1.240.000đ")
+    one = t.build_order([{"sku": "hsmo-tui", "qty": 2}], "Nga", PHONE, ADDR, "new")["confirm_text"]
+    assert "Sản phẩm + Số lượng: Hồng sâm dạng nước (hộp 20 túi) x 2 hộp" in one and "Quà tặng kèm:" in one   # 1 món: giữ mẫu cũ
+
+
+# 28 ─ (rà soát 29/10) giá Nước Hồng sâm chỉ lấy từ bảng: dòng combo mọi kiểu, câu giá không ghi quy cách, giá viết 'k'
+def test_28_gia_dung_bang():
+    fx = lambda x: engine._fix_nhs_prices(x)[0]
+    assert "2.480.000đ" in fx("✅ Combo 4 hộp – 2.400.000đ – tặng 3 hộp Trà sâm 1700 (10 gói)")
+    assert "3.720.000đ" in fx("🎁 Combo 6 hộp giá 3.600.000đ: tặng ngay 5 hộp Trà sâm 1700 (10 gói)")
+    assert "1.860.000đ" in fx("Mua 3 hộp: 1.800.000đ – tặng 3 hộp Trà sâm 1700 (10 gói)")
+    assert "620.000đ" in fx("Nước Hồng sâm giá 650.000đ một hộp ạ.") and "620.000đ" in fx("Nước Hồng sâm giá chỉ 600k/hộp ạ.")
+    assert "330.000đ" in fx("Hộp nhỏ 10 túi giá 350.000đ ạ.")
+    for ok in ("Tổng tiền đơn hàng: 1.255.000đ", "Mua 1 hộp phí ship 15.000đ nội thành",
+               "🎁 Mua 12 hộp: 7.440.000đ – tặng 2 hộp Nước Hồng sâm dạng túi cùng loại + 1 hộp Trà sâm 1700 (10 gói)",
+               "Hồng sâm lát 1.420.000đ/hộp 14 gói, Nước Hồng sâm 620.000đ/hộp 20 túi"):
+        assert engine._fix_nhs_prices(ok)[1] == 0, ok
+
+
+# 29 ─ (rà soát 29/10) khách tự xưng anh/chị/bác/cô trong câu hỏi → bot gọi đúng
+def test_29_xung_ho():
+    assert engine.customer_self_gender(["chị hay mệt, uống được không"]) == "female"
+    assert engine.customer_self_gender(["anh dạo này ngủ kém"]) == "male"
+    assert engine._customer_title(["bác 70 tuổi rồi, bác uống được không cháu"]) == "bác"
+    assert engine._customer_title(["cô hay mệt mỏi dùng được không con"]) == "cô"
+    assert engine._customer_title(["mua cho bà, bà uống được không em"]) == ""     # bà là người khác
+
+
+# 30 ─ (rà soát 29/10) không lộ ghi chú: nhãn vai, câu nói về lượt / hệ thống, dòng ghi chú trong ngoặc
+def test_30_khong_lo_ghi_chu():
+    G = "Dạ Nước Hồng sâm giá 620.000đ/hộp 20 túi ạ."
+    for leak in ("KHÁCH: hỏi giá\nTRẢ LỜI: " + G, G + "\n\nLượt này em chưa gửi combo theo hướng dẫn hệ thống.",
+                 "(Báo giá lần đầu, hỏi sức khỏe)\n" + G):
+        assert engine.strip_internal(leak)[0].strip() == G, leak
+    for keep in ("Tên khách hàng: Nguyễn Thị Nga", "Thái Minh có hệ thống điểm bán toàn quốc ạ.", "Hệ thống sản xuất đạt GMP ạ."):
+        assert engine.strip_internal(keep)[0] == keep, keep
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted((k, v) for k, v in globals().items() if k.startswith("test_")):

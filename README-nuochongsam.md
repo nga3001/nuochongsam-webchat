@@ -1,4 +1,19 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.3 (29/10/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.6 (29/10/2026)
+
+## v0.5.6 — rà soát tổng thể (luật, giá, xưng hô, lộ ghi chú)
+- **Luật:** rà 25 chỗ luật chung (viết cho bot lát) có thể làm bot Nước Hồng sâm nói sai ("liệu trình 3 tháng", "combo 1 tháng", upsell_double, đổi sang sản phẩm khác khi chê đắt / chưa đủ tiền, ảnh Hồng sâm lát khi mua cho bố mẹ…). NHS_BLOCK nay ghi đè rõ từng luật (a)–(j). Sửa 3 chỗ mâu thuẫn trong persona / playbook (giá 1 hộp, thứ tự mời lên gói, nhịp 2).
+- **Giá:** thêm lưới giá riêng Nước Hồng sâm — dòng combo / mua N hộp mọi kiểu trình bày luôn = N × 620.000đ; câu giá không ghi quy cách hoặc viết "600k" → đúng bảng (20 túi 620.000đ, 10 túi 330.000đ, chai 550.000đ). Không đụng tổng đơn, phí ship, giá sản phẩm khác (đã có lưới riêng).
+- **Xưng hô:** khách viết "chị hay mệt…", "anh dạo này ngủ kém…" → gọi chị / anh; "bác … uống được không cháu", "cô … con" → gọi bác / cô, xưng cháu.
+- **Lộ ghi chú:** thêm chặn nhãn vai ("KHÁCH: … / TRẢ LỜI: …"), câu nói về "lượt này / hướng dẫn hệ thống / kịch bản", dòng ghi chú nằm trong ngoặc. Ảnh Hồng sâm lát / Long Sâm / Dương Sâm bị bỏ khi khách không hỏi.
+- Chị Nga chốt 29/10: (1) mua 1 hộp 20 túi + 1 hộp 10 túi → VẪN tính phí ship (miễn ship khi từ 2 hộp cùng loại 20 túi); (2) giữ câu FAQ đã duyệt có chữ "giúp ăn ngon, ngủ ngon".
+- Ca thử tự động: 30/30 (bot Nước Hồng sâm), 17/17 (bot lát); đầu ra bot lát giống hệt bản gốc.
+
+## v0.5.5 — đơn nhiều sản phẩm
+- Khách mua 2 sản phẩm khác nhau (vd 2 hộp Nước Hồng sâm + 2 hộp Hồng sâm lát) → 1 tin tổng hợp đơn, mỗi món 1 dòng: số lượng, thành tiền, quà riêng của món đó; tổng tiền và phí ship tính cho cả đơn. Đơn 1 món giữ mẫu cũ.
+- AI tự viết tin tổng hợp đơn mà không gọi công cụ lên đơn (lỗi gặp khi chat thử bằng Gemini Flash-Lite) → code bắt gọi công cụ, gửi đúng bản tổng hợp của công cụ (đủ món, đúng quà, đúng tổng, kiểm tra SĐT / địa chỉ).
+
+## v0.5.4 — SĐT sai thì hỏi lại
+Chị Nga chat thử gửi "009876862776" (12 số) mà bot vẫn gửi xác nhận đơn. Nay code kiểm tra dãy số khách gửi: không đủ 10 số bắt đầu bằng 0 (hoặc +84) → bỏ tin xác nhận, hỏi lại số điện thoại (nói rõ số đó đang có bao nhiêu chữ số). Lỗi này dùng chung code nên cũng có ở bot Hồng sâm lát.
 
 ## v0.5.3 — chạy thật trên Railway (project miraculous-alignment, service "Nước Hồng Sâm")
 - Lỗi chị Nga gặp khi chat thử: khách hỏi giá → bot báo 620.000đ; khách kể "mua cho mẹ bị HA cao, tiểu đường" → bot nhắc lại nguyên câu giá. Nay: đã báo giá ở lượt trước và khách không hỏi lại giá → bỏ câu giá lặp, gửi bảng combo luôn, không hỏi thêm câu sức khỏe.
