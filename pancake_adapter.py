@@ -3420,7 +3420,8 @@ if engine.IS_DS:
         "combo theo tháng", "3 gói Liệu trình 1/2/3 tháng theo scripts_approved.price_quote_duongsam")
     CMT_PROFILE_POS = CMT_PROFILE_POS.replace("Dạ Sâm Thái Minh chào anh/chị ạ", "Dạ Dương Sâm Linh Đan chào anh ạ")
 if engine.IS_NHS:   # v0.4.0: bot Nước Hồng sâm — báo giá dưới bình luận theo 3 combo 2/4/6 hộp
-    CMT_PROFILE = CMT_PROFILE.replace("combo theo tháng", "3 combo 2/4/6 hộp theo scripts_approved.price_quote_nhs")
+    CMT_PROFILE = CMT_PROFILE.replace("các combo theo tháng", "3 combo 2/4/6 hộp theo scripts_approved.price_quote_nhs").replace(
+        "chọn gói/liệu trình", "chọn gói (KHÔNG nói 'liệu trình', KHÔNG gọi combo theo tháng)")
 
 
 def _cmt_post_id(conv: dict, conv_id: str) -> str:

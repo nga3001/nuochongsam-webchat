@@ -347,6 +347,10 @@ def test_26_sdt_sai_hoi_lai():
     assert engine._fix_invalid_phone(c, ["Nga 0987686277 Hải Dương"])[1] == 0          # số đúng → giữ xác nhận
     assert engine._fix_invalid_phone(c, ["Nga +84987686277 Hải Dương"])[1] == 0
     assert engine._fix_invalid_phone(c, ["Nga 098768627 Hải Dương"])[1] == 1           # thiếu 1 số
+    # v0.5.8 (chạy thật 30/10): AI tự hỏi lại SĐT nhưng bịa lý do "dạng bảo mật" → thay bằng câu chuẩn (11 chữ số)
+    bm = "Dạ chị Nga ơi, SĐT chị vừa gửi đang hiển thị dạng bảo mật nên hệ thống chưa nhận diện đủ 10 số ạ. Chị nhắn lại giúp em nhé ạ."
+    out, n = engine._fix_invalid_phone(bm, ["09876867765, chị Nga, 92 Trung Kính, Cầu Giấy, HN"])
+    assert n == 1 and "bảo mật" not in out and "11 chữ số" in out
 
 
 # 27 ─ (chị Nga 29/10) khách mua 2 sản phẩm khác nhau → MỘT tin tổng hợp, mỗi món 1 dòng, quà từng món, tổng đúng
@@ -400,6 +404,44 @@ def test_31_khong_lo_ma_sku():
     assert engine.strip_internal(leak)[0].strip() == ""
     assert engine.strip_internal("Dạ chị dùng hộp 10 túi nhé ạ.\n[IMG: nuoc-hong-sam-10tui]")[0].count("[IMG: nuoc-hong-sam-10tui]") == 1
     assert engine.customer_self_gender(["chị Nga, 09768627765 SN23 thôn đông, thanh tùng, thanh miện, hải dương"]) == "female"
+
+
+# 32 ─ (chạy thật 30/10) chê đắt / chưa đủ tiền → thuyết phục ÍT NHẤT 2 lần mới mời hộp 10 túi; thành ngữ đủ chữ, tên viện đúng
+def test_32_thuyet_phuc_2_lan_moi_10_tui():
+    R = "Dạ bác dùng được ạ.\nNếu chị muốn trải nghiệm trước, bên em có hộp nhỏ 10 túi giá 330.000đ ạ. Chị có muốn lấy hộp 10 túi không ạ?\n[IMG: nuoc-hong-sam-10tui]"
+    T = lambda *x: [{"role": r, "text": tx} for r, tx in x]
+    c1 = T(("user", "giá"), ("assistant", "620.000đ/hộp 20 túi"), ("user", "hơi đắt nhỉ"), ("assistant", "Dạ em hiểu…"), ("user", "mẹ chị huyết áp cao"))
+    out, n = engine._gate_10tui(R, c1)
+    assert n and "10 túi" not in out and "330.000" not in out and "nuoc-hong-sam-10tui" not in out and "combo 2 hộp" in out
+    out, n = engine._gate_10tui(R, T(("user", "giá"), ("assistant", "x"), ("user", "không có tiền, thôi")))
+    assert n and "11.000mg" in out and "10 túi" not in out          # lần 1: nêu giá trị
+    c2 = c1 + T(("assistant", "Dạ… combo 2 hộp…"), ("user", "vẫn đắt, thôi để sau"))
+    assert engine._gate_10tui(R, c2)[1] == 0                         # đã thuyết phục 2 lần → được mời 10 túi
+    assert engine._gate_10tui(R, T(("user", "có hộp nhỏ không em")))[1] == 0
+    assert engine._gate_10tui(R, T(("user", "có cho dùng thử không")))[1] == 0
+    fb = engine._fix_banned_phrases("Tiền nào nấy, chuyển giao từ Viện Dược liệu, tặng kèm Trà sâm 1700 giúp bác dễ ngủ, thư thái hơn ạ.")
+    assert "Tiền nào của nấy" in fb and "Viện Nghiên cứu Sâm và Dược liệu Việt Nam (VIGH)" in fb and "dễ ngủ" not in fb
+
+
+# 33 ─ (chạy thật 30/10) nêu rõ tên công ty; hỏi nhà thuốc → link tra điểm bán
+def test_33_cong_ty_va_diem_ban():
+    t1 = engine._fix_banned_phrases("Sản phẩm được phân phối chính hãng trực tiếp từ công ty, có tem niêm phong ạ.")
+    assert "Công ty Cổ phần Sâm và Dược liệu quý Thái Minh" in t1
+    out, n = engine._add_where_buy("Dạ chị yên tâm ạ.\n\nChị muốn ghé cửa hàng không ạ?", "hay có ở nhà thuốc ko")
+    assert n == 1 and "samthaiminh.com/diem-ban" in out and out.rstrip().endswith("?")
+    assert engine._add_where_buy("Dạ vâng ạ.", "giá bao nhiêu")[1] == 0
+
+
+# 34 ─ (chạy thật 30/10, ca anh Văn Mạnh Phí) khách xác nhận / im 5 phút sau tổng hợp đơn → không gửi lại tổng hợp, luôn gắn thẻ Bot chốt đơn
+def test_34_xac_nhan_don():
+    CF = t.build_order([{"sku": "hsmo-tui", "qty": 1}], "Văn Mạnh Phí", "0918305087", "25/1 Lê Thị Kỉnh, Phước Kiển, Nhà Bè, TP.HCM", "new")["confirm_text"]
+    T = lambda *x: [{"role": r, "text": tx} for r, tx in x]
+    tr = T(("user", "địa chỉ…"), ("assistant", CF), ("user", "[Khách chưa trả lời sau 5 phút kể từ khi em gửi tổng hợp đơn — coi như khách ĐỒNG Ý đơn]"))
+    out, n = engine._order_confirmed("Dạ em gửi lại xác nhận đơn hàng ạ:\n- Tên khách hàng: Văn Mạnh Phí\n- Số điện thoại: 0918305087\n- Tổng thanh toán: 640.000đ", tr)
+    assert n == 2 and not engine._is_order_summary(out) and "[HANDOFF: đơn đã chốt - lên đơn | 0918305087 | 1]" in out
+    out, n = engine._order_confirmed("Dạ đơn hàng của anh đã được ghi nhận ạ.", T(("user", "x"), ("assistant", CF), ("user", "Oki")))
+    assert n == 1 and "| 1]" in out
+    assert engine._order_confirmed("Dạ vâng ạ", T(("user", "giá"), ("assistant", "620.000đ"), ("user", "ok")))[1] == 0
 
 
 if __name__ == "__main__":

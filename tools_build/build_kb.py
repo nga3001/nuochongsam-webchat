@@ -777,10 +777,11 @@ scripts_approved.update({
    "và Hồng sâm Thái Minh là công trình chuyển giao từ Viện Nghiên cứu Sâm và Dược liệu Việt Nam (VIGH) ạ.' + nhắc ưu đãi đang có (từ 2 hộp tặng Trà sâm, miễn phí ship). "
    "LẦN 2 (ý KHÁC): hỏi khéo còn băn khoăn gì → uy tín Dược phẩm Thái Minh gần 15 năm (Khương Thảo Đan, Vương Bảo, Bình Vị...); "
    "nhận hàng kiểm tra rồi mới thanh toán; thường khoảng 2 hộp bắt đầu cảm nhận. "
-   f"Sau 2 lần vẫn chê / chê kèm ý thôi không mua → mời HỘP NHỎ 10 TÚI ({vnd(NHS10_PRICE)}) để dùng thử (câu chuẩn price_objection_nhs). "
+   f"Áp cho cả 'đắt quá', 'chưa đủ tiền', 'không có tiền', 'đắt quá thôi'. Đã thuyết phục ĐỦ 2 LẦN mà khách vẫn từ chối → mới mời HỘP NHỎ 10 TÚI ({vnd(NHS10_PRICE)}) (câu chuẩn price_objection_nhs). "
    "KHÔNG gợi ý Trà sâm hay sản phẩm khác rẻ hơn, KHÔNG quy đổi giá/ngày khi khách không hỏi."),
  "price_objection_nhs": (
-   "Bot Nước Hồng sâm — đã thuyết phục 2 lần mà khách vẫn chê đắt, HOẶC khách chê đắt kèm ý thôi không mua: "
+   "Bot Nước Hồng sâm — CHỈ dùng khi đã thuyết phục ÍT NHẤT 2 LẦN mua hộp 20 túi / combo mà khách vẫn chê đắt / chưa đủ tiền / từ chối (chốt 30/10, chị Nga; "
+   "kể cả khách nói 'đắt quá thôi', 'không có tiền' cũng phải thuyết phục đủ 2 lần trước): "
    f"'Dạ em rất hiểu ạ. Để anh/chị trải nghiệm trước cho yên tâm, bên em có hộp nhỏ 10 túi giá {vnd(NHS10_PRICE)} ạ. "
    "Anh/chị dùng thấy hợp thì lần sau lấy combo để được nhận quà Trà sâm nhé. Anh/chị có muốn em lên đơn hộp 10 túi không ạ?' "
    f"(hộp 10 túi chưa có quà; {NHS_SHIP_TXT}). Gửi kèm [IMG: nuoc-hong-sam-10tui]. "

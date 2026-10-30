@@ -1,5 +1,6 @@
 """Engine hội thoại (v0.1.59 — 23/10 bản đầy đủ: lưới đủ ý + bám tài liệu, chặn "mã lạ"; CTKM khách cũ chỉ khi đã dùng đúng sản phẩm; v0.1.58 — 23/10 bản đầy đủ: không nói toàn bộ sâm trồng ở Sìn Hồ; tên/địa chỉ, giao hàng sau chốt, lời chúc đúng buổi, cảm ơn ngắn; lời chúc đúng buổi, cảm ơn lại → 1 câu ngắn; v0.1.56 — 23/10: quà mua 1 hộp chỉ khi khách tự hỏi; v0.1.54 — 23/10: giờ mở cửa + quà tại cửa hàng 92 Trung Kính, không bán nợ; v0.1.53 — 23/10: chặn phí ship/tổng tiền sai, bán chịu ≠ rượu; v0.1.52 — 23/10: khách muốn qua cửa hàng 92 Trung Kính vẫn dẫn tới chốt; v0.1.50 — 22/10: lưới chặn giá _fix_prices; bắt thêm câu \"xin lại số điện thoại\"): Claude API tool-use + não Sâm Thái Minh (nhân bản từ Bình Vị v1.0).
 Kiến trúc kế thừa KingsUp: LLM lo hội thoại/judgment, tool lo fact/tính toán/safety gate.
+v0.5.8 (30/10/2026, chị Nga chạy thật): khách xác nhận đơn (ok / im 5 phút) → không gửi lại tổng hợp đơn, luôn gắn thẻ Bot chốt đơn; SĐT sai → luôn báo rõ số đang có bao nhiêu chữ số (không bịa "dạng bảo mật"); chê đắt / chưa đủ tiền → thuyết phục ít nhất 2 lần mua hộp 20 túi rồi mới mời hộp 10 túi (code chặn); thành ngữ viết đủ chữ ("tiền nào của nấy"); tên viện đúng (VIGH); không gán công dụng cho quà Trà sâm.
 v0.5.7 (29/10/2026, chị Nga chat thử): mã SKU nội bộ không lộ ra khách; khách gửi lại SĐT đúng (địa chỉ ở tin trước) → lên đơn luôn, không dừng; nhận "chị Nga, 09…" là khách xưng chị.
 v0.5.6 (29/10/2026, rà soát tổng thể): NHS_BLOCK ghi đè rõ 12 luật chung của bot lát; lưới giá riêng Nước Hồng sâm; nhận khách tự xưng anh/chị/bác/cô rộng hơn; lưới chống lộ thêm nhãn vai, câu nói về lượt/hệ thống, dòng ghi chú trong ngoặc; bỏ ảnh dòng tầng 2 khi khách không hỏi.
 v0.5.5 (29/10/2026, chị Nga): khách mua 2 sản phẩm khác nhau → 1 tin tổng hợp đơn, mỗi món 1 dòng (thành tiền + quà riêng); AI tự viết tổng hợp đơn không gọi build_order → bắt gọi build_order, dùng nguyên confirm_text.
@@ -262,6 +263,13 @@ _FOREIGN = re.compile(
 
 
 _BANNED_FIX = [  # v0.1.21 (16/10): lưới chặn cuối — cụm anh Huy cấm mà AI vẫn lỡ viết
+    # v0.5.8 (30/10, chị Nga chạy thật): thành ngữ viết thiếu chữ; tên viện sai; quà Trà sâm bị gán công dụng
+    (re.compile(r"([Tt])iền nào(?! của)\s+nấy", re.I), r"\1iền nào của nấy"),
+    # v0.5.8: "phân phối chính hãng trực tiếp từ công ty" — không nói công ty nào → nêu rõ
+    (re.compile(r"((?:phân phối|cung cấp|bán)[^.!?\n]{0,30}?)từ công ty(?!\s+(?:Cổ phần|CP|cổ phần|Sâm|Dược|TNHH|Thái Minh|Công nghệ))", re.I),
+     r"\1từ Sâm Thái Minh (Công ty Cổ phần Sâm và Dược liệu quý Thái Minh, thuộc hệ thống Dược phẩm Thái Minh)"),
+    (re.compile(r"(?<!Sâm và )(?<!sâm và )Viện Dược liệu(?! Việt Nam \(VIGH\))", re.I), "Viện Nghiên cứu Sâm và Dược liệu Việt Nam (VIGH)"),
+    (re.compile(r"(Trà sâm 1700(?:\s*(?:loại\s*)?\(?\d+\s*gói\)?)?)\s+(?:giúp|để giúp|hỗ trợ|cho)\s+[^.,;!?\n]{0,40}?(?:ngủ|thư thái|thư giãn|khỏe|ngon|tỉnh táo|giải nhiệt)[^.!?\n]*", re.I), r"\1 ạ"),
     (re.compile(r"để dưỡng chất thấm sâu", re.I), "để cơ thể hấp thu tốt"),
     (re.compile(r"dưỡng chất thấm sâu", re.I), "cơ thể hấp thu tốt"),
     (re.compile(r"\bthấm sâu\b", re.I), "hấp thu tốt"),
@@ -1233,8 +1241,11 @@ def _fix_invalid_phone(text: str, user_texts: list) -> tuple:
         return text, 0
     d = re.sub(r"\D", "", raw)
     confirm = (len(_RE_CONFIRM_BLOCK.findall(text)) >= 2 or re.search(r"xác nhận[^.?!\n]{0,30}đơn|lên đơn|chốt đơn|ghi nhận đơn", text, re.I)
-               or d in re.sub(r"\D", "", text))
-    if not confirm or _RE_PHONE_REASK.search(text):
+               or d in re.sub(r"\D", "", text)
+               # v0.5.8 (30/10, chạy thật): AI tự hỏi lại SĐT nhưng bịa lý do "số hiển thị dạng bảo mật" (SĐT bị che trước khi gửi AI)
+               # → luôn thay bằng câu chuẩn nói rõ số đang thừa / thiếu bao nhiêu chữ số
+               or re.search(r"số điện thoại|sđt|số đt", text, re.I))
+    if not confirm:
         return text, 0
     return ("Dạ số điện thoại " + raw + " anh/chị gửi hình như chưa đúng ạ. Số điện thoại cần đủ 10 chữ số và bắt đầu bằng số 0 "
             "(số này đang có " + str(len(d)) + " chữ số). Anh/chị kiểm tra và gửi lại giúp em số điện thoại để em lên đơn nhé ạ."), 1
@@ -2405,6 +2416,115 @@ def _fix_order_summary(text: str, bo: dict = None) -> tuple:
 _RE_ASK_10TUI = re.compile(r"10\s*túi|hộp\s*(nhỏ|bé|10)|loại\s*(nhỏ|10)|330\s*(k|nghìn|ngàn)|330\.000", re.I)
 
 
+# v0.5.8 (30/10, chị Nga chạy thật): khách chê đắt / chưa đủ tiền → thuyết phục ÍT NHẤT 2 LẦN mua hộp 20 túi rồi mới mời hộp 10 túi.
+# Ca thật: khách "hơi đắt nhỉ" → bot thuyết phục 1 lần → khách kể mẹ huyết áp, tiểu đường → bot mời luôn hộp 10 túi (SAI).
+_RE_OBJ_PRICE = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(?:đắt|mắc|giá cao|hơi cao|cao quá|chát|tốn|"
+                           r"(?:chưa|không|ko|k|hông|hết)\s*(?:có|đủ)?\s*tiền|ngân sách|eo hẹp|túng|không đủ)(?![A-Za-zÀ-ỹĐđ])", re.I)
+_RE_REFUSE = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(?:thôi|không mua|ko mua|k mua|chưa mua|để sau|tính sau|hẹn sau|lúc khác|"
+                        r"không cần|ko cần|chưa cần|xem đã|suy nghĩ|nghĩ thêm)(?![A-Za-zÀ-ỹĐđ])", re.I)
+_RE_10TUI_OFFER = re.compile(r"10\s*túi(?!\s*lọc)|hộp\s*nhỏ|330\.000|330k|nuoc-hong-sam-10tui", re.I)
+
+
+_RE_ASK_WHERE = re.compile(r"nhà thuốc|hiệu thuốc|tiệm thuốc|đại lý|điểm bán|cửa hàng|mua ở đâu|bán ở đâu|có bán ở|chỗ nào bán|ngoài hiệu|siêu thị", re.I)
+
+
+_RE_USER_OK = re.compile(r"^\s*(?:dạ\s+|vâng\s+|ừ\s+|ok\s+)?(?:ok(?:e|ie|i|ay)?|oki|okk+|ô kê|ừ+m?|uh+|đúng(?: rồi| r| ạ)?|chuẩn(?: rồi)?|được(?: rồi)?|đc|dc|"
+                         r"vâng(?: ạ)?|dạ(?: vâng| đúng)?|chốt(?: luôn| đi)?|xác nhận|gửi(?: đi| luôn)?|ship(?: đi| luôn)?|lên đơn(?: đi| luôn)?|"
+                         r"👍+|❤️|\(y\)|like)(?:\s+(?:em|e|nhé|nha|ạ|shop|luôn|rồi|nhá|nhe))*\s*[.!]*\s*$", re.I)
+
+
+def _order_confirmed(text: str, transcript: list) -> tuple:
+    """v0.5.8 (30/10, chạy thật ca anh Văn Mạnh Phí): bot đã gửi tổng hợp đơn → 5 phút khách im (hệ thống nhắn hộ) hoặc khách "Oki"
+    → AI (1) gửi LẠI tổng hợp đơn lần 2, (2) báo đã ghi nhận đơn nhưng QUÊN thẻ [HANDOFF … | 1] → không gắn thẻ "Bot chốt đơn".
+    Code: khách đã xác nhận / im 5 phút sau tổng hợp đơn → không gửi lại tổng hợp đơn (thay bằng câu chuẩn order_after_confirm)
+    và LUÔN có thẻ [HANDOFF: đơn đã chốt - lên đơn | SĐT | 1]."""
+    turns = [(m.get("role"), str(m.get("text") or m.get("content") or "")) for m in transcript or []]
+    if not turns or turns[-1][0] != "user":
+        return text, 0
+    last_u = turns[-1][1]
+    if not (last_u.startswith("[Khách chưa trả lời sau") or _RE_USER_OK.match(last_u)):
+        return text, 0
+    bots = [t for r, t in turns[:-1] if r == "assistant"]
+    last_cf = next((i for i in range(len(bots) - 1, max(-1, len(bots) - 4), -1) if _is_order_summary(bots[i])), None)
+    if last_cf is None:
+        return text, 0
+    if any(re.search(r"gọi điện lại để xác nhận đơn|đã được ghi nhận|ghi chú đóng gói", b, re.I) for b in bots[last_cf + 1:]):
+        return text, 0                     # đơn này đã ghi nhận rồi
+    n = 0
+    if _is_order_summary(text):
+        try:
+            _q = re.search(r"'([^']+)'", tools_core.load_kb()["scripts_approved"].get("order_after_confirm", ""))
+            text = _q.group(1) if _q else "Dạ em cảm ơn anh/chị ạ. Trong ngày hôm nay bên em sẽ gọi điện lại để xác nhận đơn trước khi gửi hàng ạ."
+        except Exception:  # noqa: BLE001
+            text = "Dạ em cảm ơn anh/chị ạ. Trong ngày hôm nay bên em sẽ gọi điện lại để xác nhận đơn trước khi gửi hàng ạ."
+        n += 1
+    if not re.search(r"\[HANDOFF:[^\]]*\|\s*1\s*\]", text):
+        ph = _RE_VALID_PHONE.search(bots[last_cf])
+        phone = re.sub(r"\D", "", ph.group(0)) if ph else ""
+        if phone.startswith("84"):
+            phone = "0" + phone[2:]
+        text = text.rstrip() + "\n[HANDOFF: đơn đã chốt - lên đơn | " + phone + " | 1]"
+        n += 1
+    return text, n
+
+
+def _add_where_buy(text: str, last_user: str) -> tuple:
+    """v0.5.8 (30/10, chạy thật): khách hỏi "có ở nhà thuốc không" mà bot không đưa link tra điểm bán → chèn câu chuẩn where_buy."""
+    if not text or not _RE_ASK_WHERE.search(last_user or "") or "samthaiminh.com/diem-ban" in text:
+        return text, 0
+    add = "Anh/chị có thể tra các nhà thuốc, điểm bán sản phẩm gần nhà tại https://samthaiminh.com/diem-ban ạ."
+    paras = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
+    if paras and paras[-1].rstrip().endswith("?"):
+        paras.insert(len(paras) - 1, add)
+    else:
+        paras.append(add)
+    return "\n\n".join(paras), 1
+
+
+def _gate_10tui(text: str, transcript: list) -> tuple:
+    """Chặn lời mời hộp 10 túi khi CHƯA thuyết phục đủ 2 lần (khách tự hỏi gói nhỏ / dùng thử thì cho)."""
+    if not IS_NHS or not text or not _RE_10TUI_OFFER.search(text):
+        return text, 0
+    turns = [(m.get("role"), str(m.get("text") or m.get("content") or "")) for m in transcript or []]
+    users = [t for r, t in turns if r == "user"]
+    if _RE_ASK_10TUI.search(" ".join(users)) or any(re.search(r"dùng thử|mẫu thử|test thử|thử trước", u, re.I) for u in users):
+        return text, 0
+    if len(_RE_CONFIRM_BLOCK.findall(text)) >= 2:
+        return text, 0                      # tin tổng hợp đơn (khách đã chọn) → không đụng
+    first = next((i for i, (r, t) in enumerate(turns) if r == "user" and _RE_OBJ_PRICE.search(t)), None)
+    persuaded = sum(1 for r, _t in turns[first + 1:] if r == "assistant") if first is not None else 0
+    last_u = users[-1] if users else ""
+    if first is not None and persuaded >= 2 and (_RE_OBJ_PRICE.search(last_u) or _RE_REFUSE.search(last_u)):
+        return text, 0                      # đã thuyết phục đủ 2 lần mà khách vẫn chê / từ chối → được mời hộp 10 túi
+    n = 0
+    text = re.sub(r"[ \t]*\[IMG:\s*nuoc-hong-sam-10tui\s*\][ \t]*\n?", "", text, flags=re.I)
+    out = []
+    for p_ in re.split(r"\n\s*\n", text):
+        lines = []
+        for ln in p_.split("\n"):
+            ss = re.split(r"(?<=[.!?…])\s+", ln)
+            kp = [x for x in ss if not _RE_10TUI_OFFER.search(x) and not re.search(r"trải nghiệm trước|dùng thử với mức chi phí|chi phí nhẹ nhàng hơn|dùng thấy hợp thì lần sau|lần sau lấy combo", x, re.I)]
+            n += len(ss) - len(kp)
+            if " ".join(kp).strip():
+                lines.append(" ".join(kp))
+        if lines:
+            out.append("\n".join(lines))
+    text = "\n\n".join(out).strip()
+    if n and "?" not in text:
+        _why = ""
+        if persuaded < 1 and not re.search(r"11\.000\s*mg|MR2", text):
+            try:
+                _m = re.search(r"'([^']+)'", tools_core.load_kb()["scripts_approved"].get("price_why_nhs", ""))
+                _why = re.sub(r"^Dạ em hiểu băn khoăn của anh/chị ạ\.\s*", "", _m.group(1)) + " Hiện mua từ 2 hộp anh/chị được tặng Trà sâm và miễn phí vận chuyển ạ.\n\n" if _m else ""
+            except Exception:  # noqa: BLE001
+                _why = ""
+        q = (_why + "Anh/chị còn băn khoăn gì thêm về sản phẩm hay chương trình để em tư vấn kỹ hơn không ạ?" if persuaded < 1 else
+             "Nhận hàng anh/chị được kiểm tra rồi mới thanh toán, lấy từ 2 hộp còn được tặng Trà sâm và miễn phí vận chuyển. "
+             "Anh/chị lấy combo 2 hộp dùng trước nhé ạ?")
+        text = (text + "\n\n" + q).strip()
+    return text, n
+
+
 def _fix_nhs_summary_pack(text: str, user_texts: list, bot_texts: list = None) -> tuple:
     if not text or len(_RE_CONFIRM_BLOCK.findall(text)) < 2 or not re.search(r"10\s*túi", text):
         return text, 0
@@ -2557,7 +2677,8 @@ Khách KHÔNG hỏi → KHÔNG nhắc 3 dòng này, kể cả khi khách là ng�
 CHƯA gửi bảng combo; khách hỏi thẳng combo / ưu đãi / vội / hỏi lại giá → gửi luôn bảng 3 combo 2/4/6 hộp + 1 câu chốt (code tự xoay vòng kiểu trình bày \
 và câu chốt; giá & quà lấy từ tool). Khách trả lời câu hỏi sức khỏe → ghi nhận 1 câu rồi gửi bảng combo. \
 KHÔNG gọi combo là "1 tháng / 2 tháng / 3 tháng" (1 hộp 20 túi dùng 10–20 ngày). Mua 1 hộp: không quà, có phí ship (kb_lookup shipping); từ 2 hộp miễn phí ship.
-- CHÊ ĐẮT: lần 1 scripts_approved.price_why_nhs → lần 2 ý khác → sau đó (hoặc khách chê kèm ý thôi không mua) mời HỘP NHỎ 10 TÚI \
+- CHÊ ĐẮT / CHƯA ĐỦ TIỀN / KHÔNG CÓ TIỀN (chốt 30/10, chị Nga): thuyết phục ÍT NHẤT 2 LẦN mua hộp 20 túi / combo — lần 1 scripts_approved.price_why_nhs, \
+lần 2 ý khác — kể cả khách nói "đắt quá thôi"; khách VẪN từ chối sau 2 lần mới mời HỘP NHỎ 10 TÚI \
 theo scripts_approved.price_objection_nhs → vẫn từ chối thì soft ask SĐT. KHÔNG mời Trà sâm, KHÔNG dùng price_objection_switch. \
 Quà mua 1 hộp Hồng sâm lát (luật 5o-g) chỉ áp khi khách đang hỏi chính Hồng sâm lát.
 - QUY CÁCH LÊN ĐƠN (v0.4.2, như luật 5y hộp 50 gói): khách nói "lấy 1 hộp / 2 hộp / dùng thử combo…" = hộp 20 túi (hsmo-tui). \
@@ -2576,18 +2697,22 @@ trẻ từ 3 tuổi trở lên: tài liệu chưa có liều riêng → gọi co
 Khách hỏi "ai không dùng được" → đúng 3 nhóm: phụ nữ có thai, phụ nữ đang cho con bú, trẻ dưới 3 tuổi.
 - GHI ĐÈ CỤ THỂ (v0.5.6, rà soát 29/10): \
 (a) KHÔNG nói "liệu trình" với Nước Hồng sâm; câu khuyên dùng chuẩn là câu trong price_quote_nhs ("nên dùng đều mỗi ngày, thường sau khoảng 2 hộp đầu…"). \
-(b) Khách nói chưa đủ tiền / không có tiền (luật 5o(n)) → price_objection_nhs (hộp 10 túi), KHÔNG price_objection_switch. \
+(b) Khách nói chưa đủ tiền / không có tiền (luật 5o(n)) → coi như CHÊ ĐẮT: thuyết phục đủ 2 lần rồi mới price_objection_nhs (hộp 10 túi), KHÔNG price_objection_switch. \
 (c) Khách đang hỏi dòng tầng 2 (lát / Long Sâm / Dương Sâm) mà chê đắt → nêu giá trị 1 lần, rồi gợi ý quay về Nước Hồng sâm hộp 20 túi (combo 2/4/6 hộp); KHÔNG mời Trà sâm. \
 (d) ẢNH: chỉ dùng [IMG: nuoc-hong-sam] (lượt đầu, đúng 1 ảnh), [IMG: nuoc-hong-sam-10tui] (khi mời hộp 10 túi); ảnh Hồng sâm lát / Long Sâm / Dương Sâm / Trà sâm \
 CHỈ khi khách đã hỏi đúng sản phẩm đó; ảnh vườn sâm chỉ khi khách tự hỏi chuyến thăm Thủ tướng. \
-(e) MỜI LÊN GÓI: chỉ theo upsell_nhs (1 → 2; 2–3 → 4; 4–5 → 6 hộp), KHÔNG dùng upsell_double, KHÔNG nói "tháng". Thứ tự: gửi confirm_text → khách xác nhận → \
-tin riêng mời lên gói ĐÚNG 1 LẦN → khách trả lời → order_after_confirm + [HANDOFF: đơn đã chốt - lên đơn | SĐT | 1]. \
+(e) MỜI LÊN GÓI: chỉ theo upsell_nhs (1 → 2; 2–3 → 4; 4–5 → 6 hộp), KHÔNG dùng upsell_double, KHÔNG nói "tháng". Thứ tự: gửi confirm_text → khách xác nhận \
+(ok / like / im 5 phút) → order_after_confirm + BẮT BUỘC thẻ [HANDOFF: đơn đã chốt - lên đơn | SĐT | 1] + (có upsell_hint) mời lên gói ĐÚNG 1 LẦN; \
+KHÔNG gửi lại tổng hợp đơn lần 2. Khách đồng ý lên gói → build_order lại + confirm_text mới + [HANDOFF: khách đổi đơn lên gói lớn | SĐT | 2]. \
 (f) KHÓA SẢN PHẨM (luật 8): khách chê đắt → theo luồng CHÊ ĐẮT ở trên (cuối cùng là hộp 10 túi), KHÔNG đổi sang sản phẩm khác. \
 (g) [END] (luật 5v): em vừa mời hộp 10 túi thì KHÔNG [END]. \
 (h) Khách cũ Nước Hồng sâm mua đến 12 hộp: bot tự báo bảng khách cũ và chốt đơn, KHÔNG chuyển nhân viên mức 2; trên 12 hộp build_order tự báo chuyển. \
 (i) Khách hỏi tăng cường sinh lý nam → đây là khách hỏi nhu cầu khác → Dương Sâm Linh Đan (tầng 2); "chức năng sinh lý kém" trong bảng đối tượng của Nước Hồng sâm \
 không dùng để tư vấn sinh lý nam. \
-(j) TỔNG HỢP ĐƠN: chỉ gửi NGUYÊN VĂN confirm_text của build_order (đơn nhiều sản phẩm → 1 đơn, đủ mọi món), không tự viết.
+(j) TỔNG HỢP ĐƠN: chỉ gửi NGUYÊN VĂN confirm_text của build_order (đơn nhiều sản phẩm → 1 đơn, đủ mọi món), không tự viết. \
+(k) (30/10) Nói về công ty phải nêu RÕ TÊN: "Sâm Thái Minh (Công ty Cổ phần Sâm và Dược liệu quý Thái Minh), thuộc hệ thống Dược phẩm Thái Minh gần 15 năm"; \
+không nói chung chung "từ công ty". Khách hỏi nhà thuốc / mua ở đâu → câu chuẩn where_buy (link https://samthaiminh.com/diem-ban) + mời đặt qua page. \
+Viết câu đầy đủ, rõ nghĩa, không bỏ chữ.
 """
 
 # v0.4.0: dòng gói Nước Hồng sâm "Combo K hộp (… túi): … – tặng …" → giá K × giá hộp 20 túi, quà đúng bảng
@@ -4225,6 +4350,12 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
             debug["parents_dropped"] = _bm
         text = _fix_ds_packages(text)   # v0.3.0: gói Dương Sâm đúng giá/quà
         text = _fix_nhs_packages(text, [str(m.get("text") or "") for m in transcript_orig if m.get("role") == "assistant"])   # v0.4.0: gói Nước Hồng sâm đúng giá/quà
+        text, _g10 = _gate_10tui(text, transcript_orig)   # v0.5.8: chưa thuyết phục đủ 2 lần → chưa mời hộp 10 túi
+        text, _wb = _add_where_buy(text, (user_texts_real or [""])[-1])   # v0.5.8: hỏi nhà thuốc / mua ở đâu → link điểm bán
+        if _wb:
+            debug["where_buy_added"] = True
+        if _g10:
+            debug["offer10_blocked"] = _g10
         text, _ut = _drop_unasked_tiers(text, user_texts_real, focus or "")   # v0.4.0: không tự nhắc dòng khác khi khách không hỏi
         if _ut:
             debug["other_tier_dropped"] = _ut
@@ -4279,6 +4410,9 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         text = re.sub(r"^\s*(?:dạ\s*)?vâng(?:\s+(?:anh|chị|bác|cô|chú|em|anh/chị)(?:\s+[A-Za-zÀ-ỹĐđ]+){0,3})?\s*ạ?\s*[.!]?\s*\n+", "", text, flags=re.I)
         if channel == "messenger" and text:
             text = _ensure_greeting(text, transcript_orig, profile or "")
+        text, _oc = _order_confirmed(text, transcript_orig)   # v0.5.8: khách xác nhận đơn → không gửi lại tổng hợp, luôn gắn thẻ Bot chốt đơn
+        if _oc:
+            debug["order_confirmed_fixed"] = _oc
         text, handoffs = extract_handoffs(text)
         text, _dups = _drop_repeats(text, transcript_orig)
         if _dups:

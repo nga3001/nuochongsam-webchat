@@ -1,4 +1,14 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.7 (29/10/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.8 (30/10/2026)
+
+## v0.5.8 — chạy thật trên page (30/10), chị Nga góp ý
+- Khách chê đắt / chưa đủ tiền / không có tiền (kể cả "đắt quá thôi") → thuyết phục ÍT NHẤT 2 LẦN mua hộp 20 túi / combo; khách vẫn từ chối mới mời hộp nhỏ 10 túi. Code chặn lời mời 10 túi đến sớm (bỏ câu + ảnh hộp 10 túi, thay bằng lần thuyết phục tiếp theo). Khách tự hỏi hộp nhỏ / xin dùng thử thì vẫn giới thiệu 10 túi.
+- Thành ngữ phải viết đủ chữ: "tiền nào nấy" → "tiền nào của nấy". Tên viện sai "Viện Dược liệu" → "Viện Nghiên cứu Sâm và Dược liệu Việt Nam (VIGH)". Không gán công dụng cho quà ("Trà sâm 1700 giúp bác dễ ngủ" → bỏ phần công dụng).
+- SĐT khách gửi sai (thừa / thiếu số) → luôn trả lời bằng câu chuẩn nói rõ số đang có bao nhiêu chữ số (AI từng bịa lý do "số hiển thị dạng bảo mật" vì SĐT được che trước khi gửi AI).
+- Nói về công ty phải nêu rõ tên ("từ công ty" → "từ Sâm Thái Minh (Công ty Cổ phần Sâm và Dược liệu quý Thái Minh, thuộc hệ thống Dược phẩm Thái Minh)"). Khách hỏi nhà thuốc / mua ở đâu → luôn kèm link https://samthaiminh.com/diem-ban.
+- Khách xác nhận đơn ("ok", "oki", like) hoặc im 5 phút sau tin tổng hợp đơn → bot KHÔNG gửi lại tổng hợp đơn lần 2 (thay bằng câu chuẩn "bên em sẽ gọi điện lại để xác nhận đơn") và LUÔN gắn thẻ "Bot chốt đơn" (ca thật anh Văn Mạnh Phí 30/10: lặp xác nhận + không gắn thẻ).
+- Trả lời bình luận: tin nhắn riêng theo combo 2/4/6 hộp, không nói "liệu trình / combo theo tháng".
+- Khuyến nghị: đặt DEFAULT_MODEL=gemini (Gemini 3.8 Flash), FALLBACK_MODEL=gemini_lite — Flash-Lite viết tiếng Việt kém tự nhiên, hay bỏ chữ.
+- Ca thử tự động: 33/33 (bot Nước Hồng sâm), 17/17 (bot lát).
 
 ## v0.5.7 — bot dừng giữa chừng khi chốt đơn (chat thử chị Nga)
 - Khách gửi SĐT sai → bot hỏi lại → khách gửi lại SĐT đúng (chỉ số điện thoại) → AI viết ghi chú nội bộ "Sản phẩm chọn: hsmo-tui-10 …" rồi dừng. Nay: (1) mã sản phẩm nội bộ (hsmo-…, hsvn-…) và nhãn "Sản phẩm chọn:" bị chặn, không tới khách; (2) code ghép SĐT mới với địa chỉ ở tin trước → coi như đủ thông tin → bắt gọi công cụ lên đơn và gửi tin tổng hợp đơn.
