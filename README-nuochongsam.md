@@ -1,4 +1,10 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.9 (30/10/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.10 (30/10/2026)
+
+## v0.5.10 — rà lại xưng hô (ca thật Mây Bay: "Cháu chúc chị…")
+- Khách không tự xưng bác/cô/chú/ông/bà → bot LUÔN xưng "em" (code đổi "Cháu chúc…", "cho cháu xin…", "bên cháu" → "em"); không đụng "cháu nhà chị", "cháu bé".
+- Bot không gọi khách là "bạn" (đổi thành anh/chị rồi theo hồ sơ khách).
+- Câu chuẩn code chèn khi khách xác nhận đơn cũng đổi xưng hô theo khách.
+- Rà 13 tình huống xưng hô qua toàn bộ code (không rõ giới tính; hồ sơ Pancake chị Hoa / anh Tuấn; khách tự xưng chị, anh, bác, cô; "Cho cô hỏi giá"; mua cho mẹ; vợ tôi; khách tự xưng mình; khách gọi bot là chị; cháu nhà chị) — đều đúng.
 
 ## v0.5.9 — trả lời bình luận khi chạy chế độ POLL
 - Bot Nước Hồng sâm nhận tin bằng chế độ tự hỏi Pancake (PANCAKE_POLL=1, giống bot Dương Sâm). Chế độ này trước đây CHỈ xét hội thoại tin nhắn (INBOX), bình luận không bao giờ tới bot (bình luận chỉ đi qua webhook) → bình luận "Ib" không được trả lời. Nay xét cả hội thoại bình luận khi PANCAKE_COMMENT=1. Lần đầu chạy thật cần thử bằng bình luận có #tm (PANCAKE_COMMENT_TEST=1) trước khi mở cho mọi bình luận.

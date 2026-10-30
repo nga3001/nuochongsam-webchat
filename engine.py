@@ -1,5 +1,6 @@
 """Engine hội thoại (v0.1.59 — 23/10 bản đầy đủ: lưới đủ ý + bám tài liệu, chặn "mã lạ"; CTKM khách cũ chỉ khi đã dùng đúng sản phẩm; v0.1.58 — 23/10 bản đầy đủ: không nói toàn bộ sâm trồng ở Sìn Hồ; tên/địa chỉ, giao hàng sau chốt, lời chúc đúng buổi, cảm ơn ngắn; lời chúc đúng buổi, cảm ơn lại → 1 câu ngắn; v0.1.56 — 23/10: quà mua 1 hộp chỉ khi khách tự hỏi; v0.1.54 — 23/10: giờ mở cửa + quà tại cửa hàng 92 Trung Kính, không bán nợ; v0.1.53 — 23/10: chặn phí ship/tổng tiền sai, bán chịu ≠ rượu; v0.1.52 — 23/10: khách muốn qua cửa hàng 92 Trung Kính vẫn dẫn tới chốt; v0.1.50 — 22/10: lưới chặn giá _fix_prices; bắt thêm câu \"xin lại số điện thoại\"): Claude API tool-use + não Sâm Thái Minh (nhân bản từ Bình Vị v1.0).
 Kiến trúc kế thừa KingsUp: LLM lo hội thoại/judgment, tool lo fact/tính toán/safety gate.
+v0.5.10 (30/10/2026, chị Nga chạy thật ca Mây Bay): khách không xưng bác/cô… thì bot luôn xưng "em" (không "cháu"); không gọi khách là "bạn"; bot nhận và trả lời bình luận ở chế độ POLL (v0.5.9).
 v0.5.8 (30/10/2026, chị Nga chạy thật): khách xác nhận đơn (ok / im 5 phút) → không gửi lại tổng hợp đơn, luôn gắn thẻ Bot chốt đơn; SĐT sai → luôn báo rõ số đang có bao nhiêu chữ số (không bịa "dạng bảo mật"); chê đắt / chưa đủ tiền → thuyết phục ít nhất 2 lần mua hộp 20 túi rồi mới mời hộp 10 túi (code chặn); thành ngữ viết đủ chữ ("tiền nào của nấy"); tên viện đúng (VIGH); không gán công dụng cho quà Trà sâm.
 v0.5.7 (29/10/2026, chị Nga chat thử): mã SKU nội bộ không lộ ra khách; khách gửi lại SĐT đúng (địa chỉ ở tin trước) → lên đơn luôn, không dừng; nhận "chị Nga, 09…" là khách xưng chị.
 v0.5.6 (29/10/2026, rà soát tổng thể): NHS_BLOCK ghi đè rõ 12 luật chung của bot lát; lưới giá riêng Nước Hồng sâm; nhận khách tự xưng anh/chị/bác/cô rộng hơn; lưới chống lộ thêm nhãn vai, câu nói về lượt/hệ thống, dòng ghi chú trong ngoặc; bỏ ảnh dòng tầng 2 khi khách không hỏi.
@@ -3139,6 +3140,31 @@ def _fix_title(text: str, title: str, user_texts: list = None) -> str:
     return text
 
 
+_SELF_V = (r"chúc|xin|gửi|cảm ơn|cám ơn|hiểu|sẽ|đã|rất|tư vấn|ghi nhận|kiểm tra|mời|báo|lên đơn|giữ|hỗ trợ|gợi ý|nhắn|chờ|đợi|"
+           r"không|chưa|vừa|là|ạ|có|đang|thấy|nghĩ|mong|xác nhận|giao|gọi|chuyển|tặng|dặn|nhờ|hướng dẫn|lưu|nhận|đề xuất")
+_RE_SELF_CHAU = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(Cháu|cháu)(?=\s+(?:" + _SELF_V + r")(?![A-Za-zÀ-ỹĐđ]))")
+_RE_SELF_CHAU2 = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(bên|cho|với|giúp|của|để|Dạ|dạ)\s+cháu(?![A-Za-zÀ-ỹĐđ])(?!\s+(?:nhà|bé|nội|ngoại|gái|trai|của (?:anh|chị|bác|cô)))")
+
+
+_RE_BAN = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])([Bb])ạn(?![A-Za-zÀ-ỹĐđ])(?!\s+(?:bè|đời|trai|gái|thân|học|cùng|đồng|của (?:anh|chị|bác|cô|em)))")
+
+
+def _fix_ban(text: str) -> str:
+    """v0.5.10: bot gọi khách là "bạn" (cấm từ 23/09) → "anh/chị" (bước xưng hô sau đó đổi tiếp theo hồ sơ khách)."""
+    if not text:
+        return text
+    return _RE_BAN.sub(lambda m: "Anh/chị" if m.group(1) == "B" else "anh/chị", text)
+
+
+def _fix_self_em(text: str) -> str:
+    """v0.5.10 (30/10, chạy thật ca Mây Bay): khách KHÔNG tự xưng bác/cô… mà bot lại xưng "cháu" ("Cháu chúc chị…") → bot luôn xưng "em".
+    Không đổi "cháu" chỉ người nhà khách ("cháu nhà chị", "cháu bé")."""
+    if not text:
+        return text
+    text = _RE_SELF_CHAU.sub(lambda m: "Em" if m.group(1) == "Cháu" else "em", text)
+    return _RE_SELF_CHAU2.sub(lambda m: m.group(1) + " em", text)
+
+
 def _fix_pronoun(text: str, profile: str, user_texts: list = None) -> str:
     """v0.1.45/0.1.98: biết khách là anh/chị → không còn 'anh/chị', 'anh chị', và không còn gọi nhầm giới ('anh muốn…' khi khách là chị)."""
     m = re.search(r'GỌI KHÁCH: "(chị|anh) ([^"]+)"', profile or "")
@@ -4280,7 +4306,7 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
                         lambda mm: (_ww[:1].upper() + _ww[1:]) if mm.group(1)[:1].isupper() else _ww, t_)
         if _ct:
             return _fix_title(t_, _ct, user_texts_real)
-        return _fix_pronoun(t_, profile or "", user_texts_real)
+        return _fix_self_em(_fix_pronoun(t_, profile or "", user_texts_real))   # v0.5.10: không phải khách lớn tuổi → bot xưng "em"
 
     def _finish(text, debug):
         text = extract_tagged(text or "")[0]   # v0.1.96: mọi đường đi đều bóc thẻ <khach>/<nghi>
@@ -4298,7 +4324,7 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         text, _leaks = strip_internal(text)
         if _leaks:
             debug["leak_dropped"] = _leaks
-        text = fix_minh(sanitize_out(strip_markdown(text))).strip()
+        text = _fix_ban(fix_minh(sanitize_out(strip_markdown(text)))).strip()   # v0.5.10: không gọi khách là "bạn"
         text = _fix_banned_phrases(text)
         text, _sp = _fix_support(text)          # v0.1.99: tác dụng bệnh lý luôn có "hỗ trợ"
         if _sp:
@@ -4413,6 +4439,7 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         text, _oc = _order_confirmed(text, transcript_orig)   # v0.5.8: khách xác nhận đơn → không gửi lại tổng hợp, luôn gắn thẻ Bot chốt đơn
         if _oc:
             debug["order_confirmed_fixed"] = _oc
+            text = _address(text)   # câu chuẩn order_after_confirm viết "anh/chị" → đổi theo khách
         text, handoffs = extract_handoffs(text)
         text, _dups = _drop_repeats(text, transcript_orig)
         if _dups:

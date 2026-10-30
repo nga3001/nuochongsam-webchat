@@ -444,6 +444,15 @@ def test_34_xac_nhan_don():
     assert engine._order_confirmed("Dạ vâng ạ", T(("user", "giá"), ("assistant", "620.000đ"), ("user", "ok")))[1] == 0
 
 
+# 35 ─ (chạy thật 30/10, ca Mây Bay) khách không xưng bác/cô → bot xưng "em", không "cháu"; không gọi khách "bạn"
+def test_35_bot_xung_em():
+    assert engine._fix_self_em("Cháu chúc chị luôn nhiều sức khỏe ạ!") == "Em chúc chị luôn nhiều sức khỏe ạ!"
+    assert engine._fix_self_em("Dạ cháu cảm ơn chị, chị cho cháu xin số điện thoại nhé.") == "Dạ em cảm ơn chị, chị cho em xin số điện thoại nhé."
+    assert engine._fix_self_em("Cháu nhà chị mấy tuổi rồi ạ?") == "Cháu nhà chị mấy tuổi rồi ạ?"
+    assert engine._fix_ban("Dạ bạn ơi, bạn muốn lấy mấy hộp ạ?") == "Dạ anh/chị ơi, anh/chị muốn lấy mấy hộp ạ?"
+    assert engine._fix_ban("Mua làm quà cho bạn bè cũng hợp ạ.") == "Mua làm quà cho bạn bè cũng hợp ạ."
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted((k, v) for k, v in globals().items() if k.startswith("test_")):
