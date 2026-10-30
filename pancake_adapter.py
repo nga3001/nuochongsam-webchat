@@ -3681,7 +3681,10 @@ def _poll_once():
     for cv in convs[:30]:
         cid = cv.get("id")
         ctype = (cv.get("type") or "").upper()
-        if not cid or (ctype and ctype != "INBOX"):
+        # v0.5.8 (30/10, chị Nga: bình luận "Ib" không được trả lời): chế độ POLL trước đây CHỈ xét hội thoại INBOX nên bình luận
+        # không bao giờ tới bot (bình luận chỉ đi qua webhook). Nay xét cả COMMENT khi đã bật trả lời bình luận.
+        _cmt_on = db.get_setting("pancake_comment", os.environ.get("PANCAKE_COMMENT", "0")) == "1"
+        if not cid or (ctype and ctype != "INBOX" and not (ctype == "COMMENT" and _cmt_on)):
             continue
         upd = cv.get("updated_at") or ""
         if _already_seen(f"poll:{cid}:{upd}"):

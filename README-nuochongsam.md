@@ -1,4 +1,7 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.8 (30/10/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.9 (30/10/2026)
+
+## v0.5.9 — trả lời bình luận khi chạy chế độ POLL
+- Bot Nước Hồng sâm nhận tin bằng chế độ tự hỏi Pancake (PANCAKE_POLL=1, giống bot Dương Sâm). Chế độ này trước đây CHỈ xét hội thoại tin nhắn (INBOX), bình luận không bao giờ tới bot (bình luận chỉ đi qua webhook) → bình luận "Ib" không được trả lời. Nay xét cả hội thoại bình luận khi PANCAKE_COMMENT=1. Lần đầu chạy thật cần thử bằng bình luận có #tm (PANCAKE_COMMENT_TEST=1) trước khi mở cho mọi bình luận.
 
 ## v0.5.8 — chạy thật trên page (30/10), chị Nga góp ý
 - Khách chê đắt / chưa đủ tiền / không có tiền (kể cả "đắt quá thôi") → thuyết phục ÍT NHẤT 2 LẦN mua hộp 20 túi / combo; khách vẫn từ chối mới mời hộp nhỏ 10 túi. Code chặn lời mời 10 túi đến sớm (bỏ câu + ảnh hộp 10 túi, thay bằng lần thuyết phục tiếp theo). Khách tự hỏi hộp nhỏ / xin dùng thử thì vẫn giới thiệu 10 túi.
