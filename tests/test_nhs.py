@@ -453,6 +453,17 @@ def test_35_bot_xung_em():
     assert engine._fix_ban("Mua làm quà cho bạn bè cũng hợp ạ.") == "Mua làm quà cho bạn bè cũng hợp ạ."
 
 
+# 36 ─ (chạy thật 02/11, ca Nguyễn Tâm) khách lưỡng lự mà chưa thấy combo → gửi ưu đãi combo + xin SĐT; không nói "liệu trình"
+def test_36_luong_lu_gui_uu_dai():
+    T = lambda *x: [{"role": r, "text": tx} for r, tx in x]
+    tr = T(("user", "cho e xin giá ạ"), ("assistant", "Dạ giá 620.000đ một hộp 20 túi ạ."), ("user", "Dạ vâng để e xem đã ạ"))
+    out, n = engine._hesitate_offer_nhs("Dạ vâng ạ. Chị để lại số điện thoại giúp em nhé ạ.", tr)
+    assert n == 1 and out.count("Combo") == 3 and "1.240.000đ" in out and "số điện thoại" in out
+    tr2 = T(("user", "giá"), ("assistant", "🎁 Combo 2 hộp: 1.240.000đ – tặng 1 hộp Trà sâm"), ("user", "để em suy nghĩ thêm"))
+    assert engine._hesitate_offer_nhs("Dạ vâng ạ.", tr2)[1] == 0          # đã thấy combo rồi → không gửi lại
+    assert engine._fix_lieu_trinh_nhs("Chị muốn tìm hiểu liệu trình dùng cho cá nhân ạ?")[0] == "Chị muốn tìm hiểu cách dùng cho cá nhân ạ?"
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted((k, v) for k, v in globals().items() if k.startswith("test_")):

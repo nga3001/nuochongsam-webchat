@@ -1,5 +1,6 @@
 """Engine hội thoại (v0.1.59 — 23/10 bản đầy đủ: lưới đủ ý + bám tài liệu, chặn "mã lạ"; CTKM khách cũ chỉ khi đã dùng đúng sản phẩm; v0.1.58 — 23/10 bản đầy đủ: không nói toàn bộ sâm trồng ở Sìn Hồ; tên/địa chỉ, giao hàng sau chốt, lời chúc đúng buổi, cảm ơn ngắn; lời chúc đúng buổi, cảm ơn lại → 1 câu ngắn; v0.1.56 — 23/10: quà mua 1 hộp chỉ khi khách tự hỏi; v0.1.54 — 23/10: giờ mở cửa + quà tại cửa hàng 92 Trung Kính, không bán nợ; v0.1.53 — 23/10: chặn phí ship/tổng tiền sai, bán chịu ≠ rượu; v0.1.52 — 23/10: khách muốn qua cửa hàng 92 Trung Kính vẫn dẫn tới chốt; v0.1.50 — 22/10: lưới chặn giá _fix_prices; bắt thêm câu \"xin lại số điện thoại\"): Claude API tool-use + não Sâm Thái Minh (nhân bản từ Bình Vị v1.0).
 Kiến trúc kế thừa KingsUp: LLM lo hội thoại/judgment, tool lo fact/tính toán/safety gate.
+v0.5.12 (02/11/2026, chạy thật ca Nguyễn Tâm): khách lưỡng lự ("để em xem đã") mà chưa thấy combo → gửi bảng combo + ưu đãi + xin SĐT; không nói "liệu trình". v0.5.11: khách để SĐT → thẻ Có SĐT + giao người gọi.
 v0.5.10 (30/10/2026, chị Nga chạy thật ca Mây Bay): khách không xưng bác/cô… thì bot luôn xưng "em" (không "cháu"); không gọi khách là "bạn"; bot nhận và trả lời bình luận ở chế độ POLL (v0.5.9).
 v0.5.8 (30/10/2026, chị Nga chạy thật): khách xác nhận đơn (ok / im 5 phút) → không gửi lại tổng hợp đơn, luôn gắn thẻ Bot chốt đơn; SĐT sai → luôn báo rõ số đang có bao nhiêu chữ số (không bịa "dạng bảo mật"); chê đắt / chưa đủ tiền → thuyết phục ít nhất 2 lần mua hộp 20 túi rồi mới mời hộp 10 túi (code chặn); thành ngữ viết đủ chữ ("tiền nào của nấy"); tên viện đúng (VIGH); không gán công dụng cho quà Trà sâm.
 v0.5.7 (29/10/2026, chị Nga chat thử): mã SKU nội bộ không lộ ra khách; khách gửi lại SĐT đúng (địa chỉ ở tin trước) → lên đơn luôn, không dừng; nhận "chị Nga, 09…" là khách xưng chị.
@@ -2482,6 +2483,43 @@ def _add_where_buy(text: str, last_user: str) -> tuple:
     return "\n\n".join(paras), 1
 
 
+_RE_HESITATE = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(?:để\s+(?:e|em|chị|c|anh|a|mình|tôi|t|cô|bác)?\s*(?:xem|suy nghĩ|nghĩ|tính|cân nhắc|tham khảo|hỏi|bàn)|"
+                          r"xem đã|xem thêm đã|tham khảo (?:thêm|đã)|suy nghĩ (?:thêm|đã)|để sau|lúc khác|hôm khác|tính sau)(?![A-Za-zÀ-ỹĐđ])", re.I)
+
+
+def _fix_lieu_trinh_nhs(text: str) -> tuple:
+    """v0.5.12 (02/11, chạy thật ca Nguyễn Tâm): bot Nước Hồng sâm vẫn nói "liệu trình" (luật cấm) → đổi cách nói."""
+    if not IS_NHS or not text or "liệu trình" not in text.lower():
+        return text, 0
+    t2 = re.sub(r"(?i)(tìm hiểu|tư vấn|gợi ý|chọn|hướng dẫn)\s+liệu trình(?:\s+dùng)?", r"\1 cách dùng", text)
+    t2 = re.sub(r"(?i)liệu trình(?:\s+dùng)?", "gói dùng", t2)
+    return t2, int(t2 != text)
+
+
+def _hesitate_offer_nhs(text: str, transcript: list) -> tuple:
+    """v0.5.12 (02/11, chạy thật ca Nguyễn Tâm): khách mới nghe giá 1 hộp rồi nói "để em xem đã" → bot chỉ xin SĐT,
+    khách CHƯA từng thấy ưu đãi combo. Nay: khách lưỡng lự mà chưa được gửi bảng combo → gửi bảng combo + ưu đãi
+    (miễn ship, kiểm tra hàng rồi mới trả tiền) + xin SĐT nhẹ, trước khi khách rời đi."""
+    if not IS_NHS or not text:
+        return text, 0
+    turns = [(m.get("role"), str(m.get("text") or m.get("content") or "")) for m in transcript or []]
+    if not turns or turns[-1][0] != "user" or not _RE_HESITATE.search(turns[-1][1]):
+        return text, 0
+    said = " ".join(t for r, t in turns if r == "assistant") + " " + text
+    if re.search(r"combo\s*2\s*hộp", said, re.I) or _is_order_summary(text):
+        return text, 0
+    fit, styles, closes, adv = _nhs_quote_parts()
+    if not styles:
+        return text, 0
+    head, lines = styles[_rr_next("style", len(styles))]
+    out = ("Dạ vâng ạ, anh/chị cứ tham khảo thêm nhé. Em gửi anh/chị ưu đãi đang áp dụng để tiện cân nhắc ạ:\n\n"
+           + head + "\n" + "\n".join(lines[:3])
+           + ("\n✅ Nhận hàng kiểm tra rồi mới thanh toán" if "miễn phí vận chuyển" in head.lower()
+              else "\n✅ Từ 2 hộp miễn phí vận chuyển, nhận hàng kiểm tra rồi mới thanh toán")
+           + "\n\nAnh/chị để lại số điện thoại giúp em, khi anh/chị cần em tư vấn kỹ hơn và giữ quà cho anh/chị nhé ạ?")
+    return out, 1
+
+
 def _gate_10tui(text: str, transcript: list) -> tuple:
     """Chặn lời mời hộp 10 túi khi CHƯA thuyết phục đủ 2 lần (khách tự hỏi gói nhỏ / dùng thử thì cho)."""
     if not IS_NHS or not text or not _RE_10TUI_OFFER.search(text):
@@ -4378,6 +4416,12 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         text = _fix_nhs_packages(text, [str(m.get("text") or "") for m in transcript_orig if m.get("role") == "assistant"])   # v0.4.0: gói Nước Hồng sâm đúng giá/quà
         text, _g10 = _gate_10tui(text, transcript_orig)   # v0.5.8: chưa thuyết phục đủ 2 lần → chưa mời hộp 10 túi
         text, _wb = _add_where_buy(text, (user_texts_real or [""])[-1])   # v0.5.8: hỏi nhà thuốc / mua ở đâu → link điểm bán
+        text, _ho = _hesitate_offer_nhs(text, transcript_orig)   # v0.5.12: khách lưỡng lự mà chưa thấy combo → gửi ưu đãi + xin SĐT
+        if _ho:
+            debug["hesitate_offer"] = True
+        text, _lt = _fix_lieu_trinh_nhs(text)   # v0.5.12: Nước Hồng sâm không nói "liệu trình"
+        if _lt:
+            debug["lieu_trinh_fixed"] = True
         if _wb:
             debug["where_buy_added"] = True
         if _g10:
