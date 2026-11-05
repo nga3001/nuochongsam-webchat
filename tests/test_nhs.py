@@ -464,6 +464,31 @@ def test_36_luong_lu_gui_uu_dai():
     assert engine._fix_lieu_trinh_nhs("Chị muốn tìm hiểu liệu trình dùng cho cá nhân ạ?")[0] == "Chị muốn tìm hiểu cách dùng cho cá nhân ạ?"
 
 
+# 37 ─ (05/11, chị Nga) thông điệp Hội nghị Quốc tế về Sâm: nguyên văn, đúng 2 ảnh, 1 lần/hội thoại, tự gửi khi khách nghi ngờ chất lượng
+def test_37_hoi_nghi_sam():
+    T = lambda *x: [{"role": r, "text": tx} for r, tx in x]
+    imgs = ("[IMG: hoi-nghi-sam-han-quoc]", "[IMG: ts-thai-bao-cao-han-quoc]")
+    # (a) khách hỏi uy tín, AI chưa nói → tự thêm trước câu hỏi cuối, kèm đúng 2 ảnh
+    tr = T(("user", "giá sao em"), ("assistant", "Dạ 620.000đ/hộp ạ."), ("user", "sâm việt nam có tốt bằng sâm hàn không em"))
+    out, n = engine._symposium_net("Dạ sâm Việt Nam có hoạt chất MR2 ạ.\n\nAnh/chị dùng cho bản thân hay người thân ạ?", tr)
+    assert n == 1 and engine.SYMPOSIUM_MSG in out and all(out.count(i) == 1 for i in imgs)
+    assert out.rstrip().endswith("người thân ạ?") and out.index(imgs[1]) < out.index("Anh/chị dùng")
+    # (b) AI tự diễn đạt lại → thay bằng câu chuẩn, gắn 2 ảnh, bỏ ảnh thừa
+    ai = "Dạ vâng ạ. Sản phẩm vừa được giới thiệu tại Hội nghị Quốc tế về Sâm ở Hàn Quốc, rất được đánh giá cao ạ. [IMG: hoi-nghi-sam-han-quoc]"
+    out, n = engine._symposium_net(ai, T(("user", "ok")))
+    assert n == 1 and engine.SYMPOSIUM_MSG in out and out.startswith("Dạ vâng ạ.") and all(out.count(i) == 1 for i in imgs)
+    # (c) đã gửi rồi → không lặp, bỏ ảnh
+    tr3 = T(("assistant", engine.SYMPOSIUM_MSG), ("user", "hàng có chính hãng không"))
+    out, n = engine._symposium_net(ai, tr3)
+    assert "Hội nghị" not in out and "[IMG" not in out and out.startswith("Dạ vâng ạ.")
+    assert engine._symposium_net("Dạ hàng chính hãng ạ.", tr3)[1] == 0
+    # (d) ảnh hội nghị đứng một mình → bỏ; khách không nghi ngờ → không thêm
+    assert engine._symposium_net("Dạ vâng ạ.\n[IMG: ts-thai-bao-cao-han-quoc]", T(("user", "giá bao nhiêu")))[0] == "Dạ vâng ạ."
+    assert engine._symposium_net("Dạ 620.000đ ạ.", T(("user", "giá bao nhiêu")))[1] == 0
+    # (e) tin an toàn (cho con bú) → không chèn
+    assert engine._symposium_net("Dạ phụ nữ đang cho con bú không dùng được ạ.", T(("user", "đang cho con bú dùng hàng thật được không")))[1] == 0
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted((k, v) for k, v in globals().items() if k.startswith("test_")):

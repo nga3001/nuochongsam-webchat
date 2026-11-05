@@ -1774,6 +1774,7 @@ Rượu sâm chai 650ml: [IMG: ruou-sam] (CHỈ gửi khi khách hỏi/xin ảnh
 Sâm tươi (CHỈ khi khách hỏi): [IMG: sam-tuoi-vuon] (sâm thu hoạch tại vườn Lai Châu), [IMG: sam-tuoi-can] (sâm nguyên cây đặt trên cân — ẢNH MINH HỌA, \
 không nói đây là hàng khách sẽ nhận; cân thực tế nhân viên báo khi chốt). \
 Đông trùng hạ thảo (CHỈ khi khách hỏi): [IMG: dong-trung]. Khách hỏi nhà máy / quy trình sản xuất Hồng sâm: [IMG: nha-may], [IMG: nha-may-2] (nhà máy Thái Minh Hi-tech — KHÔNG dùng cho Dương Sâm, Long Sâm). Khách hỏi quy trình sản xuất / chất lượng Dương Sâm Linh Đan: [IMG: duong-sam-vien] (viên hoàn trong giấy gói), [IMG: duong-sam-dong-goi] (đóng gói). \
+Thông điệp Hội nghị Quốc tế về Sâm (scripts_approved.symposium_trust, Hồng sâm lát + Nước Hồng sâm): LUÔN kèm ĐÚNG 2 ảnh [IMG: hoi-nghi-sam-han-quoc] [IMG: ts-thai-bao-cao-han-quoc], tối đa 1 lần/hội thoại; ngoài thông điệp này KHÔNG gửi 2 ảnh đó. \
 Khách TỰ hỏi chuyến thăm của Thủ tướng: được kèm [IMG: vuon-sam-lai-chau] cùng câu chuẩn pm_visit; ngoài trường hợp đó KHÔNG gửi ảnh này. Hũ/bình rượu nguyên cây: CHƯA có ảnh — mô tả bằng chữ, \
 khách cần xem ảnh thì mời để SĐT + [HANDOFF: khách xin ảnh sản phẩm | SĐT | 2]. Chỉ dùng đúng các mã trên, không bịa mã. \
 Ảnh có người là ẢNH QUẢNG CÁO của nhãn hàng — TUYỆT ĐỐI KHÔNG giới thiệu là khách hàng thật/review/cảm nhận người dùng. \
@@ -2520,6 +2521,67 @@ def _hesitate_offer_nhs(text: str, transcript: list) -> tuple:
     return out, 1
 
 
+# v0.5.13 (05/11, chị Nga duyệt): thông điệp Hội nghị Quốc tế về Sâm (Jeju, Hàn Quốc, 26–29/10/2026) — dùng cho Hồng sâm lát và Nước Hồng sâm.
+# Văn bản gốc viết "cô chú"; ở đây để "anh/chị" để bước _address đổi đúng cách xưng hô với từng khách.
+SYMPOSIUM_MSG = ("Hồng sâm Thái Minh là dòng hồng sâm đầu tiên làm từ sâm Việt Nam mình. Cuối tháng 10 vừa rồi, sản phẩm đã được giới thiệu "
+                 "tại Hội nghị Quốc tế về Sâm ngay tại Hàn Quốc. Đích thân Tiến sĩ Nguyễn Quang Thái – Chủ tịch Thái Minh – đã trực tiếp báo cáo "
+                 "khoa học trước chuyên gia 12 nước và được chính các nhà khoa học đánh giá rất cao. Chất lượng và uy tín đã được khẳng định "
+                 "từ nguồn sâm Việt mình, nên anh/chị cứ hoàn toàn an tâm sử dụng nhé ạ!")
+SYMPOSIUM_IMGS = ("hoi-nghi-sam-han-quoc", "ts-thai-bao-cao-han-quoc")
+_RE_SYMPO_MARK = re.compile(r"Hội nghị Quốc tế về Sâm|International Symposium|Nguyễn Quang Thái|chuyên gia 12 nước", re.I)
+_RE_SYMPO_SENT = re.compile(r"Hội nghị (?:Quốc tế|quốc tế)|Symposium|Nguyễn Quang Thái|Tiến sĩ Thái|12 nước|các nhà khoa học đánh giá|"
+                            r"dòng hồng sâm đầu tiên làm từ sâm Việt|uy tín đã được khẳng định|hoàn toàn an tâm sử dụng", re.I)
+_RE_SYMPO_IMG = re.compile(r"[ \t]*\[IMG:\s*(?:hoi-nghi-sam-han-quoc|ts-thai-bao-cao-han-quoc)\s*\][ \t]*\n?", re.I)
+# khách nghi ngờ chất lượng / uy tín / nguồn gốc, so với sâm Hàn → lưới code tự gửi thông điệp (nếu AI chưa gửi)
+_RE_DOUBT_TRUST = re.compile(r"uy tín|chính hãng|hàng (?:thật|giả|nhái|chuẩn)|có (?:phải )?(?:thật|giả) không|tin (?:được|tưởng) (?:không|ko|k)|"
+                             r"(?:sâm|sản phẩm|sp|hàng|bên em|công ty)(?: này| bên em)? (?:có )?(?:tốt|chất lượng|ổn) (?:thật )?(?:không|ko|k)\b|"
+                             r"chất lượng (?:thế nào|ra sao|có tốt|có đảm bảo)|nguồn gốc|xuất xứ|sâm hàn|hàn quốc|"
+                             r"sâm việt(?: nam)?.{0,20}(?:tốt|bằng|thua|kém|so)|so (?:với|sánh)(?: với)? (?:sâm|hàng|bên|loại|hãng)", re.I)
+
+
+def _symposium_net(text: str, transcript: list) -> tuple:
+    """v0.5.13: thông điệp Hội nghị Quốc tế về Sâm — đúng NGUYÊN VĂN đã duyệt, luôn kèm ĐÚNG 2 ảnh, tối đa 1 lần / hội thoại.
+    - AI đã viết (nguyên văn hoặc diễn đạt lại) → thay bằng câu chuẩn + gắn 2 ảnh ngay sau.
+    - Đã gửi ở lượt trước → bỏ câu lặp + ảnh.
+    - Khách nghi ngờ chất lượng / uy tín / nguồn gốc / so với sâm Hàn mà AI chưa nói → tự thêm (trừ tin tổng hợp đơn, tin chuyển người, khách chưa hỏi sản phẩm)."""
+    if not text:
+        return text, 0
+    turns = [(m.get("role"), str(m.get("text") or m.get("content") or "")) for m in transcript or []]
+    sent_before = any(r == "assistant" and _RE_SYMPO_MARK.search(t) for r, t in turns)
+    has = bool(_RE_SYMPO_MARK.search(text))
+    t0 = text
+    text = _RE_SYMPO_IMG.sub("", text).strip()       # ảnh hội nghị chỉ đi cùng thông điệp — gắn lại bên dưới
+    if not has:
+        last_u = turns[-1][1] if turns and turns[-1][0] == "user" else ""
+        if sent_before or not _RE_DOUBT_TRUST.search(last_u) or _is_order_summary(text) or "[HANDOFF:" in text \
+                or re.search(r"cho con bú|có thai|mang thai|dưới 3 tuổi|không dùng được|chưa nên dùng", text, re.I):
+            return text, int(text != t0)
+    paras = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
+    out, pos = [], None
+    for p in paras:
+        if has and _RE_SYMPO_SENT.search(p):
+            keep = [s for s in re.split(r"(?<=[.!?…])\s+", p) if s.strip() and not _RE_SYMPO_SENT.search(s)]
+            if pos is None:
+                pos = len(out)
+            if keep:
+                out.append(" ".join(keep))
+                pos = len(out)       # câu chuẩn đặt sau phần còn lại của đoạn
+            continue
+        out.append(p)
+    if sent_before:
+        return "\n\n".join(out).strip(), 1
+    # xưng hô: câu gốc viết "cô chú" → theo cách gọi khách đang dùng trong tin này / tin bot trước (mặc định "anh/chị", _address đổi tiếp)
+    _ctx = "\n".join(out) + "\n" + "\n".join(t for r, t in turns[-4:] if r == "assistant")
+    _m = re.search(r"(?<![A-Za-zÀ-ỹĐđ/])(cô chú|cô|chú|bác|ông bà|anh/chị|anh chị|anh|chị)\s+(?:yên tâm|cứ|dùng|mua|cho|ơi|nhé|có|đang|muốn|cần|định|vui lòng|kiểm tra|tham khảo)",
+                   _ctx, re.I)
+    _who = (_m.group(1).lower() if _m else "anh/chị").replace("anh chị", "anh/chị")
+    block = SYMPOSIUM_MSG.replace("nên anh/chị cứ", "nên " + _who + " cứ") + "\n" + "\n".join(f"[IMG: {i}]" for i in SYMPOSIUM_IMGS)
+    if pos is None:                          # tự thêm: trước câu hỏi cuối (nếu có), không thì cuối tin
+        pos = len(out) - 1 if out and out[-1].rstrip().endswith("?") else len(out)
+    out.insert(pos, block)
+    return "\n\n".join(out).strip(), 1
+
+
 def _gate_10tui(text: str, transcript: list) -> tuple:
     """Chặn lời mời hộp 10 túi khi CHƯA thuyết phục đủ 2 lần (khách tự hỏi gói nhỏ / dùng thử thì cho)."""
     if not IS_NHS or not text or not _RE_10TUI_OFFER.search(text):
@@ -2739,7 +2801,7 @@ Khách hỏi "ai không dùng được" → đúng 3 nhóm: phụ nữ có thai,
 (b) Khách nói chưa đủ tiền / không có tiền (luật 5o(n)) → coi như CHÊ ĐẮT: thuyết phục đủ 2 lần rồi mới price_objection_nhs (hộp 10 túi), KHÔNG price_objection_switch. \
 (c) Khách đang hỏi dòng tầng 2 (lát / Long Sâm / Dương Sâm) mà chê đắt → nêu giá trị 1 lần, rồi gợi ý quay về Nước Hồng sâm hộp 20 túi (combo 2/4/6 hộp); KHÔNG mời Trà sâm. \
 (d) ẢNH: chỉ dùng [IMG: nuoc-hong-sam] (lượt đầu, đúng 1 ảnh), [IMG: nuoc-hong-sam-10tui] (khi mời hộp 10 túi); ảnh Hồng sâm lát / Long Sâm / Dương Sâm / Trà sâm \
-CHỈ khi khách đã hỏi đúng sản phẩm đó; ảnh vườn sâm chỉ khi khách tự hỏi chuyến thăm Thủ tướng. \
+CHỈ khi khách đã hỏi đúng sản phẩm đó; ảnh vườn sâm chỉ khi khách tự hỏi chuyến thăm Thủ tướng; 2 ảnh hội nghị [IMG: hoi-nghi-sam-han-quoc] [IMG: ts-thai-bao-cao-han-quoc] CHỈ đi kèm thông điệp symposium_trust (mục l). \
 (e) MỜI LÊN GÓI: chỉ theo upsell_nhs (1 → 2; 2–3 → 4; 4–5 → 6 hộp), KHÔNG dùng upsell_double, KHÔNG nói "tháng". Thứ tự: gửi confirm_text → khách xác nhận \
 (ok / like / im 5 phút) → order_after_confirm + BẮT BUỘC thẻ [HANDOFF: đơn đã chốt - lên đơn | SĐT | 1] + (có upsell_hint) mời lên gói ĐÚNG 1 LẦN; \
 KHÔNG gửi lại tổng hợp đơn lần 2. Khách đồng ý lên gói → build_order lại + confirm_text mới + [HANDOFF: khách đổi đơn lên gói lớn | SĐT | 2]. \
@@ -2751,7 +2813,8 @@ không dùng để tư vấn sinh lý nam. \
 (j) TỔNG HỢP ĐƠN: chỉ gửi NGUYÊN VĂN confirm_text của build_order (đơn nhiều sản phẩm → 1 đơn, đủ mọi món), không tự viết. \
 (k) (30/10) Nói về công ty phải nêu RÕ TÊN: "Sâm Thái Minh (Công ty Cổ phần Sâm và Dược liệu quý Thái Minh), thuộc hệ thống Dược phẩm Thái Minh gần 15 năm"; \
 không nói chung chung "từ công ty". Khách hỏi nhà thuốc / mua ở đâu → câu chuẩn where_buy (link https://samthaiminh.com/diem-ban) + mời đặt qua page. \
-Viết câu đầy đủ, rõ nghĩa, không bỏ chữ.
+Viết câu đầy đủ, rõ nghĩa, không bỏ chữ. \
+(l) (05/11) THÔNG ĐIỆP HỘI NGHỊ QUỐC TẾ VỀ SÂM (scripts_approved.symposium_trust): dùng NGUYÊN VĂN khi khách băn khoăn chất lượng / uy tín / nguồn gốc / hàng thật giả, so sánh với sâm Hàn Quốc, hỏi sâm Việt có tốt không; hoặc làm lần thuyết phục thứ 2 khi khách chê đắt (trước khi mời hộp 10 túi); hoặc khi khách còn lưỡng lự sau khi đã nghe giá. Tối đa 1 lần/hội thoại, kèm ĐÚNG 2 ảnh [IMG: hoi-nghi-sam-han-quoc] [IMG: ts-thai-bao-cao-han-quoc]. Đổi 'cô chú' theo đúng cách xưng hô với khách; không thêm bớt chi tiết (không nói tên thành phố, không nói giải thưởng).
 """
 
 # v0.4.0: dòng gói Nước Hồng sâm "Combo K hộp (… túi): … – tặng …" → giá K × giá hộp 20 túi, quà đúng bảng
@@ -4419,6 +4482,9 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         text, _ho = _hesitate_offer_nhs(text, transcript_orig)   # v0.5.12: khách lưỡng lự mà chưa thấy combo → gửi ưu đãi + xin SĐT
         if _ho:
             debug["hesitate_offer"] = True
+        text, _sy = _symposium_net(text, transcript_orig)   # v0.5.13: thông điệp Hội nghị Quốc tế về Sâm — nguyên văn + đúng 2 ảnh, 1 lần
+        if _sy:
+            debug["symposium"] = True
         text, _lt = _fix_lieu_trinh_nhs(text)   # v0.5.12: Nước Hồng sâm không nói "liệu trình"
         if _lt:
             debug["lieu_trinh_fixed"] = True

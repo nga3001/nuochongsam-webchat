@@ -164,6 +164,9 @@ IMG_FILES = {
     "nuoc-hong-sam-10tui": "nuoc-hong-sam-10tui.jpg",  # v0.1.46: hộp nhỏ 10 túi — CHỈ khi khách hỏi loại 10 túi
     "nuoc-hong-sam": "nuoc-hong-sam.jpg",    # v0.1.46: ảnh chính Nước Hồng sâm hộp 20 túi (chị Nga gửi 21/10) — ƯU TIÊN khi giới thiệu NHS
     "hong-sam-tui-pha": "hong-sam-tui-pha.jpg",
+    # v0.5.13 (05/11, chị Nga): Hội nghị Quốc tế về Sâm lần 14 (Jeju, Hàn Quốc 26–29/10/2026) — CHỈ gửi kèm thông điệp symposium_trust
+    "hoi-nghi-sam-han-quoc": "hoi-nghi-sam-han-quoc.jpg",          # ảnh toàn cảnh đại biểu dưới băng rôn hội nghị
+    "ts-thai-bao-cao-han-quoc": "ts-thai-bao-cao-han-quoc.jpg",    # Tiến sĩ Nguyễn Quang Thái báo cáo, slide có sản phẩm Thái Minh
     "duong-sam": "duong-sam.jpg",
     "long-sam": "long-sam.jpg",
     "long-sam-qua-bieu": "long-sam-qua-bieu.jpg",
@@ -333,6 +336,9 @@ STICKER_SEE = "[Khách gửi sticker — hãy NHÌN hình sticker đính kèm, p
 ATT_ACK = os.environ.get("PANCAKE_ATT_ACK") or (
     "Dạ em nhận được ảnh của anh/chị rồi ạ, em nhờ chuyên viên xem giúp rồi phản hồi anh/chị ngay nhé ạ.")
 TAG_NO_REPLY = "Ko PH"
+# v0.5.11 (30/10, chị Nga: "quan trọng nhất là NV nắm được khách thả SĐT và gọi ra"): khách gửi SĐT hợp lệ → gắn thẻ này
+# + giao nhân viên trực + đánh dấu chưa đọc NGAY (bot vẫn chat tiếp bình thường). Thẻ phải tạo sẵn trên Pancake đúng tên.
+TAG_PHONE = os.environ.get("PANCAKE_TAG_PHONE", "Có SĐT")
 # v0.5.22 A3: FB #551 — khách chặn page / xoá hội thoại / hết cửa sổ: không gửi được nữa
 TAG_UNREACH = os.environ.get("PANCAKE_TAG_UNREACH", "Ko gửi được")
 # v0.5.22 A7: khách gửi TRẦN SĐT → 1 câu ghi nhận rồi giao người NGAY (không chờ nhịp 30 phút)
@@ -1323,6 +1329,27 @@ def find_phones(text: str) -> list:
     return out
 
 
+def _phone_lead(conv_id: str, phone: str):
+    """v0.5.11: khách để SĐT → thẻ "Có SĐT" + giao người trực + chưa đọc, để nhân viên GỌI RA (bot không dừng).
+    Mỗi số chỉ báo 1 lần / hội thoại; khách gửi số khác → báo lại."""
+    try:
+        if not conv_id or not phone or not is_enabled() or is_killed():
+            return
+        if is_test_only() and not db.pancake_is_test(conv_id):
+            return
+        key = "phlead:" + str(conv_id)
+        seen = (db.get_setting(key) or "").split(",")
+        if phone in seen:
+            return
+        db.set_setting(key, ",".join([x for x in seen if x] + [phone])[-200:])
+        add_tag(conv_id, TAG_PHONE)
+        assign(conv_id)
+        mark_unread(conv_id)
+        db.log_webhook("phone_lead", f"{conv_id}: khách để SĐT {phone} — gắn thẻ '{TAG_PHONE}', giao người gọi ra")
+    except Exception as ex:  # noqa: BLE001
+        db.log_webhook("error", f"phone_lead {conv_id}: {ex}")
+
+
 def ab_save_phones(conv_id, grp, phones, src="webhook") -> list:
     """v0.5.21: lưu SĐT THẬT cho CẢ HAI nhóm A/B. Trước đây chỉ nhóm bot ghi số (qua
     _respond → bảng leads), nhóm người chỉ có cờ 0/1 nên không tra được đơn — anh Na hỏi
@@ -1544,6 +1571,8 @@ def handle_event(payload: dict) -> dict:
     is_new = db.ab_in(conv_id, grp, bool(_phones))
     if _phones:
         ab_save_phones(conv_id, grp, _phones)
+        if grp == "bot":
+            _phone_lead(conv_id, _phones[-1])
     if db.pancake_is_test(conv_id):
         db.ab_contaminate(conv_id)   # hội thoại thử không được tính vào số liệu A/B
     # v0.5.19 (anh Na chốt 27/08): khách gửi ẢNH/TỆP thì bot CỐ Ý không đoán nội dung mà

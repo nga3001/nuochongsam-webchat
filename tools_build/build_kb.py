@@ -738,6 +738,14 @@ NHS_CLOSES = [
  ("Ⓘ YÊN TÂM NHẬN HÀNG", "Bên em giao tận nhà, anh/chị nhận hàng kiểm tra rồi mới thanh toán ạ. Anh/chị chọn combo 2 hộp hay 6 hộp để em lên đơn luôn ạ?"),
 ]
 scripts_approved.update({
+ "symposium_trust": ("Chốt 05/11 (chị Nga) — thông điệp Hội nghị Quốc tế về Sâm lần thứ 14 (Jeju, Hàn Quốc, 26–29/10/2026), dùng cho Hồng sâm lát và Nước Hồng sâm "
+   "khi khách băn khoăn chất lượng / uy tín / nguồn gốc / hàng thật giả, so với sâm Hàn Quốc, hỏi sâm Việt có tốt không; hoặc làm lần thuyết phục thứ 2 khi khách chê đắt; "
+   "hoặc khách còn lưỡng lự sau khi nghe giá. TỐI ĐA 1 LẦN/hội thoại. BẮT BUỘC kèm ĐÚNG 2 ảnh [IMG: hoi-nghi-sam-han-quoc] [IMG: ts-thai-bao-cao-han-quoc]. "
+   "Nói NGUYÊN VĂN (chỉ đổi 'cô chú' theo đúng xưng hô với khách): "
+   "'Hồng sâm Thái Minh là dòng hồng sâm đầu tiên làm từ sâm Việt Nam mình. Cuối tháng 10 vừa rồi, sản phẩm đã được giới thiệu tại Hội nghị Quốc tế về Sâm "
+   "ngay tại Hàn Quốc. Đích thân Tiến sĩ Nguyễn Quang Thái – Chủ tịch Thái Minh – đã trực tiếp báo cáo khoa học trước chuyên gia 12 nước và được chính các nhà "
+   "khoa học đánh giá rất cao. Chất lượng và uy tín đã được khẳng định từ nguồn sâm Việt mình, nên cô chú cứ hoàn toàn an tâm sử dụng nhé ạ!' "
+   "KHÔNG thêm chi tiết ngoài câu này (không tự nói giải thưởng, tên hội nghị tiếng Anh, tên thành phố)."),
  "price_quote_nhs": (
    "Bot Nước Hồng sâm (v0.5.0, học theo luồng báo giá Hồng sâm lát v0.1.106) — khách hỏi giá / chương trình Nước Hồng sâm (mặc định DẠNG TÚI). "
    "BÁO GIÁ LẦN ĐẦU (code tự xoay vòng): CHỦ YẾU (3/4 khách) = câu dẫn giá 1 hộp + câu khuyên dùng đều + ĐÚNG 1 câu hỏi tình hình sức khỏe "

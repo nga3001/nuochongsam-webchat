@@ -1,4 +1,21 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.10 (30/10/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.13 (05/11/2026)
+
+## v0.5.13 — thông điệp Hội nghị Quốc tế về Sâm (chị Nga duyệt 05/11)
+- Câu chuẩn `symposium_trust` (nguyên văn đã duyệt; "cô chú" đổi theo cách gọi khách). Dùng cho Hồng sâm lát và Nước Hồng sâm.
+- Luôn kèm đúng 2 ảnh: `static/img/hoi-nghi-sam-han-quoc.jpg` (toàn cảnh hội nghị) + `static/img/ts-thai-bao-cao-han-quoc.jpg` (Tiến sĩ Thái báo cáo, slide có sản phẩm). Tối đa 1 lần/hội thoại.
+- Lưới code `_symposium_net`: AI tự diễn đạt → thay bằng câu chuẩn + gắn 2 ảnh; khách hỏi uy tín / chất lượng / nguồn gốc / hàng thật giả / so với sâm Hàn mà AI chưa nói → tự thêm; đã gửi rồi → bỏ lặp; ảnh hội nghị đứng một mình → bỏ. Không chèn vào tin tổng hợp đơn, tin chuyển người, tin an toàn.
+- Prompt: NHS_BLOCK (l) + (d) cho phép 2 ảnh này; playbook thêm mục.
+- Test: test_nhs 37/37 (thêm test_37_hoi_nghi_sam), test_sam_12ca 17/17, lát diff không đổi.
+
+
+## v0.5.12 — khách lưỡng lự (ca thật Nguyễn Tâm 02/11)
+- Khách hỏi giá, bot báo giá 1 hộp + hỏi sức khỏe, khách đáp "để em xem đã" → bot chỉ xin SĐT, khách chưa từng thấy ưu đãi combo. Nay: khách lưỡng lự ("để em xem / suy nghĩ / tham khảo / để sau") mà chưa được gửi bảng combo → bot gửi bảng combo 2/4/6 hộp + miễn ship + nhận hàng kiểm tra rồi mới trả tiền + xin SĐT nhẹ. Đã thấy combo rồi thì giữ câu của AI.
+- Bot Nước Hồng sâm không nói "liệu trình" ("tìm hiểu liệu trình dùng" → "tìm hiểu cách dùng").
+
+## v0.5.11 — khách để SĐT: nhân viên phải biết ngay để gọi ra (chị Nga: việc quan trọng nhất)
+- Khách gửi SĐT hợp lệ (10 số) ở bất kỳ tin nào → bot gắn thẻ **Có SĐT** + giao nhân viên trực + đánh dấu chưa đọc NGAY; bot vẫn chat tiếp với khách. Mỗi số báo 1 lần / hội thoại (khách gửi số khác thì báo lại).
+- Trước đây: khách để SĐT giữa chừng mà không chốt đơn → chỉ khi khách im sau nhắc nhớ mới chuyển người; khách chào cảm ơn rồi thôi thì có thể không ai gọi.
+- Cần tạo thẻ tên đúng "Có SĐT" trên Pancake (hoặc đặt PANCAKE_TAG_PHONE = tên thẻ muốn dùng).
 
 ## v0.5.10 — rà lại xưng hô (ca thật Mây Bay: "Cháu chúc chị…")
 - Khách không tự xưng bác/cô/chú/ông/bà → bot LUÔN xưng "em" (code đổi "Cháu chúc…", "cho cháu xin…", "bên cháu" → "em"); không đụng "cháu nhà chị", "cháu bé".
