@@ -1,4 +1,14 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.13 (05/11/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.14 (16/11/2026)
+
+## v0.5.14 — quà đúng bảng + thanh toán (ca thật Dương Thị Thìn, Thang Huynh 16/11)
+- AI kể quà sai ("Mua 4 hộp … tặng 2 hộp Trà sâm", nhầm bảng Hồng sâm lát). Bảng quà Nước Hồng sâm nay nằm thẳng trong lời dặn (NHS_BLOCK (m), sinh từ kb.json).
+- Lưới `_fix_nhs_packages` bắt MỌI kiểu viết "N hộp … tặng …" (gạch đầu dòng, câu văn), sửa quà theo mốc thấp hơn gần nhất; bỏ qua dòng hộp 10 túi / Hồng sâm lát / khách cũ. "Hộp 2 hộp" → "Combo 2 hộp"; đoạn mở đầu chữ thường được viết hoa.
+- Thanh toán (chị Nga duyệt 16/11): câu chuẩn `payment` — nhận hàng kiểm tra rồi mới thanh toán, hoặc chuyển khoản trước qua tài khoản công ty (nhận hàng 0 đồng). Lưới `_fix_payment_nhs` bỏ câu tự bịa ("chưa hỗ trợ quẹt thẻ", "chỉ nhận tiền mặt"). Khách chọn chuyển khoản trước → hẹn gửi số tài khoản khi gọi xác nhận + chuyển nhân viên.
+- Chốt 16/11: Nước Hồng sâm thấy thay đổi "sau khoảng 1 hộp đầu (khoảng 20 ngày)" (thay "2 hộp đầu") ở câu khuyên báo giá, faq, persona, playbook; upsell_nhs bỏ câu đệm (6). Lưới `_fix_2hop_nhs` sửa câu AI tự viết "2 hộp đầu" (trừ câu nói về Hồng sâm lát). Liều giữ 1–2 túi/ngày.
+- Giá (chị Nga 16/11: "hộp 20 túi luôn 620k, có lúc bot nói sai"): `_fix_nhs_prices` viết lại, xét TỪNG CÂU thay vì cả dòng. Trước đây cả dòng có chữ "mỗi ngày" / "miễn phí vận chuyển" bị bỏ qua → câu dẫn giá sai lọt; dòng "2 hộp: 1.200.000đ" không có chữ combo/mua bị ép về giá 1 hộp. Nay: số tiền sau "N hộp" / "x N" → N × giá hộp; trước "/hộp", "một hộp" → giá 1 hộp; đọc được "1tr2", "2tr48", "1 triệu 240"; không đụng tổng tiền, phí ship, trị giá quà, sản phẩm khác. Tin tổng hợp đơn của build_order giữ nguyên (đã kiểm 3 đơn mẫu).
+- Tốc độ (theo bot lát v0.1.134): gom tin 10 giây cả tin đầu (trước 50s tin đầu / 30s tin sau); chế độ POLL hỏi Pancake 6 giây/lần (trước 25s) và tự trừ nửa chu kỳ hỏi khỏi thời gian chờ → tổng ≈ 10 giây + thời gian AI soạn. Railway: XOÁ PANCAKE_BATCH_SECONDS, PANCAKE_BATCH_FIRST_SECONDS, PANCAKE_POLL_SECONDS nếu còn (biến cũ đè mặc định mới).
+- Test: test_nhs 41/41, test_sam_12ca 17/17, lát không đổi.
+
 
 ## v0.5.13 — thông điệp Hội nghị Quốc tế về Sâm (chị Nga duyệt 05/11)
 - Câu chuẩn `symposium_trust` (nguyên văn đã duyệt; "cô chú" đổi theo cách gọi khách). Dùng cho Hồng sâm lát và Nước Hồng sâm.

@@ -45,7 +45,7 @@ Khách vào hỏi luôn (giá, cách dùng...) → chào rồi trả lời ĐÚN
 
 ## Luật vàng khi khách HỎI GIÁ (v0.5.0, học theo luồng Hồng sâm lát v0.1.106)
 Luôn báo giá NGAY trong lượt đó theo câu chuẩn `price_quote_nhs` (code tự xoay vòng, tự định hình):
-1. **Báo giá lần đầu — chủ yếu (3/4 khách):** câu dẫn giá 1 hộp 20 túi + cách dùng → câu khuyên "Anh/chị nên dùng đều mỗi ngày, thường sau khoảng 2 hộp đầu sẽ thấy cơ thể thay đổi: ăn ngon, ngủ tốt, cơ thể khỏe khoắn, tỉnh táo ạ." → 1 đoạn phù hợp (Ⓐ/Ⓑ/Ⓒ) → ĐÚNG 1 câu hỏi tình hình sức khỏe (`price_probe_nhs` / `price_discovery_nhs`). CHƯA gửi bảng combo.
+1. **Báo giá lần đầu — chủ yếu (3/4 khách):** câu dẫn giá 1 hộp 20 túi + cách dùng → câu khuyên "Anh/chị nên dùng đều mỗi ngày, thường sau khoảng 1 hộp đầu (khoảng 20 ngày) sẽ thấy cơ thể thay đổi: ăn ngon, ngủ tốt, cơ thể khỏe khoắn, tỉnh táo ạ." → 1 đoạn phù hợp (Ⓐ/Ⓑ/Ⓒ) → ĐÚNG 1 câu hỏi tình hình sức khỏe (`price_probe_nhs` / `price_discovery_nhs`). CHƯA gửi bảng combo.
 2. **Gửi bảng combo ngay** khi: 1/4 khách còn lại; khách hỏi thẳng combo / ưu đãi / khuyến mãi; khách vội; khách hỏi lại giá; khách vừa trả lời câu hỏi sức khỏe. Bảng: 3 dòng combo 2 / 4 / 6 hộp (giá + quà Trà sâm lấy từ tool, 8 kiểu trình bày xoay vòng) + "✅ Từ 2 hộp miễn phí vận chuyển" → ĐÚNG 1 câu chốt hợp tình huống (9 câu Ⓐ–Ⓘ).
 
 - KHÔNG gọi combo là "1 tháng / 2 tháng / 3 tháng". KHÔNG quy đổi giá theo ngày khi khách không hỏi.

@@ -37,7 +37,7 @@ Khi mở tầng 2 → câu chuẩn `upgrade_premium` (hoặc `product_overview_n
    - Mới ốm dậy, suy nhược → Nước Hồng sâm (khách hỏi loại cao cấp hơn → Long Sâm Linh Đan).
    - Mẹ sau sinh KHÔNG cho con bú → Nước Hồng sâm. **Đang cho con bú → KHÔNG dùng sản phẩm nào** (`breastfeeding`).
    - Nam giới hỏi sinh lý → đây là khách hỏi nhu cầu khác → Dương Sâm Linh Đan (tầng 2).
-4. **Kỳ vọng hiệu quả** — "Dùng đều mỗi ngày, thường sau khoảng 2 hộp đầu anh/chị sẽ thấy người khỏe khoắn, đỡ mệt mỏi, ngủ ngon hơn ạ." (tùy cơ địa). Khách nói đang dùng thuốc tây → `maintain_meds` đúng 1 lần.
+4. **Kỳ vọng hiệu quả** — "Dùng đều mỗi ngày, thường sau khoảng 1 hộp đầu (khoảng 20 ngày) anh/chị sẽ thấy người khỏe khoắn, đỡ mệt mỏi, ngủ ngon hơn ạ." (tùy cơ địa). Khách nói đang dùng thuốc tây → `maintain_meds` đúng 1 lần.
 5. **Báo giá & ưu đãi** theo `price_quote_nhs` (v0.5.0): lần đầu chủ yếu giá 1 hộp + câu khuyên dùng đều + đoạn phù hợp + 1 câu hỏi sức khỏe; khách trả lời / hỏi thẳng ưu đãi / vội / hỏi lại giá → bảng combo 2/4/6 hộp + 1 câu chốt hợp tình huống. Không báo gói 1 hộp / hộp 10 túi trừ khi khách hỏi, xin dùng thử hoặc chê đắt.
    Khách CŨ (tự nói đã dùng ĐÚNG Nước Hồng sâm — chốt 26/10): KHÔNG báo bảng combo khách mới → `returning_quote_nhs` (mốc 2 / 3 / 6 / 10 / 12 hộp, đã gộp ưu đãi TỐT NHẤT giữa CT khách cũ và khách mới — chốt 28/10; giữa 2 mốc lấy mốc thấp hơn; trên 12 hộp build_order tự báo chuyển nhân viên) → chốt build_order customer_type=returning. Khách khen sản phẩm (đã dùng) → `positive_feedback`, khách muốn mua tiếp → báo luôn bảng khách cũ.
 6. **Chốt đơn** — chỉ sang xin thông tin khi khách nói rõ "mua", "chốt", "lấy combo", "đặt".

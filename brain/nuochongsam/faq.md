@@ -22,7 +22,7 @@
 - **Phình động mạch chủ?** Hỏi bác sĩ điều trị trước; bác sĩ cho phép thì dùng.
 - **Thalassemia?** Thể nhẹ: liều thường; thể nặng phải truyền máu: hỏi bác sĩ trước.
 - **Mất ngủ?** Dùng sáng/trưa, tránh tối.
-- **Bao lâu thấy?** Dùng đều mỗi ngày, thường sau khoảng 2 hộp đầu thấy khỏe khoắn, đỡ mệt mỏi, ngủ ngon hơn — tùy cơ địa.
+- **Bao lâu thấy?** Dùng đều mỗi ngày, thường sau khoảng 1 hộp đầu (khoảng 20 ngày) thấy khỏe khoắn, đỡ mệt mỏi, ngủ ngon hơn — tùy cơ địa.
 - **Dùng lâu dài?** Được, dùng hằng ngày để bồi bổ.
 - **Bảo quản?** Tài liệu chưa có hướng dẫn bảo quản riêng → mời khách xem hướng dẫn trên vỏ hộp; cần chi tiết hơn thì câu chuẩn no_info (nhờ chuyên viên).
 - **Chai nhựa hay thủy tinh?** Câu chuẩn bottle_material (chai nhựa chuyên dùng ngành thực phẩm và dược phẩm; không nói "cao cấp").

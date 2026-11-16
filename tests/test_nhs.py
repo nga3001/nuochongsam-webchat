@@ -489,6 +489,54 @@ def test_37_hoi_nghi_sam():
     assert engine._symposium_net("Dạ phụ nữ đang cho con bú không dùng được ạ.", T(("user", "đang cho con bú dùng hàng thật được không")))[1] == 0
 
 
+# 38 ─ (16/11, ca Dương Thị Thìn + Thang Huynh) AI tự kể quà sai bảng ("Mua 4 hộp … tặng 2 hộp Trà sâm") → sửa đúng bảng mọi kiểu viết
+def test_38_qua_dung_bang():
+    a = engine._fix_nhs_packages("- Hộp 2 hộp: 1.240.000đ - Tặng ngay 1 hộp Trà sâm 1700 (10 gói) - Miễn phí vận chuyển\n"
+                                 "- Mua 4 hộp: 2.480.000đ - Tặng ngay 2 hộp Trà sâm 1700 (10 gói) - Miễn phí vận chuyển\n"
+                                 "- Mua 6 hộp: 3.720.000đ - Tặng ngay 3 hộp Trà sâm 1700 (10 gói) - Miễn phí vận chuyển", [])
+    assert "- Combo 2 hộp" in a and "Tặng ngay 3 hộp Trà sâm 1700 (10 gói) - Miễn phí" in a and "Tặng ngay 5 hộp Trà sâm 1700 (10 gói) - Miễn phí" in a
+    b = engine._fix_nhs_packages("Ví dụ mua 2 hộp anh được tặng 1 hộp Trà sâm, mua 4 hộp tặng 2 hộp Trà sâm, còn mua 6 hộp được tặng 3 hộp trà ạ.", [])
+    assert b.count("Trà sâm 1700 (10 gói)") == 3 and "tặng 3 hộp" in b and "tặng 5 hộp" in b and b.endswith("ạ.")
+    c = engine._fix_nhs_packages("Lấy 5 hộp được tặng 5 hộp Trà sâm. Hộp nhỏ 10 túi không có quà ạ.", [])
+    assert "tặng 3 hộp Trà sâm 1700 (10 gói)" in c
+    assert "3 hộp Trà sâm 1700 (10 gói)" in engine._nhs_gift_table_txt()
+
+
+# 39 ─ (16/11, chị Nga duyệt) thanh toán: 2 cách, không tự nói "chưa hỗ trợ quẹt thẻ"
+def test_39_thanh_toan():
+    ai = "Dạ Nước Hồng sâm giá 620.000đ/hộp 20 túi ạ.\n\nVề thanh toán thì bên em nhận tiền mặt hoặc chuyển khoản khi nhận hàng, hiện chưa hỗ trợ quẹt thẻ anh nhé.\n\nAnh định tham khảo combo mấy hộp ạ?"
+    out, n = engine._fix_payment_nhs(ai, "Có trả bằng thẻ không ạ")
+    assert n == 1 and engine.PAYMENT_MSG in out and "quẹt thẻ" not in out and out.rstrip().endswith("mấy hộp ạ?")
+    out, n = engine._fix_payment_nhs("Dạ vâng ạ.", "thanh toán thế nào em")
+    assert n == 1 and engine.PAYMENT_MSG in out
+    assert engine._fix_payment_nhs("Dạ 620.000đ ạ.", "giá bao nhiêu")[1] == 0
+    assert "payment" in S and "chuyển khoản trước" in S["payment"]
+
+
+# 40 ─ (16/11, chị Nga chốt) Nước Hồng sâm: thấy thay đổi "sau khoảng 1 hộp đầu (khoảng 20 ngày)"
+def test_40_mot_hop_dau():
+    f = lambda x: engine._fix_2hop_nhs(x)[0]
+    assert f("Anh/chị nên dùng đều mỗi ngày, thường sau khoảng 2 hộp đầu sẽ thấy cơ thể thay đổi ạ.") == \
+        "Anh/chị nên dùng đều mỗi ngày, thường sau khoảng 1 hộp đầu (khoảng 20 ngày) sẽ thấy cơ thể thay đổi ạ."
+    assert f("Thông thường sau khi dùng hết 2 hộp đầu tiên, cơ thể khỏe hơn.") == "Thông thường sau khoảng 1 hộp đầu (khoảng 20 ngày), cơ thể khỏe hơn."
+    assert f("Hồng sâm lát dùng sau 2 hộp đầu thấy rõ.") == "Hồng sâm lát dùng sau 2 hộp đầu thấy rõ."
+    assert "1 hộp đầu (khoảng 20 ngày)" in S["price_quote_nhs"] and "2 hộp đầu" not in S["price_quote_nhs"]
+
+
+# 41 ─ (16/11, chị Nga: "giá hộp 20 túi luôn là 620k, có lúc bot nói sai") lưới giá xét từng câu, mọi kiểu viết
+def test_41_gia_dung_bang():
+    f = lambda x: engine._fix_nhs_prices(x)[0]
+    assert "620.000đ/hộp 20 túi, mỗi ngày" in f("Dạ Nước Hồng sâm Thái Minh mật ong dạng túi giá 650.000đ/hộp 20 túi, mỗi ngày anh/chị dùng 1–2 túi ạ.")
+    assert "620.000đ một hộp" in f("Dạ Nước Hồng sâm có giá niêm yết là 600.000đ một hộp 20 túi ạ.")
+    assert "1.240.000đ - Tặng" in f("- Hộp 2 hộp: 1.200.000đ - Tặng ngay 1 hộp Trà sâm 1700 (10 gói) - Miễn phí vận chuyển")
+    assert f("2 hộp giá 1.240.000đ, 6 hộp giá 3.600.000đ ạ.") == "2 hộp giá 1.240.000đ, 6 hộp giá 3.720.000đ ạ."
+    assert "2.480.000đ" in f("Combo 4 hộp chỉ 2tr4 thôi ạ.")
+    assert "330.000đ" in f("Hộp nhỏ 10 túi giá 350.000đ ạ.")
+    for keep in ["Hồng sâm lát giá 1.420.000đ/hộp 14 gói ạ.", "Tổng tiền: 1.260.000đ", "Mua 1 hộp phí ship 20.000đ ạ.",
+                 "Tặng 1 hộp Trà sâm 1700 (10 gói) trị giá 120.000đ ạ.", "Mỗi túi 8ml chứa tới 11.000mg tinh chất."]:
+        assert f(keep) == keep, keep
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted((k, v) for k, v in globals().items() if k.startswith("test_")):

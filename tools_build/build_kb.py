@@ -699,7 +699,7 @@ def nhs_line(q, icon="🎁"):
 NHS_COMBO_TXT = " / ".join(f"'{nhs_line(q)}'" for q in NHS_COMBOS)
 NHS_SHIP_TXT = f"mua 1 hộp phí ship {vnd(SHIP_HN_INNER)} nội thành Hà Nội, {vnd(SHIP_OTHER)} nơi khác; từ 2 hộp miễn phí vận chuyển"
 # v0.5.0: kịch bản báo giá Nước Hồng sâm gắn thẻ như Hồng sâm lát (code engine._nhs_quote_parts đọc lại từ kb.json)
-NHS_ADV = "Anh/chị nên dùng đều mỗi ngày, thường sau khoảng 2 hộp đầu sẽ thấy cơ thể thay đổi: ăn ngon, ngủ tốt, cơ thể khỏe khoắn, tỉnh táo ạ."
+NHS_ADV = "Anh/chị nên dùng đều mỗi ngày, thường sau khoảng 1 hộp đầu (khoảng 20 ngày) sẽ thấy cơ thể thay đổi: ăn ngon, ngủ tốt, cơ thể khỏe khoắn, tỉnh táo ạ."
 NHS_FIT = {
  "A": "Nước Hồng sâm rất hợp với người hay mệt mỏi, căng thẳng, ngủ không sâu ạ. Vị ngọt nhẹ của mật ong nên dễ uống, túi nhỏ tiện mang theo đi làm, đi xa ạ.",
  "B": "Nước Hồng sâm dễ uống, tiện mang theo, rất hợp với người hay mệt mỏi, ngủ không sâu ạ.",
@@ -738,6 +738,10 @@ NHS_CLOSES = [
  ("Ⓘ YÊN TÂM NHẬN HÀNG", "Bên em giao tận nhà, anh/chị nhận hàng kiểm tra rồi mới thanh toán ạ. Anh/chị chọn combo 2 hộp hay 6 hộp để em lên đơn luôn ạ?"),
 ]
 scripts_approved.update({
+ "payment": ("Chốt 16/11 (chị Nga) — khách hỏi cách thanh toán / trả bằng thẻ / chuyển khoản / COD. Nói đúng 2 cách, KHÔNG tự nói 'chưa hỗ trợ quẹt thẻ', "
+   "'chỉ nhận tiền mặt', KHÔNG tự đưa số tài khoản: 'Dạ bên em có 2 cách thanh toán ạ: anh/chị nhận hàng, kiểm tra rồi mới thanh toán; hoặc anh/chị chuyển khoản trước "
+   "qua tài khoản của công ty, khi nhận hàng anh/chị không phải trả thêm đồng nào ạ.' Khách chọn chuyển khoản trước → 'Dạ bên em sẽ gửi thông tin tài khoản công ty "
+   "cho anh/chị khi gọi xác nhận đơn ạ.' + [HANDOFF: khách muốn chuyển khoản trước - gửi số tài khoản công ty | SĐT | 2]."),
  "symposium_trust": ("Chốt 05/11 (chị Nga) — thông điệp Hội nghị Quốc tế về Sâm lần thứ 14 (Jeju, Hàn Quốc, 26–29/10/2026), dùng cho Hồng sâm lát và Nước Hồng sâm "
    "khi khách băn khoăn chất lượng / uy tín / nguồn gốc / hàng thật giả, so với sâm Hàn Quốc, hỏi sâm Việt có tốt không; hoặc làm lần thuyết phục thứ 2 khi khách chê đắt; "
    "hoặc khách còn lưỡng lự sau khi nghe giá. TỐI ĐA 1 LẦN/hội thoại. BẮT BUỘC kèm ĐÚNG 2 ảnh [IMG: hoi-nghi-sam-han-quoc] [IMG: ts-thai-bao-cao-han-quoc]. "
@@ -817,7 +821,7 @@ scripts_approved.update({
  "upsell_nhs": (
    "Bot Nước Hồng sâm — mời lên gói ĐÚNG 1 LẦN, SAU KHI khách đã xác nhận tổng hợp đơn (theo upsell_hint của build_order): 1 hộp → combo 2 hộp; 2–3 hộp → combo 4 hộp; 4–5 hộp → combo 6 hộp. "
    f"Câu đệm cho đơn 1 hộp: 'Mua 1 hộp bên em tính phí ship và chưa có quà ạ, lấy 2 hộp là anh/chị được miễn phí vận chuyển và tặng thêm {nhs_rule(2)['gift']} luôn ạ.' "
-   "Câu đệm khác dùng nguyên văn trong upsell_double (1), (2), (6), (7), (8), (9). Kết bằng 'nếu anh/chị giữ đơn cũ thì em gửi đi luôn ạ'. "
+   "Câu đệm khác dùng nguyên văn trong upsell_double (1), (2), (7), (8), (9) (KHÔNG dùng (6) 'sau khoảng 2 hộp đầu' — chốt 16/11: Nước Hồng sâm thấy thay đổi sau khoảng 1 hộp đầu (khoảng 20 ngày)). Kết bằng 'nếu anh/chị giữ đơn cũ thì em gửi đi luôn ạ'. "
    "Combo giá giữ nguyên, chỉ tặng quà → KHÔNG nói 'giảm giá / giá ưu đãi / tiết kiệm'."),
  "returning_quote_nhs": (
    "Bot Nước Hồng sâm (chốt 26/10, cập nhật 28/10: khách cũ hưởng CT TỐT NHẤT giữa CT khách cũ và khách mới, bảng dưới đã gộp sẵn) — khách TỰ nói đã từng dùng/mua ĐÚNG Nước Hồng sâm (từng dùng sản phẩm khác → báo combo khách mới): "

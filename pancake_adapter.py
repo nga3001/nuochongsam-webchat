@@ -20,13 +20,14 @@ ENV:
   PANCAKE_ENABLED          "1" để bật gửi thật lúc khởi động; admin đổi được lúc chạy (DB setting đè ENV)
   PANCAKE_KILL             "1" = tắt khẩn từ ENV; admin cũng có nút kill riêng (DB setting)
   PANCAKE_BATCH_SECONDS    gom tin: chờ N giây sau tin CUỐI của khách rồi trả lời 1 lần
-                           (Sâm: mặc định 60 — chị Nga chốt 25/09 và 13/10: khách nhắn → 1 phút sau bot mới trả lời)
+                           (v0.5.14, 16/11: mặc định 10 giây cả tin đầu — theo bot lát v0.1.134; chế độ POLL tự trừ nửa chu kỳ hỏi)
+  PANCAKE_BATCH_FIRST_SECONDS  chờ cho tin ĐẦU của hội thoại (mặc định 10)
   PANCAKE_PART_GAP         v0.5.22: nghỉ tối thiểu giữa các tin khi bot trả lời nhiều đoạn (mặc định 1.5,
                            cộng ngẫu nhiên tới +0.5 giây cho giống người gõ)
   PANCAKE_POLL             "1" = bật chế độ hỏi định kỳ (dự phòng khi webhook chưa bật được vì slot)
   PANCAKE_AB_PERCENT       A/B test: % hội thoại MỚI vào nhóm bot (mặc định 100 = tiếp quản toàn phần;
                            50 = chia đôi bot/người). Đổi lúc chạy từ admin, hash theo customer_id.
-  PANCAKE_POLL_SECONDS     chu kỳ polling (mặc định 25 giây)
+  PANCAKE_POLL_SECONDS     chu kỳ polling (mặc định 6 giây, tối thiểu 5)
   PANCAKE_FORWARD_MAP      HUB PHÂN LUỒNG: Pancake chỉ có MỘT URL webhook chung cho cả gói cước —
                            bot này làm trạm trung tâm, sự kiện page khác được chuyển tiếp NGUYÊN VẸN.
                            Định dạng "page_id=https://url-dich", nhiều tuyến cách nhau phẩy/chấm phẩy.
@@ -196,13 +197,13 @@ POS_API_KEY = os.environ.get("PANCAKE_POS_API_KEY", "")
 # 0 = Mới (nháp) · 1 = Đã xác nhận (mốc CHỐT thật) · 2,3 = đã gửi/đã nhận · 6,7 và số âm = huỷ/xoá.
 ORDER_CANCELLED = {"-1", "6", "7", "5", "4"}
 ORDER_CONFIRMED = {"1", "2", "3", "11", "17", "20"}
-BATCH_SECONDS = float(os.environ.get("PANCAKE_BATCH_SECONDS", "30"))   # v0.1.22 (chị Nga 16/10): các câu SAU chờ 30 giây
-BATCH_FIRST_SECONDS = float(os.environ.get("PANCAKE_BATCH_FIRST_SECONDS", "50"))   # v0.1.22: câu ĐẦU TIÊN của khách chờ 50 giây
+BATCH_SECONDS = float(os.environ.get("PANCAKE_BATCH_SECONDS", "10"))   # v0.5.14 (16/11, theo bot lát v0.1.134): trả lời sau 10 giây
+BATCH_FIRST_SECONDS = float(os.environ.get("PANCAKE_BATCH_FIRST_SECONDS", "10"))   # v0.5.14: cả tin đầu cũng 10 giây
 PHONE_STOP = os.environ.get("PANCAKE_PHONE_STOP", "0") == "1"   # v0.1.22: mặc định khách gửi SĐT bot VẪN chat tiếp (1 = kiểu cũ: dừng, giao người)
 # (trước v0.1.22: 60 giây) Sâm v0.1.12 (chị Nga 25/09, nhắc lại 13/10): phản hồi sau 1 phút
 # v0.5.22 A6: nghỉ 1,5–2 giây giữa các tin nhiều đoạn — bắn liền 2-4 tin nhìn rõ là máy
 PART_GAP = max(0.0, float(os.environ.get("PANCAKE_PART_GAP", "1.5")))
-POLL_SECONDS = max(15.0, float(os.environ.get("PANCAKE_POLL_SECONDS", "25")))
+POLL_SECONDS = max(5.0, float(os.environ.get("PANCAKE_POLL_SECONDS", "6")))   # v0.5.14: hỏi Pancake 6 giây/lần (trước 25s) để kịp mốc 10 giây
 PHARMACIST_IDS = [x.strip() for x in os.environ.get("PANCAKE_PHARMACIST_IDS", "").split(",") if x.strip()]
 
 
@@ -1408,6 +1409,9 @@ def _enqueue(conv_id, text, meta, imgs=None):
             b.setdefault("imgs", []).extend(imgs)
             b["imgs"] = b["imgs"][:3]
         wait = BATCH_SECONDS if db.get_setting("bot_replied:" + str(conv_id)) else BATCH_FIRST_SECONDS
+        if is_polling():
+            # v0.5.14: chế độ POLL — tin đã chờ trung bình nửa chu kỳ hỏi Pancake trước khi tới đây → trừ đi để tổng ≈ 10 giây
+            wait = max(2.0, wait - POLL_SECONDS / 2)
         t = threading.Timer(wait, _flush, args=(conv_id,))
         t.daemon = True
         b["timer"] = t
