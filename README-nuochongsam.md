@@ -1,4 +1,25 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.14 (16/11/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.16 (17/11/2026)
+
+## v0.5.16 — báo giá chỉ nêu 1 quà (chị Nga 17/11)
+- Bảng quà Hồng sâm lát / Dương Sâm có nhiều phương án: build_kb tách `gift` = phương án ĐẦU của bảng (quà mặc định) và `gift_options` = các phương án đổi.
+- Báo giá, tổng hợp đơn chỉ ghi 1 quà. Khách xin đổi / hỏi quà khác → bot mới đưa các phương án; khách chọn → build_order với `items[].gift_choice`
+  (chỉ nhận đúng phương án trong bảng; quà ngoài bảng → giữ quà mặc định). build_order trả `gift_options_if_customer_asks`.
+- Lưới quà giữ phương án khách đã xin đổi (khách có nói đổi / thay / chọn / quà khác).
+- Test: test_nhs 43/43 (ca 42 viết lại), test_sam_12ca 17/17 (ca 10, 11, 12 theo quà mặc định mới), test_potential_nhs 10/10.
+
+
+## v0.5.15 — thẻ "KH tiềm năng", CTKM mới Hồng sâm lát + Dương Sâm, đọc hết tin dài (17/11)
+- Khách CHƯA để SĐT, CHƯA chốt đơn, có 1 trong 5 dấu hiệu → gắn thẻ **KH tiềm năng** (1 lần / hội thoại), bot vẫn chat bình thường:
+  1. Lưỡng lự: "để chị suy nghĩ đã", "hỏi ý kiến chồng", "để sau", "cuối tháng / lương về chị lấy".
+  2. Hỏi sâu sau khi đã báo giá: combo tặng gì, ship mấy ngày, thanh toán thế nào, cách dùng sao.
+  3. Chê đắt nhưng vẫn hỏi tiếp ("đắt quá" rồi "có bớt không em?").
+  4. Nhắn qua lại với bot từ 3 lượt trong cùng một ngày (giờ VN).
+  5. Nói muốn mua ("lấy 2 hộp"), bot xin SĐT + địa chỉ, khách im → kiểm lúc nhịp nhắc nhớ 1.
+- Tên thẻ đổi được bằng biến PANCAKE_TAG_POTENTIAL (mặc định "KH tiềm năng" — thẻ đã có sẵn trên Pancake).
+- CTKM mới 17/11 (chị Nga) — Hồng sâm lát (HSVN-M04 khách mới, HSVN-C06 khách cũ; hộp 14 gói và 50 gói) và Dương Sâm Linh Đan (DSLĐ-M03 khách mới, DSLĐ-C06 khách cũ) nạp vào programs (build_kb.py). Bot Nước Hồng sâm CHỈ nói khi khách hỏi đúng sản phẩm đó (NHS_BLOCK (p)). Quà có 'hoặc' = khách chọn 1, ghi '(chọn 1)'. Combo Hồng sâm lát đổi tên 'Combo N hộp Hồng sâm lát' (2/3/5/6 hộp), bỏ 'combo 1/2/3 tháng'. Lát 1 hộp có quà (khách mới, 1 lần duy nhất), không còn điều kiện chê đắt. Mời lên gói lát: 1 → 2 hộp, 2 → 3 hộp. Dương Sâm khách cũ: mốc 4/7/10/15 theo C06; 1/2/3/6/9 theo bảng khách mới (cách chốt 19/10). Lưới quà `_fix_nhs_packages` nhận câu nói về Hồng sâm lát / Dương Sâm và sửa theo bảng của đúng sản phẩm đó.
+- Đọc hết tin dài (chị Nga 17/11): `_is_long_msg`, `_asks_price` — tin dài chỉ coi là hỏi giá khi có câu hỏi giá rõ ('bao nhiêu', 'giá thế nào', 'báo giá' hoặc câu có chữ giá kèm dấu hỏi); không chèn câu giá, không thay câu trả lời bằng bảng ưu đãi khi khách vừa lưỡng lự vừa hỏi ý khác; không tự chèn thông điệp Hội nghị chỉ vì tin dài nhắc 'sâm Hàn'. Lời dặn NHS_BLOCK (o): đọc toàn bộ, trả lời đủ từng ý theo thứ tự.
+- Test: tests/test_potential_nhs.py 10/10; test_nhs 43/43; test_sam_12ca 17/17 (ca 10 cập nhật theo bảng lát mới).
+
 
 ## v0.5.14 — quà đúng bảng + thanh toán (ca thật Dương Thị Thìn, Thang Huynh 16/11)
 - AI kể quà sai ("Mua 4 hộp … tặng 2 hộp Trà sâm", nhầm bảng Hồng sâm lát). Bảng quà Nước Hồng sâm nay nằm thẳng trong lời dặn (NHS_BLOCK (m), sinh từ kb.json).

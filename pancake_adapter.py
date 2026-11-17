@@ -340,6 +340,9 @@ TAG_NO_REPLY = "Ko PH"
 # v0.5.11 (30/10, chị Nga: "quan trọng nhất là NV nắm được khách thả SĐT và gọi ra"): khách gửi SĐT hợp lệ → gắn thẻ này
 # + giao nhân viên trực + đánh dấu chưa đọc NGAY (bot vẫn chat tiếp bình thường). Thẻ phải tạo sẵn trên Pancake đúng tên.
 TAG_PHONE = os.environ.get("PANCAKE_TAG_PHONE", "Có SĐT")
+# v0.5.15 (17/11, chị Nga: "gắn thêm thẻ KH tiềm năng để care sát hơn", như bot Hồng sâm lát): khách CHƯA để SĐT, CHƯA chốt đơn
+# mà có 1 trong 5 dấu hiệu → gắn thẻ này (1 lần / hội thoại), bot VẪN chat bình thường.
+TAG_POTENTIAL = os.environ.get("PANCAKE_TAG_POTENTIAL", "KH tiềm năng")
 # v0.5.22 A3: FB #551 — khách chặn page / xoá hội thoại / hết cửa sổ: không gửi được nữa
 TAG_UNREACH = os.environ.get("PANCAKE_TAG_UNREACH", "Ko gửi được")
 # v0.5.22 A7: khách gửi TRẦN SĐT → 1 câu ghi nhận rồi giao người NGAY (không chờ nhịp 30 phút)
@@ -1330,6 +1333,94 @@ def find_phones(text: str) -> list:
     return out
 
 
+_RE_PL_HESITATE = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(?:suy nghĩ|nghĩ (?:thêm|đã)|cân nhắc|tham khảo (?:thêm|đã)|xem (?:thêm )?đã|để sau|tính sau|lúc khác|hôm khác|"
+                             r"hỏi (?:ý kiến )?(?:chồng|vợ|con|bố|mẹ|nhà|ông xã|bà xã|anh nhà|chị nhà)|bàn (?:với|lại)|"
+                             r"cuối tháng|đầu tháng|lương về|có lương|nhận lương|khi nào có tiền|để (?:em|chị|anh|cô|mình|tôi|e|c|a) (?:xem|tính|nghĩ|hỏi))(?![A-Za-zÀ-ỹĐđ])", re.I)
+_RE_PL_DEEP = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(?:tặng (?:gì|những gì|mấy)|quà (?:gì|là gì)|được (?:tặng|quà) gì|combo|ưu đãi|khuyến (?:mãi|mại)|"
+                         r"ship|giao (?:hàng|mấy ngày|bao lâu|trong)|mấy ngày|bao lâu (?:thì )?(?:nhận|tới|có hàng)|phí vận chuyển|"
+                         r"thanh toán|chuyển khoản|trả tiền|cách dùng|dùng (?:thế nào|sao|như nào|ra sao)|uống (?:thế nào|sao|như nào|lúc nào|khi nào)|"
+                         r"bảo quản|hạn (?:sử dụng|dùng)|hsd|dùng được bao lâu|1 hộp dùng|bán ở đâu|nhà thuốc)(?![A-Za-zÀ-ỹĐđ])", re.I)
+_RE_PL_QUESTION = re.compile(r"\?|(?<![A-Za-zÀ-ỹĐđ])(?:không|ko|k|hông|sao|bao nhiêu|gì|bớt|giảm|được không|nào|thế nào|có)(?![A-Za-zÀ-ỹĐđ])", re.I)
+_RE_PL_WANT = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(?:lấy|mua|đặt|chốt|gửi cho|ship cho|cho (?:em|chị|anh|tôi|mình|cô|c|e|a))\s*(?:\d{1,2}|một|hai|ba|bốn|sáu|1 combo|combo)\s*(?:hộp|combo|túi)?", re.I)
+_RE_PL_ASKPHONE = re.compile(r"số điện thoại|sđt|địa chỉ", re.I)
+_RE_PL_PRICE = re.compile(r"\d{3}\.000\s*đ|combo\s*\d", re.I)
+
+
+def _pl_has_phone(conv_id: str, history: list) -> bool:
+    if db.get_setting("phlead:" + str(conv_id)) or db.get_setting("phone:" + str(conv_id)):
+        return True
+    return any(m.get("role") == "user" and find_phones(str(m.get("content") or "")) for m in history or [])
+
+
+def _potential_reason(conv_id: str, history: list, text: str) -> str:
+    """5 dấu hiệu KH tiềm năng (chị Nga chốt 17/11). history = lịch sử TRƯỚC tin khách hiện tại hoặc gồm cả nó."""
+    users = [str(m.get("content") or "") for m in history if m.get("role") == "user"]
+    bots = [str(m.get("content") or "") for m in history if m.get("role") == "assistant"]
+    t = text or ""
+    if _RE_PL_HESITATE.search(t):
+        return "lưỡng lự"
+    if any(_RE_PL_PRICE.search(b) for b in bots) and _RE_PL_DEEP.search(t):
+        return "hỏi sâu sau khi đã báo giá"
+    prev_users = users[:-1] if users and users[-1].strip() == t.strip() else users
+    if any(engine._RE_OBJ_PRICE.search(u) for u in prev_users) and _RE_PL_QUESTION.search(t) and not engine._RE_REFUSE.search(t):
+        return "chê đắt nhưng vẫn hỏi tiếp"
+    # tương tác từ 3 lượt trở lên trong ngày (giờ VN)
+    day = time.strftime("%Y-%m-%d", time.gmtime(time.time() + 7 * 3600))
+    key = "pl_turns:" + str(conv_id)
+    try:
+        d, c = (db.get_setting(key) or ":0").split(":")
+        c = int(c) + 1 if d == day else 1
+    except Exception:  # noqa: BLE001
+        c = 1
+    db.set_setting(key, f"{day}:{c}")
+    if c >= 3:
+        return "tương tác từ 3 lượt trở lên trong ngày"
+    return ""
+
+
+def _potential_tag(conv_id: str, reason: str):
+    """Gắn thẻ KH tiềm năng ĐÚNG 1 LẦN / hội thoại; bot không dừng."""
+    try:
+        if not reason or not conv_id or not is_enabled() or is_killed():
+            return
+        if is_test_only() and not db.pancake_is_test(conv_id):
+            return
+        if db.get_setting("potential:" + str(conv_id)) or db.get_setting("order_done:" + str(conv_id)):
+            return
+        db.set_setting("potential:" + str(conv_id), f"{time.time():.0f}|{reason}")
+        add_tag(conv_id, TAG_POTENTIAL)
+        db.log_webhook("potential", f"{conv_id}: gắn thẻ '{TAG_POTENTIAL}' — {reason}")
+    except Exception as ex:  # noqa: BLE001
+        db.log_webhook("error", f"potential {conv_id}: {ex}")
+
+
+def _potential_check(conv_id: str, history: list, text: str):
+    try:
+        if db.get_setting("potential:" + str(conv_id)) or db.get_setting("order_done:" + str(conv_id)):
+            return
+        if _pl_has_phone(conv_id, history) or find_phones(text or ""):
+            return
+        _potential_tag(conv_id, _potential_reason(conv_id, history, text))
+    except Exception as ex:  # noqa: BLE001
+        db.log_webhook("error", f"potential_check {conv_id}: {ex}")
+
+
+def _potential_silent_after_ask(conv_id: str):
+    """Dấu hiệu 5 — kiểm lúc nhịp nhắc nhớ 1: khách đã nói muốn mua, bot xin SĐT/địa chỉ, khách im, chưa có SĐT."""
+    try:
+        if db.get_setting("potential:" + str(conv_id)) or db.get_setting("order_done:" + str(conv_id)):
+            return
+        hist = db.get_history(db.pancake_local_conv(conv_id))
+        if _pl_has_phone(conv_id, hist):
+            return
+        users = [str(m.get("content") or "") for m in hist if m.get("role") == "user"]
+        last_bot = next((str(m.get("content") or "") for m in reversed(hist) if m.get("role") == "assistant"), "")
+        if any(_RE_PL_WANT.search(u) for u in users[-3:]) and _RE_PL_ASKPHONE.search(last_bot):
+            _potential_tag(conv_id, "muốn mua nhưng im sau lời xin số")
+    except Exception as ex:  # noqa: BLE001
+        db.log_webhook("error", f"potential_silent {conv_id}: {ex}")
+
+
 def _phone_lead(conv_id: str, phone: str):
     """v0.5.11: khách để SĐT → thẻ "Có SĐT" + giao người trực + chưa đọc, để nhân viên GỌI RA (bot không dừng).
     Mỗi số chỉ báo 1 lần / hội thoại; khách gửi số khác → báo lại."""
@@ -1873,6 +1964,7 @@ def _respond(conv_id: str, text: str, meta: dict, images: list = None) -> dict:
         db.log_webhook("vision_in", f"{conv_id}: bot nhìn {len(images[:3])} ảnh/sticker đính kèm")
     # v0.5.30 C2 (lưới code): 2 tin gần nhất của bot — để chặn gửi lại nội dung gần y hệt
     _prev_bot = [m["content"] for m in history if m["role"] == "assistant"][-2:]
+    _potential_check(conv_id, history, text)   # v0.5.15: thẻ KH tiềm năng (bot vẫn chat bình thường)
     # v0.5.30 C4+C5: hồ sơ khách (tên chào hợp lệ + xưng hô theo gender thật) vào system prompt
     profile = _profile_of(conv_id) or None     # gọi trước: có thể nạp post_id/ad_ids từ API
     _adg = _ad_gift_line(conv_id)   # v0.1.42: quảng cáo hứa tặng quà khi mua 1 hộp
@@ -3102,6 +3194,8 @@ def _fu_phone_of(conv_id) -> str:
 
 def _fu_send(conv_id, step: int, has_phone: bool, st: dict, src: str = "organic") -> bool:
     """Gửi ĐÚNG 1 CÂU cho một nhịp (anh Na chốt: không nhắn nhiều). Câu chọn theo nguồn ca."""
+    if step == 1 and not has_phone:
+        _potential_silent_after_ask(conv_id)   # v0.5.15: dấu hiệu 5 (muốn mua nhưng im sau lời xin số)
     if not _may_send(conv_id):
         return False
     if step == 1:

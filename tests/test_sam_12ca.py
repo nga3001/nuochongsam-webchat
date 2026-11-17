@@ -125,10 +125,9 @@ def test_09_chua_khoi_bo_thuoc():
 
 # 10 ─ Chê đắt nhiều lần → quà mốc 1 hộp chỉ khi chê đắt; sau ≥2 lần thuyết phục chuyển Hồng sâm nước
 def test_10_che_dat():
+    # 17/11 (chị Nga): bảng CTKM mới HSVN-M04 — mua 1 hộp (khách mới) có quà chọn 1, không còn điều kiện "chê đắt"
     thuong = t.build_order([{"sku": "hsvn-lat-14", "qty": 1}], "A", PHONE, ADDR)
-    assert thuong["promo_applied"] == []
-    che = t.build_order([{"sku": "hsvn-lat-14", "qty": 1}], "A", PHONE, ADDR, price_objection=True)
-    assert "10 gói" in che["promo_applied"][0]["gift"]
+    assert "10 gói" in thuong["promo_applied"][0]["gift"] and "hoặc" not in thuong["promo_applied"][0]["gift"]   # 17/11: chỉ nêu 1 quà
     assert KB["scripts_approved"]["price_objection_switch"] and "NGAY KHI" in KB["scripts_approved"]["price_objection_switch"]
     _sw = KB["scripts_approved"]["price_objection_switch"]
     assert "dạng túi" in _sw and "dạng nước tinh chất" not in _sw, "v0.1.20: mời Nước HS dạng túi"
@@ -146,7 +145,7 @@ def test_11_chot_don_day_du():
               "Quà tặng kèm", "Tổng tiền đơn hàng"):
         assert k in o["confirm_text"], k
     o4 = t.build_order([{"sku": "hsvn-lat-14", "qty": 4}], "A", PHONE, ADDR)
-    assert "2 hộp Trà sâm" in o4["promo_applied"][0]["gift"]
+    assert "dầu nóng" in o4["promo_applied"][0]["gift"]   # 17/11: 4 hộp → mốc 3 hộp, quà mặc định Trà sâm 20 gói + dầu nóng
     thieu = t.build_order([{"sku": "hsvn-lat-14", "qty": 1}], "A", PHONE, "")
     assert not thieu["ready_to_confirm"] and "address" in thieu["missing_info"]
 
@@ -157,9 +156,9 @@ def test_12_ship_nuoc_va_khach_cu():
     assert t.build_order([{"sku": "hsmo-chai", "qty": 2}], "A", PHONE, ADDR)["ship_fee"] == 0
     # v0.1.16 (14/10): khách cũ — Hồng sâm lát có bảng quà riêng, bot tự chốt; sản phẩm chưa có bảng → chuyển nhân viên
     r = t.build_order([{"sku": "hsvn-lat-14", "qty": 2}], "A", PHONE, ADDR, customer_type="returning")
-    assert "Heviho" in r["promo_applied"][0]["gift"] and r["program"] == "returning_customer"
+    assert "dầu nóng" in r["promo_applied"][0]["gift"] and r["program"] == "returning_customer"   # 17/11 bảng C06
     r5 = t.build_order([{"sku": "hsvn-lat-14", "qty": 6}], "A", PHONE, ADDR, customer_type="returning")
-    assert "8 hộp viên ngậm Heviho" in r5["promo_applied"][0]["gift"]       # 6 hộp áp mốc 5
+    assert "4 hộp Trà sâm 1700 (20 gói)" in r5["promo_applied"][0]["gift"]   # 6 hộp áp mốc 5 (17/11: quà mặc định, đổi được sang 8 Heviho)
     assert t.build_order([{"sku": "hsmo-chai", "qty": 1}], customer_type="returning")["handoff_required"]
 
 

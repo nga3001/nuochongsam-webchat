@@ -97,7 +97,7 @@
      "price_retail": 5000000,
      "in_stock": true,
      "unit_name": "hộp",
-     "note": "chốt 16/10 (chị Nga): ĐÃ CÓ HÀNG — chỉ nói khi khách hỏi; mua hộp 50 gói hiện KHÔNG có CTKM (không quà)"
+     "note": "chốt 16/10 (chị Nga): ĐÃ CÓ HÀNG — chỉ nói khi khách hỏi; CTKM riêng từ 17/11 (mốc 1 / 2 / 5 hộp khách mới, 1 / 2 / 4 hộp khách cũ)"
     }
    ],
    "recommended_package": "hsvn-lat-14",
@@ -2144,41 +2144,99 @@
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 1,
-     "gift": "1 hộp Trà sâm 1700 loại 10 gói (trị giá 120.000đ)",
+     "gift": "1 hộp Trà sâm 1700 (10 gói) – chỉ áp dụng 1 lần duy nhất cho khách hàng mới",
      "freeship": true,
-     "condition": "price_objection"
+     "gift_options": [
+      "1 hộp Trà sâm 1700 (20 gói)",
+      "1 lọ dầu nóng Khương Thảo Đan (10ml)",
+      "2 hộp viên ngậm Heviho (18 viên)"
+     ]
     },
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 2,
-     "gift": "1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ)",
+     "gift": "1 hộp Trà sâm 1700 (20 gói)",
      "freeship": true,
-     "label": "Combo 1 tháng"
+     "label": "Combo",
+     "gift_options": [
+      "2 hộp viên ngậm Heviho",
+      "2 lọ dầu nóng Khương Thảo Đan"
+     ]
     },
     {
      "if_sku": "hsvn-lat-14",
-     "min_qty": 4,
-     "gift": "2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ)",
+     "min_qty": 3,
+     "gift": "1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan",
      "freeship": true,
-     "label": "Combo 2 tháng"
+     "label": "Combo",
+     "gift_options": [
+      "2 hộp Trà sâm 1700 (10 gói)",
+      "2 hộp viên ngậm Heviho + 1 lọ dầu nóng Khương Thảo Đan"
+     ]
+    },
+    {
+     "if_sku": "hsvn-lat-14",
+     "min_qty": 5,
+     "gift": "3 hộp Trà sâm 1700 (20 gói)",
+     "freeship": true,
+     "label": "Combo",
+     "gift_options": [
+      "6 hộp viên ngậm Heviho"
+     ]
     },
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 6,
-     "gift": "5 hộp Trà sâm 1700 loại 10 gói",
+     "gift": "5 hộp Trà sâm 1700 (10 gói)",
      "freeship": true,
-     "label": "Combo 3 tháng"
+     "label": "Combo",
+     "gift_options": [
+      "3 hộp Trà sâm 1700 (10 gói) + 1 lọ Bổ gan Thái Minh (30 viên)"
+     ]
     },
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 10,
-     "gift": "1 chai Nước Hồng Sâm Mật Ong (trị giá 550.000đ)",
+     "gift": "1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi) + 2 hộp Trà sâm 1700 (20 gói)",
      "freeship": true
     },
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 15,
-     "gift": "1 hộp Hồng sâm Việt Nam Thái Minh cùng loại + 1 hộp Trà sâm 1700 (20 gói)",
+     "gift": "1 hộp Hồng sâm lát cùng loại (14 gói) + 1 hộp Trà sâm 1700 (20 gói)",
+     "freeship": true,
+     "gift_options": [
+      "1 hộp Hồng sâm lát cùng loại (14 gói) + 2 hộp viên ngậm Heviho"
+     ]
+    },
+    {
+     "if_sku": "hsvn-lat-14",
+     "min_qty": 50,
+     "gift": "3 hộp Hồng sâm lát cùng loại (14 gói) + 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)",
+     "freeship": true
+    },
+    {
+     "if_sku": "hsvn-lat-50",
+     "min_qty": 1,
+     "gift": "4 hộp Trà sâm 1700 (10 gói)",
+     "freeship": true,
+     "gift_options": [
+      "4 lọ dầu nóng Khương Thảo Đan"
+     ]
+    },
+    {
+     "if_sku": "hsvn-lat-50",
+     "min_qty": 2,
+     "gift": "6 hộp Trà sâm 1700 (10 gói)",
+     "freeship": true,
+     "gift_options": [
+      "1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)"
+     ]
+    },
+    {
+     "if_sku": "hsvn-lat-50",
+     "min_qty": 5,
+     "gift": "1 hộp Hồng sâm lát (14 gói) + 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)",
      "freeship": true
     },
     {
@@ -2268,33 +2326,51 @@
     {
      "if_sku": "duongsam-10",
      "min_qty": 1,
-     "gift": "",
-     "freeship": true
+     "gift": "1 lọ dầu nóng Khương Thảo Đan",
+     "freeship": true,
+     "gift_options": [
+      "1 hộp Trà sâm 1700 (10 gói)",
+      "1 Viên sủi Super Cool Thái Minh",
+      "1 hộp viên ngậm Heviho (18 viên)"
+     ]
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 2,
-     "gift": "1 hộp Trà sâm 1700 (10 gói)",
-     "freeship": true
+     "gift": "1 lọ dầu nóng Khương Thảo Đan",
+     "freeship": true,
+     "gift_options": [
+      "1 hộp Trà sâm 1700 (10 gói)",
+      "1 Viên sủi Super Cool Thái Minh",
+      "1 hộp viên ngậm Heviho (18 viên)"
+     ]
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 3,
      "gift": "2 hộp Trà sâm 1700 (10 gói)",
      "freeship": true,
-     "label": "Liệu trình 1 tháng"
+     "label": "Liệu trình 1 tháng",
+     "gift_options": [
+      "2 hộp Trà sâm 1700 (10 gói) + 1 lọ dầu nóng Khương Thảo Đan",
+      "2 hộp viên ngậm Heviho"
+     ]
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 6,
-     "gift": "1 chai Nước Hồng sâm mật ong (hoặc đổi sang 2 hộp Bổ Gan Thái Minh + 1 hộp Trà sâm 1700 loại 10 gói)",
+     "gift": "2 lọ Bổ gan Thái Minh (30 viên) + 1 hộp Trà sâm 1700 (10 gói)",
      "freeship": true,
-     "label": "Liệu trình 2 tháng"
+     "label": "Liệu trình 2 tháng",
+     "gift_options": [
+      "1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)",
+      "2 hộp Nước Hồng sâm Thái Minh mật ong (hộp 10 túi)"
+     ]
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 9,
-     "gift": "2 chai nước Hồng sâm mật ong",
+     "gift": "2 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)",
      "freeship": true,
      "label": "Liệu trình 3 tháng"
     },
@@ -2413,7 +2489,7 @@
      "freeship": true
     }
    ],
-   "tier_rule": "Số lượng nằm GIỮA hai bậc → áp bậc thấp hơn gần nhất (vd lấy 3 hộp Hồng sâm lát → quà bậc 2 hộp; 5 hộp → quà bậc 4 hộp). Dòng có condition=price_objection (Hồng sâm lát 1 hộp tặng 1 hộp Trà sâm 10 gói) CHỈ áp khi khách chê đắt/chưa đủ tiền HOẶC khách CHỦ ĐỘNG hỏi CT tặng trà khi mua 1 hộp (chốt 23/10, chị Nga — CT linh động, KHÔNG tự báo). Vượt bậc cao nhất → quà bậc cao nhất + mời chuyển nhân viên xin thêm ưu đãi (big_order).",
+   "tier_rule": "Số lượng nằm GIỮA hai bậc → áp bậc thấp hơn gần nhất (vd lấy 4 hộp Hồng sâm lát → quà bậc 3 hộp; 7–9 hộp → quà bậc 6 hộp). Quà có chữ 'hoặc' = khách CHỌN 1 trong các phương án (bảng 17/11), nói đủ các phương án để khách chọn. Vượt bậc cao nhất → quà bậc cao nhất + mời chuyển nhân viên xin thêm ưu đãi (big_order).",
    "freeship_rule": "freeship=true: miễn phí ship. freeship=false: tính phí ship theo shipping. freeship=null: tài liệu để trống → nhân viên xác nhận phí ship khi lên đơn.",
    "note": "Chốt 25/09 (brief): khách hỏi giá → BÁO NGAY giá + liệu trình + các combo quà trong CÙNG 1 tin (gọi là 'Chương trình tri ân khách hàng mới'), KHÔNG cần hỏi khách mới/cũ trước. Khách TỰ nói đã từng mua ĐÚNG sản phẩm này → khách cũ (returning_customer); từng dùng sản phẩm khác → vẫn khách mới (chốt 23/10). CẤM tự suy diễn quà ngoài bảng. Thời hạn chương trình: từ 23/09/2026 đến hết 31/12/2026 (được nói khi khách hỏi hoặc khi cần tạo động lực chốt, không ép). Hết hạn → không hứa quà, chuyển nhân viên báo chương trình mới."
   },
@@ -2425,91 +2501,139 @@
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 1,
-     "gift": "1 lọ dầu nóng Khương Thảo Đan 10ml (trị giá 55.000đ) hoặc 1 hộp Trà sâm 1700 loại 10 gói",
-     "freeship": true
+     "gift": "1 hộp Trà sâm 1700 (10 gói)",
+     "freeship": true,
+     "gift_options": [
+      "1 lọ dầu nóng Khương Thảo Đan",
+      "1 hộp viên ngậm Heviho"
+     ]
     },
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 2,
-     "gift": "2 hộp viên ngậm Heviho + 1 lọ dầu nóng Khương Thảo Đan để xoa bóp",
-     "freeship": true
+     "gift": "1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan",
+     "freeship": true,
+     "gift_options": [
+      "2 hộp viên ngậm Heviho + 1 lọ dầu nóng Khương Thảo Đan"
+     ]
     },
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 3,
-     "gift": "4 hộp viên ngậm Heviho",
-     "freeship": true
+     "gift": "2 hộp Trà sâm 1700 (20 gói)",
+     "freeship": true,
+     "gift_options": [
+      "4 hộp viên ngậm Heviho"
+     ]
     },
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 5,
-     "gift": "8 hộp viên ngậm Heviho",
-     "freeship": true
+     "gift": "4 hộp Trà sâm 1700 (20 gói)",
+     "freeship": true,
+     "gift_options": [
+      "8 hộp viên ngậm Heviho"
+     ]
     },
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 12,
-     "gift": "1 hộp Hồng sâm cùng loại + 2 hộp viên ngậm Heviho",
-     "freeship": true
+     "gift": "1 hộp Hồng sâm lát cùng loại (14 gói) + 1 hộp Trà sâm 1700 (20 gói)",
+     "freeship": true,
+     "gift_options": [
+      "1 hộp Hồng sâm lát cùng loại (14 gói) + 2 hộp viên ngậm Heviho"
+     ]
     },
     {
      "if_sku": "hsvn-lat-14",
      "min_qty": 24,
-     "gift": "2 hộp Hồng sâm cùng loại + 1 chai Nước Hồng sâm mật ong",
+     "gift": "2 hộp Hồng sâm lát cùng loại (14 gói) + 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)",
+     "freeship": true
+    },
+    {
+     "if_sku": "hsvn-lat-50",
+     "min_qty": 1,
+     "gift": "5 hộp Trà sâm 1700 (10 gói)",
+     "freeship": true,
+     "gift_options": [
+      "5 lọ dầu nóng Khương Thảo Đan",
+      "5 hộp viên ngậm Heviho"
+     ]
+    },
+    {
+     "if_sku": "hsvn-lat-50",
+     "min_qty": 2,
+     "gift": "1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi) + 3 hộp Trà sâm 1700 (10 gói)",
+     "freeship": true
+    },
+    {
+     "if_sku": "hsvn-lat-50",
+     "min_qty": 4,
+     "gift": "1 hộp Hồng sâm lát (14 gói) + 3 hộp Trà sâm 1700 (10 gói)",
      "freeship": true
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 1,
-     "gift": "",
-     "freeship": true
+     "gift": "1 lọ dầu nóng Khương Thảo Đan",
+     "freeship": true,
+     "gift_options": [
+      "1 hộp Trà sâm 1700 (10 gói)",
+      "1 Viên sủi Super Cool Thái Minh",
+      "1 hộp viên ngậm Heviho (18 viên)"
+     ]
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 2,
-     "gift": "1 hộp Trà sâm 1700 (10 gói)",
-     "freeship": true
+     "gift": "1 lọ dầu nóng Khương Thảo Đan",
+     "freeship": true,
+     "gift_options": [
+      "1 hộp Trà sâm 1700 (10 gói)",
+      "1 Viên sủi Super Cool Thái Minh",
+      "1 hộp viên ngậm Heviho (18 viên)"
+     ]
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 3,
      "gift": "2 hộp Trà sâm 1700 (10 gói)",
-     "freeship": true
+     "freeship": true,
+     "gift_options": [
+      "2 hộp Trà sâm 1700 (10 gói) + 1 lọ dầu nóng Khương Thảo Đan",
+      "2 hộp viên ngậm Heviho"
+     ]
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 4,
-     "gift": "2 hộp Trà sâm 1700 (10 gói) + 1 hộp Bổ Gan Thái Minh",
-     "freeship": true
-    },
-    {
-     "if_sku": "duongsam-10",
-     "min_qty": 5,
-     "gift": "2 hộp Trà sâm 1700 (10 gói) + 1 hộp Bổ Gan Thái Minh",
-     "freeship": true
+     "gift": "1 Viên sủi Super Cool Thái Minh + 2 hộp Trà sâm 1700 (10 gói)",
+     "freeship": true,
+     "gift_options": [
+      "3 hộp Trà sâm 1700 (10 gói)",
+      "3 hộp viên ngậm Heviho"
+     ]
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 6,
-     "gift": "1 chai Nước Hồng sâm mật ong (hoặc đổi sang 2 hộp Bổ Gan Thái Minh + 1 hộp Trà sâm 1700 loại 10 gói)",
-     "freeship": true
+     "gift": "2 lọ Bổ gan Thái Minh (30 viên) + 1 hộp Trà sâm 1700 (10 gói)",
+     "freeship": true,
+     "gift_options": [
+      "1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)",
+      "2 hộp Nước Hồng sâm Thái Minh mật ong (hộp 10 túi)"
+     ]
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 7,
-     "gift": "1 chai nước Hồng sâm mật ong + 1 hộp Bổ Gan Thái Minh (30 viên)",
-     "freeship": true
-    },
-    {
-     "if_sku": "duongsam-10",
-     "min_qty": 8,
-     "gift": "1 chai nước Hồng sâm mật ong + 1 hộp Bổ Gan Thái Minh (30 viên)",
+     "gift": "1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi) + 1 lọ Bổ gan Thái Minh (30 viên)",
      "freeship": true
     },
     {
      "if_sku": "duongsam-10",
      "min_qty": 9,
-     "gift": "2 chai nước Hồng sâm mật ong",
+     "gift": "2 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)",
      "freeship": true
     },
     {
@@ -2521,7 +2645,7 @@
     {
      "if_sku": "duongsam-10",
      "min_qty": 15,
-     "gift": "1 hộp Dương Sâm Linh Đan + 1 chai nước Hồng sâm mật ong",
+     "gift": "1 hộp Dương Sâm Linh Đan + 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)",
      "freeship": true
     },
     {
@@ -2581,7 +2705,7 @@
    "note": "KHÔNG tự chế quà, KHÔNG khuyên mua ít hơn. Thu đủ tên/SĐT/địa chỉ/số lượng rồi: 'Đơn của anh/chị em xin thêm chương trình tốt hơn từ bộ phận phụ trách, bên em gọi lại xác nhận sớm ạ.' + [HANDOFF: đơn lớn | SĐT | 2]."
   }
  },
- "combo_tiers_note": "Hồng sâm lát (giá 1.420.000đ/hộp): Combo 1 tháng (2 hộp): 2.840.000đ – tặng 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ); Combo 2 tháng (4 hộp): 5.680.000đ – tặng 2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ); Combo 3 tháng (6 hộp): 8.520.000đ – tặng 5 hộp Trà sâm 1700 loại 10 gói; chê đắt mua 1 hộp tặng 1 hộp Trà sâm 1700 loại 10 gói (trị giá 120.000đ). Liệu trình khuyên dùng 3–6 tháng. Sản phẩm khác: lấy quà đúng bảng programs.new_customer.",
+ "combo_tiers_note": "Hồng sâm lát (giá 1.420.000đ/hộp): Combo 2 hộp Hồng sâm lát: 2.840.000đ – tặng 1 hộp Trà sâm 1700 (20 gói); Combo 3 hộp Hồng sâm lát: 4.260.000đ – tặng 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan; Combo 5 hộp Hồng sâm lát: 7.100.000đ – tặng 3 hộp Trà sâm 1700 (20 gói); Combo 6 hộp Hồng sâm lát: 8.520.000đ – tặng 5 hộp Trà sâm 1700 (10 gói); mua 1 hộp tặng 1 hộp Trà sâm 1700 (10 gói) – chỉ áp dụng 1 lần duy nhất cho khách hàng mới; từ 10 / 15 / 50 hộp theo bảng programs.new_customer (bảng 17/11; mỗi mốc nêu 1 quà, khách xin đổi mới đưa phương án trong gift_options). Sản phẩm khác: lấy quà đúng bảng programs.new_customer.",
  "customer_segments": {
   "A_con_mua_cho_bo_me": "Con cái mua cho bố mẹ/ông bà: quan tâm an toàn với bệnh nền, nguồn gốc, cách dùng đơn giản — cần thông tin dễ giải thích lại",
   "B_nguoi_cao_tuoi_tu_mua": "Người cao tuổi tự mua, có bệnh nền, hay hỏi kỹ — tư vấn chậm, chắc, xưng hô đúng (bác/ông/bà → cháu)",
@@ -2636,10 +2760,10 @@
   "trial_request": "Chốt 25/09: khách xin DÙNG THỬ / xin mẫu thử → khéo léo từ chối, KHÔNG hứa mẫu thử, KHÔNG nói 'không hiệu quả thì hoàn tiền'. KHÔNG mời khách bóc hàng dùng thử (chốt 14/10). Mẫu: 'Dạ em rất hiểu anh/chị muốn dùng thử trước cho yên tâm ạ. Hiện bên em chưa có chương trình dùng thử, vì sâm được đóng gói nguyên hộp, niêm phong để giữ trọn chất lượng ạ. Anh/chị có thể bắt đầu với 1 hộp, nhận hàng được kiểm tra nguyên hộp, tem niêm phong rồi mới thanh toán; hoặc chọn Nước Hồng sâm mật ong dạng túi có mức giá nhẹ hơn để trải nghiệm trước ạ.'",
   "price_discovery_hsvn": "Chốt 26/10 (chị Nga) — báo giá lần đầu KHÔNG nhất thiết lúc nào cũng gửi bảng combo: có thể sau câu giá + đoạn phù hợp, hỏi 1 câu KHƠI GỢI để khách chia sẻ nhu cầu (khách trả lời rồi mới gửi bảng combo + câu chốt hợp nhu cầu). Chọn 1 trong 3 câu đã duyệt (chị Nga 26/10: D1, D2, D4), xoay vòng: ⓀD1 'Để em tư vấn đúng nhu cầu nhất, anh/chị cho em hỏi anh/chị đang muốn bồi bổ sức khỏe cho bản thân hay mua biếu người thân ạ?' | ⓀD2 'Anh/chị có hay gặp tình trạng ngủ kém, ăn không ngon hay mệt mỏi không ạ, để em gợi ý liệu trình phù hợp nhất ạ?' | ⓀD4 'Trước đây anh/chị đã dùng sâm hay sản phẩm bồi bổ nào chưa ạ, để em tư vấn liệu trình phù hợp nhất cho anh/chị ạ?' KHÔNG dùng câu khơi gợi khi khách hỏi thẳng combo / khuyến mãi / ưu đãi / bảng giá, khi khách đã nói rõ nhu cầu, hoặc khi đã hỏi khơi gợi 1 lần trong hội thoại.",
   "price_probe_hsvn": "Chốt 26/10 (chị Nga) — CÂU KHAI THÁC khi khách hỏi giá Hồng sâm lát (TH1–TH11). Luôn báo giá trước; mỗi lượt 1 câu; tối đa 2 câu khai thác (tính cả câu khơi gợi D) trước khi gửi bảng combo; câu hỏi phải bám điều khách vừa nói: ⓀK1 'Anh/chị có đang điều trị huyết áp, tiểu đường hay bệnh nền nào không ạ, để em hướng dẫn cách dùng an toàn, đúng liều ạ?' | ⓀK2 'Anh/chị có đang dùng thuốc gì hằng ngày không ạ, để em dặn khoảng cách dùng sâm với thuốc cho phù hợp ạ?' | ⓀK3 'Giấc ngủ của anh/chị dạo này thế nào ạ: khó vào giấc hay ngủ không sâu, hay thức dậy giữa đêm ạ?' | ⓀK4 'Anh/chị thấy mệt nhiều vào thời điểm nào ạ: buổi sáng khó tỉnh hay chiều tối hay đuối sức ạ?' | ⓀK5 'Anh/chị năm nay khoảng bao nhiêu tuổi ạ, để em tư vấn liều dùng phù hợp ạ?' | ⓀK5b 'Anh/chị năm nay khoảng bao nhiêu tuổi và có đang dùng thuốc gì hằng ngày không ạ, để em tư vấn cách dùng phù hợp ạ?' | ⓀK7 'Anh/chị định biếu ông bà, bố mẹ hay biếu đối tác ạ, để em gợi ý gói quà phù hợp nhất ạ?' | ⓀK8 'Công việc của anh/chị có hay thức khuya, áp lực hay phải đi lại nhiều không ạ, để em gợi ý cách dùng giúp anh/chị tỉnh táo hơn ban ngày ạ?' KHÔNG khai thác khi: khách hỏi thẳng combo / khuyến mãi / ưu đãi; khách vội ('giá thôi', 'nhanh', 'ok'); khách hỏi lại giá lần 2; khách đã chốt mua. Khách kể bệnh → compliance_check trước. Sau khi khai thác xong → bảng combo + câu chốt hợp nhu cầu (bố mẹ → Ⓔ; tình trạng/bệnh → Ⓑ; lưỡng lự → Ⓓ; vội → Ⓕ).",
-  "price_quote_hsvn": "Chốt 13/10 — khách hỏi giá / chương trình Hồng sâm lát → trả lời đúng 3 phần, KHÔNG kèm đoạn mô tả tính năng dài ở cuối: (1) 1 câu dẫn: giá 1.420.000đ/hộp 14 gói, dùng 14 ngày (mỗi ngày 1 gói buổi sáng), liệu trình cơ bản 3 tháng; NGAY SAU câu dẫn, xuống dòng thành 1 đoạn riêng, thêm ĐÚNG 1 trong 3 đoạn sau (chốt 25/10, chị Nga — chọn theo tình huống, không lặp đoạn đã dùng trong hội thoại): Ⓐ MẶC ĐỊNH (khách hỏi giá lần đầu, chưa rõ người dùng): 'Hồng sâm này đặc biệt phù hợp với người ngủ kém, ăn không ngon, cơ thể hay mệt mỏi, uể oải ạ. Thông thường chỉ sau khoảng 2 hộp đầu, anh/chị sẽ thấy ăn ngon miệng hơn, ngủ sâu giấc hơn, người khỏe khoắn và tỉnh táo hơn ạ.' | Ⓑ NGẮN (khách hỏi lại giá lần 2 sau khi đã nghe Ⓐ, hoặc lượt đó đã phải trả lời nhiều ý khác): 'Hồng sâm này rất hợp với người ngủ kém, ăn không ngon, hay mệt mỏi ạ. Dùng đều mỗi sáng, cơ thể sẽ dần ăn ngon, ngủ sâu và khỏe khoắn hơn ạ.' | Ⓒ MUA CHO BỐ MẸ / ÔNG BÀ / người lớn tuổi (khách nói mua cho bố, mẹ, ông bà, biếu người già): 'Bố mẹ lớn tuổi hay ngủ chập chờn, ăn kém, người mệt mỏi thì dùng Hồng sâm rất hợp ạ. Sau khoảng 2 hộp đầu, nhiều người thấy ăn ngon, ngủ sâu và khỏe khoắn hơn rõ (tùy cơ địa).' (Ⓒ đổi 'Bố mẹ' thành đúng người khách nói, vd 'Ông bà', 'Bố'). (khách đã nói rõ tình trạng/người dùng khác thì có thể thay bằng câu phù hợp tình trạng đó, vẫn ngắn 1 câu); (2) danh sách gói theo tháng, mỗi gói 1 dòng (giá + quà) — chốt 25/10 (chị Nga): ĐA DẠNG cách trình bày, chọn 1 trong 4 kiểu dưới, XOAY VÒNG (khách hỏi lại giá thì đổi kiểu khác), giữ NGUYÊN giá, số hộp, quà: KIỂU 1: 'Chương trình tri ân khách hàng mới:' + '🎁 Combo 1 tháng (2 hộp): 2.840.000đ – tặng 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ)' / '🎁 Combo 2 tháng (4 hộp): 5.680.000đ – tặng 2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ)' / '🎁 Combo 3 tháng (6 hộp): 8.520.000đ – tặng 5 hộp Trà sâm 1700 loại 10 gói' || KIỂU 2: 'Hiện bên em đang có ưu đãi quà tặng cho khách mới theo liệu trình ạ:' + '✅ Combo 1 tháng (2 hộp) – 2.840.000đ – tặng 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ)' / '✅ Combo 2 tháng (4 hộp) – 5.680.000đ – tặng 2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ)' / '✅ Combo 3 tháng (6 hộp) – 8.520.000đ – tặng 5 hộp Trà sâm 1700 loại 10 gói' || KIỂU 3: 'Anh/chị mua theo combo sẽ được tặng thêm quà ạ:' + '🎁 Combo 1 tháng (2 hộp) giá 2.840.000đ: tặng ngay 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ)' / '🎁 Combo 2 tháng (4 hộp) giá 5.680.000đ: tặng ngay 2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ)' / '🎁 Combo 3 tháng (6 hộp) giá 8.520.000đ: tặng ngay 5 hộp Trà sâm 1700 loại 10 gói' || KIỂU 4: 'Ưu đãi dành riêng cho khách hàng mới, áp dụng đến hết 31/12/2026:' + '🌿 Combo 1 tháng (2 hộp): 2.840.000đ, tặng kèm 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ)' / '🌿 Combo 2 tháng (4 hộp): 5.680.000đ, tặng kèm 2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ)' / '🌿 Combo 3 tháng (6 hộp): 8.520.000đ, tặng kèm 5 hộp Trà sâm 1700 loại 10 gói' || KIỂU 5: 'Bên em có 3 gói liệu trình kèm quà, combo 3 tháng được tặng nhiều quà nhất ạ:' + '⭐ Combo 3 tháng (6 hộp): 8.520.000đ – tặng 5 hộp Trà sâm 1700 loại 10 gói' / '▫️ Combo 2 tháng (4 hộp): 5.680.000đ – tặng 2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ)' / '▫️ Combo 1 tháng (2 hộp): 2.840.000đ – tặng 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ)' || KIỂU 6: 'Mua theo combo anh/chị được tặng thêm Trà sâm ạ:' + '• Combo 1 tháng (2 hộp) → 2.840.000đ, tặng 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ)' / '• Combo 2 tháng (4 hộp) → 5.680.000đ, tặng 2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ)' / '• Combo 3 tháng (6 hộp) → 8.520.000đ, tặng 5 hộp Trà sâm 1700 loại 10 gói' || KIỂU 7: 'Anh/chị chọn gói theo nhu cầu nhé ạ:' + '🎁 Combo 1 tháng (2 hộp) – dùng thử cảm nhận: 2.840.000đ, tặng 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ)' / '🎁 Combo 2 tháng (4 hộp) – dùng đều: 5.680.000đ, tặng 2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ)' / '🎁 Combo 3 tháng (6 hộp) – đủ liệu trình cơ bản: 8.520.000đ, tặng 5 hộp Trà sâm 1700 loại 10 gói' || KIỂU 8: 'Ưu đãi khách mới đang áp dụng theo từng liệu trình ạ:' + '1️⃣ Combo 1 tháng (2 hộp): 2.840.000đ – quà tặng: 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ)' / '2️⃣ Combo 2 tháng (4 hộp): 5.680.000đ – quà tặng: 2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ)' / '3️⃣ Combo 3 tháng (6 hộp): 8.520.000đ – quà tặng: 5 hộp Trà sâm 1700 loại 10 gói'; (3) DẪN DẮT CHỐT — ĐÚNG 1 câu hỏi cuối (chốt 25/10, chị Nga: đa dạng cách triển khai combo, chọn chiến thuật theo tình huống, XOAY VÒNG không lặp câu đã dùng): Ⓐ HỎI CHỌN ƯU ĐÃI (mặc định lần báo giá đầu): 'Trong 3 ưu đãi trên, anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?' | Ⓑ GỢI Ý ƯU ĐÃI TỐT NHẤT (khách nói rõ tình trạng: mệt nhiều, ngủ kém lâu, có bệnh nền, mới ốm dậy — hoặc hỏi 'nên mua gói nào'): 'Với tình trạng của anh/chị, em gợi ý combo 3 tháng ạ: đủ liệu trình cơ bản để cơ thể thay đổi rõ, lại được tặng nhiều quà nhất (5 hộp Trà sâm 1700 loại 10 gói). Em lên đơn combo 3 tháng cho anh/chị nhé?' | Ⓒ DẪN DẮT 1 THÁNG HAY 3 THÁNG (khách đã quan tâm, đang cân nhắc): 'Anh/chị muốn dùng thử combo 1 tháng trước, hay lấy luôn combo 3 tháng cho đủ liệu trình và nhận thêm 5 hộp Trà sâm 1700 ạ?' | Ⓓ BẮT ĐẦU NHẸ (khách lưỡng lự, dùng lần đầu, ngại chi nhiều): 'Lần đầu dùng anh/chị có thể bắt đầu combo 1 tháng (2 hộp) để cảm nhận trước, vẫn được tặng 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ). Em lên đơn combo 1 tháng cho anh/chị nhé?' | Ⓔ MUA BIẾU BỐ MẸ / ÔNG BÀ: 'Với bố mẹ lớn tuổi, dùng đều 3 tháng sẽ thấy rõ sức khỏe cải thiện hơn ạ. Anh/chị lấy combo 3 tháng biếu bố mẹ luôn, vừa đủ liệu trình vừa có thêm Trà sâm làm quà nhé?' | Ⓕ CHỐT NHẸ, BỎ RÀO CẢN (khách đã nghe giá mà chưa trả lời / hỏi lại lần 2): 'Anh/chị chọn combo nào thì chỉ cần nhắn em tên, số điện thoại và địa chỉ, em lên đơn ngay ạ. Hàng giao tận nơi, kiểm tra rồi mới thanh toán nên anh/chị yên tâm nhé.' | Ⓖ HỎI NGƯỜI DÙNG (chưa biết mua cho ai): 'Anh/chị định dùng cho bản thân hay biếu người thân ạ, để em gợi ý gói phù hợp nhất cho anh/chị ạ?' | Ⓗ BẮT ĐẦU RỒI DÙNG TIẾP (khách cân nhắc, lần đầu biết sản phẩm): 'Nhiều anh chị bắt đầu combo 1 tháng để cảm nhận, dùng hợp thì lấy tiếp cho đủ liệu trình 3 tháng ạ. Anh/chị muốn em lên đơn combo nào ạ?' | Ⓘ YÊN TÂM NHẬN HÀNG (khách lo mua online): 'Bên em giao tận nhà, anh/chị nhận hàng kiểm tra rồi mới thanh toán ạ. Anh/chị chọn combo 1 tháng hay 3 tháng để em lên đơn luôn ạ?' KHÔNG nói 'giảm giá / tiết kiệm'; mỗi lượt chỉ 1 chiến thuật, 1 câu hỏi. KHÔNG tư vấn gói lẻ 1 hộp (và quà mốc 1 hộp: 1 hộp Trà sâm 1700 loại 10 gói (trị giá 120.000đ)) trừ khi khách chê đắt hoặc muốn dùng thử.",
+  "price_quote_hsvn": "Chốt 13/10 — khách hỏi giá / chương trình Hồng sâm lát → trả lời đúng 3 phần, KHÔNG kèm đoạn mô tả tính năng dài ở cuối: (1) 1 câu dẫn: giá 1.420.000đ/hộp 14 gói, dùng 14 ngày (mỗi ngày 1 gói buổi sáng), liệu trình cơ bản 3 tháng; NGAY SAU câu dẫn, xuống dòng thành 1 đoạn riêng, thêm ĐÚNG 1 trong 3 đoạn sau (chốt 25/10, chị Nga — chọn theo tình huống, không lặp đoạn đã dùng trong hội thoại): Ⓐ MẶC ĐỊNH (khách hỏi giá lần đầu, chưa rõ người dùng): 'Hồng sâm này đặc biệt phù hợp với người ngủ kém, ăn không ngon, cơ thể hay mệt mỏi, uể oải ạ. Thông thường chỉ sau khoảng 2 hộp đầu, anh/chị sẽ thấy ăn ngon miệng hơn, ngủ sâu giấc hơn, người khỏe khoắn và tỉnh táo hơn ạ.' | Ⓑ NGẮN (khách hỏi lại giá lần 2 sau khi đã nghe Ⓐ, hoặc lượt đó đã phải trả lời nhiều ý khác): 'Hồng sâm này rất hợp với người ngủ kém, ăn không ngon, hay mệt mỏi ạ. Dùng đều mỗi sáng, cơ thể sẽ dần ăn ngon, ngủ sâu và khỏe khoắn hơn ạ.' | Ⓒ MUA CHO BỐ MẸ / ÔNG BÀ / người lớn tuổi (khách nói mua cho bố, mẹ, ông bà, biếu người già): 'Bố mẹ lớn tuổi hay ngủ chập chờn, ăn kém, người mệt mỏi thì dùng Hồng sâm rất hợp ạ. Sau khoảng 2 hộp đầu, nhiều người thấy ăn ngon, ngủ sâu và khỏe khoắn hơn rõ (tùy cơ địa).' (Ⓒ đổi 'Bố mẹ' thành đúng người khách nói, vd 'Ông bà', 'Bố'). (khách đã nói rõ tình trạng/người dùng khác thì có thể thay bằng câu phù hợp tình trạng đó, vẫn ngắn 1 câu); (2) danh sách gói 2 / 3 / 5 / 6 hộp (bảng 17/11), mỗi gói 1 dòng (giá + quà; quà có 'hoặc' = khách chọn 1) — chốt 25/10 (chị Nga): ĐA DẠNG cách trình bày, chọn 1 trong 4 kiểu dưới, XOAY VÒNG (khách hỏi lại giá thì đổi kiểu khác), giữ NGUYÊN giá, số hộp, quà: KIỂU 1: 'Chương trình tri ân khách hàng mới:' + '🎁 Combo 2 hộp Hồng sâm lát: 2.840.000đ – tặng 1 hộp Trà sâm 1700 (20 gói)' / '🎁 Combo 3 hộp Hồng sâm lát: 4.260.000đ – tặng 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan' / '🎁 Combo 5 hộp Hồng sâm lát: 7.100.000đ – tặng 3 hộp Trà sâm 1700 (20 gói)' / '🎁 Combo 6 hộp Hồng sâm lát: 8.520.000đ – tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 2: 'Hiện bên em đang có ưu đãi quà tặng cho khách mới ạ:' + '✅ Combo 2 hộp Hồng sâm lát – 2.840.000đ – tặng 1 hộp Trà sâm 1700 (20 gói)' / '✅ Combo 3 hộp Hồng sâm lát – 4.260.000đ – tặng 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan' / '✅ Combo 5 hộp Hồng sâm lát – 7.100.000đ – tặng 3 hộp Trà sâm 1700 (20 gói)' / '✅ Combo 6 hộp Hồng sâm lát – 8.520.000đ – tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 3: 'Anh/chị mua theo combo sẽ được tặng thêm quà ạ:' + '🎁 Combo 2 hộp Hồng sâm lát giá 2.840.000đ: tặng 1 hộp Trà sâm 1700 (20 gói)' / '🎁 Combo 3 hộp Hồng sâm lát giá 4.260.000đ: tặng 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan' / '🎁 Combo 5 hộp Hồng sâm lát giá 7.100.000đ: tặng 3 hộp Trà sâm 1700 (20 gói)' / '🎁 Combo 6 hộp Hồng sâm lát giá 8.520.000đ: tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 4: 'Ưu đãi dành riêng cho khách hàng mới, áp dụng đến hết 31/12/2026:' + '🌿 Combo 2 hộp Hồng sâm lát: 2.840.000đ, tặng kèm 1 hộp Trà sâm 1700 (20 gói)' / '🌿 Combo 3 hộp Hồng sâm lát: 4.260.000đ, tặng kèm 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan' / '🌿 Combo 5 hộp Hồng sâm lát: 7.100.000đ, tặng kèm 3 hộp Trà sâm 1700 (20 gói)' / '🌿 Combo 6 hộp Hồng sâm lát: 8.520.000đ, tặng kèm 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 5: 'Bên em có các gói kèm quà, mua càng nhiều quà càng lớn ạ:' + '⭐ Combo 6 hộp Hồng sâm lát: 8.520.000đ – tặng 5 hộp Trà sâm 1700 (10 gói)' / '▫️ Combo 5 hộp Hồng sâm lát: 7.100.000đ – tặng 3 hộp Trà sâm 1700 (20 gói)' / '▫️ Combo 3 hộp Hồng sâm lát: 4.260.000đ – tặng 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan' / '▫️ Combo 2 hộp Hồng sâm lát: 2.840.000đ – tặng 1 hộp Trà sâm 1700 (20 gói)' || KIỂU 6: 'Mua theo combo anh/chị được tặng thêm Trà sâm ạ:' + '• Combo 2 hộp Hồng sâm lát → 2.840.000đ, tặng 1 hộp Trà sâm 1700 (20 gói)' / '• Combo 3 hộp Hồng sâm lát → 4.260.000đ, tặng 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan' / '• Combo 5 hộp Hồng sâm lát → 7.100.000đ, tặng 3 hộp Trà sâm 1700 (20 gói)' / '• Combo 6 hộp Hồng sâm lát → 8.520.000đ, tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 7: 'Anh/chị chọn gói theo nhu cầu nhé ạ:' + '🎁 Combo 2 hộp Hồng sâm lát: 2.840.000đ, tặng 1 hộp Trà sâm 1700 (20 gói)' / '🎁 Combo 3 hộp Hồng sâm lát: 4.260.000đ, tặng 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan' / '🎁 Combo 5 hộp Hồng sâm lát: 7.100.000đ, tặng 3 hộp Trà sâm 1700 (20 gói)' / '🎁 Combo 6 hộp Hồng sâm lát: 8.520.000đ, tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 8: 'Ưu đãi khách mới đang áp dụng theo từng gói ạ:' + '1️⃣ Combo 2 hộp Hồng sâm lát: 2.840.000đ – quà tặng: 1 hộp Trà sâm 1700 (20 gói)' / '2️⃣ Combo 3 hộp Hồng sâm lát: 4.260.000đ – quà tặng: 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan' / '3️⃣ Combo 5 hộp Hồng sâm lát: 7.100.000đ – quà tặng: 3 hộp Trà sâm 1700 (20 gói)' / '4️⃣ Combo 6 hộp Hồng sâm lát: 8.520.000đ – quà tặng: 5 hộp Trà sâm 1700 (10 gói)'; (3) DẪN DẮT CHỐT — ĐÚNG 1 câu hỏi cuối (chốt 25/10, chị Nga: đa dạng cách triển khai combo, chọn chiến thuật theo tình huống, XOAY VÒNG không lặp câu đã dùng): Ⓐ HỎI CHỌN ƯU ĐÃI (mặc định lần báo giá đầu): 'Trong các ưu đãi trên, anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?' | Ⓑ GỢI Ý ƯU ĐÃI TỐT NHẤT (khách nói rõ tình trạng: mệt nhiều, ngủ kém lâu, có bệnh nền, mới ốm dậy — hoặc hỏi 'nên mua gói nào'): 'Với tình trạng của anh/chị, em gợi ý combo 6 hộp ạ: dùng đều đủ lâu để cơ thể thay đổi rõ, lại được tặng nhiều quà (5 hộp Trà sâm 1700 (10 gói)). Em lên đơn combo 6 hộp cho anh/chị nhé?' | Ⓒ DẪN DẮT 2 HỘP HAY 6 HỘP (khách đã quan tâm, đang cân nhắc): 'Anh/chị muốn dùng thử combo 2 hộp trước, hay lấy luôn combo 6 hộp để dùng đều và nhận nhiều quà hơn ạ?' | Ⓓ BẮT ĐẦU NHẸ (khách lưỡng lự, dùng lần đầu, ngại chi nhiều): 'Lần đầu dùng anh/chị có thể bắt đầu combo 2 hộp để cảm nhận trước, vẫn được tặng 1 hộp Trà sâm 1700 (20 gói). Em lên đơn combo 2 hộp cho anh/chị nhé?' | Ⓔ MUA BIẾU BỐ MẸ / ÔNG BÀ: 'Với bố mẹ lớn tuổi, dùng đều 3 tháng sẽ thấy rõ sức khỏe cải thiện hơn ạ. Anh/chị lấy combo 6 hộp biếu bố mẹ luôn, vừa dùng đều vừa có thêm quà nhé?' | Ⓕ CHỐT NHẸ, BỎ RÀO CẢN (khách đã nghe giá mà chưa trả lời / hỏi lại lần 2): 'Anh/chị chọn combo nào thì chỉ cần nhắn em tên, số điện thoại và địa chỉ, em lên đơn ngay ạ. Hàng giao tận nơi, kiểm tra rồi mới thanh toán nên anh/chị yên tâm nhé.' | Ⓖ HỎI NGƯỜI DÙNG (chưa biết mua cho ai): 'Anh/chị định dùng cho bản thân hay biếu người thân ạ, để em gợi ý gói phù hợp nhất cho anh/chị ạ?' | Ⓗ BẮT ĐẦU RỒI DÙNG TIẾP (khách cân nhắc, lần đầu biết sản phẩm): 'Nhiều anh chị bắt đầu combo 2 hộp để cảm nhận, dùng hợp thì lấy tiếp combo lớn hơn ạ. Anh/chị muốn em lên đơn combo nào ạ?' | Ⓘ YÊN TÂM NHẬN HÀNG (khách lo mua online): 'Bên em giao tận nhà, anh/chị nhận hàng kiểm tra rồi mới thanh toán ạ. Anh/chị chọn combo 2 hộp hay 6 hộp để em lên đơn luôn ạ?' KHÔNG nói 'giảm giá / tiết kiệm'; mỗi lượt chỉ 1 chiến thuật, 1 câu hỏi. Mua 1 hộp (khách mới) có quà: 1 hộp Trà sâm 1700 (10 gói) – chỉ áp dụng 1 lần duy nhất cho khách hàng mới — nói khi khách hỏi mua 1 hộp / dùng thử / hỏi quà.",
   "order_after_confirm": "Chốt 15/10 (anh Huy: mượt mà, thân thiết hơn) — sau khi gửi tổng hợp đơn và khách xác nhận: 'Dạ em cảm ơn anh/chị ạ 😊 Trong ngày hôm nay bên em sẽ gọi điện lại để xác nhận đơn trước khi gửi hàng, anh/chị để ý điện thoại giúp em nhé ạ.' (xưng 'em' / 'bên em', KHÔNG nói 'sẽ có chuyên viên của Sâm Thái Minh gọi điện lại'). Nếu khách nhắn 'không cần gọi lại / cứ gửi luôn' → 'Dạ vâng, em ghi chú đóng gói và gửi hàng đi ngay cho anh/chị ạ.' (ghi rõ trong lý do HANDOFF: khách không cần gọi xác nhận). SAU ĐÓ KHÔNG chủ động nhắn thêm nội dung khác.",
-  "upsell_double": "Chốt 15/10, đổi THỨ TỰ 25/10 (chị Nga) — gửi TỔNG HỢP ĐƠN trước (tin đó KHÔNG mời thêm); khách XÁC NHẬN đúng → lượt sau: 'Dạ em đã ghi nhận đơn [x] của anh/chị rồi ạ.' + mời ĐÚNG 1 LẦN, không ép, kết bằng 'nếu anh/chị giữ đơn cũ thì em gửi đi luôn ạ'. Câu mời luôn có 1 CÂU ĐỆM nêu giá trị trước khi hỏi — XOAY VÒNG, không lặp câu đệm đã dùng trong hội thoại. Câu đệm nói ĐÚNG NGUYÊN VĂN như danh sách dưới (chỉ đổi xưng hô cho khớp khách), KHÔNG thêm thắt, KHÔNG tự chế lợi ích. CẤM khi mời combo: 'ưu đãi tốt hơn rất nhiều', 'mức ưu đãi tốt hơn', 'giá tốt hơn', 'rẻ hơn', 'dưỡng chất thấm sâu', 'thấm sâu', 'hấp thu tối đa', 'nhân dịp'. Câu mời = câu combo (giá + quà lấy từ tool) + 1 câu đệm + 1 câu hỏi; gửi gọn trong 1–2 tin. COMBO 2/4/6 HỘP GIÁ GIỮ NGUYÊN, CHỈ TẶNG QUÀ → TUYỆT ĐỐI KHÔNG nói 'giảm giá', 'giá ưu đãi', 'tiết kiệm' cho các combo này. Câu đệm dùng cho combo 2/4/6 hộp: (1) 'Lấy combo có quà, lời hơn mua lẻ đó anh/chị ạ.' | (2) 'Đây là mức quà tặng tốt nhất bên em đang có cho khách mới ạ.' | (3) 'Dùng đều đủ liệu trình thì cơ thể mới hấp thu tốt, lấy combo mình đỡ phải đặt lại giữa chừng ạ.' | (4) 'Mua lẻ 1 hộp thì bên em chưa có quà ạ, lấy combo 2 hộp là anh/chị được tặng thêm Trà sâm uống hằng ngày luôn ạ.' (chỉ dùng khi khách đang đặt 1 hộp) | (5) 'Combo 2 hộp dùng vừa tròn 1 tháng, anh/chị dùng đều mỗi ngày không phải lo hết giữa chừng ạ.' (chỉ khi mời combo 2 hộp) | (6) 'Thường sau khoảng 2 hộp đầu cơ thể mới bắt đầu cảm nhận rõ, nên lấy combo để dùng liền mạch là hợp nhất ạ.' | (7) 'Trà sâm tặng kèm cả nhà uống hằng ngày đều được, vừa tiện vừa thêm phần bồi bổ ạ.' | (8) 'Chương trình quà tặng khách mới bên em áp dụng đến hết 31/12 thôi ạ, anh/chị lấy combo bây giờ là được hưởng trọn quà ạ.' | (9) 'Lấy combo nhiều hộp anh/chị vừa dùng vừa có sẵn để biếu người thân, lại được nhận thêm quà ạ.' (khi khách có nói mua biếu/mua cho nhiều người). RIÊNG chương trình MUA 15 TẶNG 1 (từ 15 hộp Hồng sâm lát, tặng 1 hộp cùng loại — khách đặt 10–14 hộp có thể mời lên 15 hộp): được dùng thêm câu 'Lấy 15 hộp vừa đảm bảo đủ liệu trình cho mình dùng không bị gián đoạn, lại vừa được giá ưu đãi tiết kiệm thêm ạ.' Khách đặt 1 hộp Hồng sâm lát: 'Dạ em cảm ơn anh/chị đã để lại thông tin đặt hàng. Hiện bên em đang có ưu đãi Combo 1 tháng (2 hộp) giá 2.840.000đ được tặng ngay 1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ). [câu đệm] Anh/chị có muốn lấy luôn Combo 2 hộp để dùng đủ liệu trình 1 tháng không ạ? 😊'. Khách đặt 2 hộp: 'Dạ anh/chị ơi, nếu anh/chị lấy luôn Combo 2 tháng (4 hộp, đủ liệu trình 2 tháng) giá 5.680.000đ thì được tặng kèm 2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ). [câu đệm] Em đăng ký luôn combo này cho anh/chị nhé?'. Khách đặt 4 hộp: có thể mời Combo 3 tháng (6 hộp, đủ liệu trình cơ bản 3 tháng) giá 8.520.000đ, tặng 5 hộp Trà sâm 1700 loại 10 gói + câu đệm. Khách đồng ý → cập nhật số lượng, giá, quà theo combo mới; từ chối → giữ đơn cũ, sang xác nhận đơn.",
-  "returning_quote": "Chốt 14/10 + 23/10 — khách TỰ nói đã từng dùng/mua ĐÚNG Hồng sâm lát và hỏi mua lại Hồng sâm lát (từng dùng sản phẩm khác → báo combo khách mới): cảm ơn khách đã tin dùng lại; báo giá 1 hộp + ưu đãi tri ân khách hàng thân thiết (lấy đúng bảng programs.returning_customer, mỗi mốc 1 dòng 🎁; mua 1 hộp được chọn dầu nóng Khương Thảo Đan 10ml hoặc 1 hộp Trà sâm 1700 loại 10 gói); KHÔNG báo combo khách mới; 1 câu chốt hỏi số lượng. Chốt đơn bằng build_order customer_type=returning.",
+  "upsell_double": "Chốt 15/10, đổi THỨ TỰ 25/10 (chị Nga) — gửi TỔNG HỢP ĐƠN trước (tin đó KHÔNG mời thêm); khách XÁC NHẬN đúng → lượt sau: 'Dạ em đã ghi nhận đơn [x] của anh/chị rồi ạ.' + mời ĐÚNG 1 LẦN, không ép, kết bằng 'nếu anh/chị giữ đơn cũ thì em gửi đi luôn ạ'. Câu mời luôn có 1 CÂU ĐỆM nêu giá trị trước khi hỏi — XOAY VÒNG, không lặp câu đệm đã dùng trong hội thoại. Câu đệm nói ĐÚNG NGUYÊN VĂN như danh sách dưới (chỉ đổi xưng hô cho khớp khách), KHÔNG thêm thắt, KHÔNG tự chế lợi ích. CẤM khi mời combo: 'ưu đãi tốt hơn rất nhiều', 'mức ưu đãi tốt hơn', 'giá tốt hơn', 'rẻ hơn', 'dưỡng chất thấm sâu', 'thấm sâu', 'hấp thu tối đa', 'nhân dịp'. Câu mời = câu combo (giá + quà lấy từ tool) + 1 câu đệm + 1 câu hỏi; gửi gọn trong 1–2 tin. COMBO 2/4/6 HỘP GIÁ GIỮ NGUYÊN, CHỈ TẶNG QUÀ → TUYỆT ĐỐI KHÔNG nói 'giảm giá', 'giá ưu đãi', 'tiết kiệm' cho các combo này. Câu đệm dùng cho combo 2/4/6 hộp: (1) 'Lấy combo có quà, lời hơn mua lẻ đó anh/chị ạ.' | (2) 'Đây là mức quà tặng tốt nhất bên em đang có cho khách mới ạ.' | (3) 'Dùng đều đủ liệu trình thì cơ thể mới hấp thu tốt, lấy combo mình đỡ phải đặt lại giữa chừng ạ.' | (4) 'Mua lẻ 1 hộp thì bên em chưa có quà ạ, lấy combo 2 hộp là anh/chị được tặng thêm Trà sâm uống hằng ngày luôn ạ.' (chỉ dùng khi khách đang đặt 1 hộp) | (5) 'Combo 2 hộp dùng vừa tròn 1 tháng, anh/chị dùng đều mỗi ngày không phải lo hết giữa chừng ạ.' (chỉ khi mời combo 2 hộp) | (6) 'Thường sau khoảng 2 hộp đầu cơ thể mới bắt đầu cảm nhận rõ, nên lấy combo để dùng liền mạch là hợp nhất ạ.' | (7) 'Trà sâm tặng kèm cả nhà uống hằng ngày đều được, vừa tiện vừa thêm phần bồi bổ ạ.' | (8) 'Chương trình quà tặng khách mới bên em áp dụng đến hết 31/12 thôi ạ, anh/chị lấy combo bây giờ là được hưởng trọn quà ạ.' | (9) 'Lấy combo nhiều hộp anh/chị vừa dùng vừa có sẵn để biếu người thân, lại được nhận thêm quà ạ.' (khi khách có nói mua biếu/mua cho nhiều người). RIÊNG chương trình MUA 15 TẶNG 1 (từ 15 hộp Hồng sâm lát, tặng 1 hộp cùng loại — khách đặt 10–14 hộp có thể mời lên 15 hộp): được dùng thêm câu 'Lấy 15 hộp vừa đảm bảo đủ liệu trình cho mình dùng không bị gián đoạn, lại vừa được giá ưu đãi tiết kiệm thêm ạ.' Khách đặt 1 hộp Hồng sâm lát: 'Dạ em cảm ơn anh/chị đã để lại thông tin đặt hàng. Hiện bên em đang có ưu đãi Combo 2 hộp Hồng sâm lát giá 2.840.000đ được tặng 1 hộp Trà sâm 1700 (20 gói). [câu đệm] Anh/chị có muốn lấy luôn combo 2 hộp không ạ? 😊'. Khách đặt 2 hộp: 'Dạ anh/chị ơi, nếu anh/chị lấy luôn Combo 3 hộp Hồng sâm lát giá 4.260.000đ thì được tặng 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan. [câu đệm] Em đăng ký luôn combo này cho anh/chị nhé?'. Khách đặt 3–4 hộp: có thể mời Combo 5 hộp Hồng sâm lát giá 7.100.000đ, tặng 3 hộp Trà sâm 1700 (20 gói) + câu đệm. Khách đồng ý → cập nhật số lượng, giá, quà theo combo mới; từ chối → giữ đơn cũ, sang xác nhận đơn.",
+  "returning_quote": "Chốt 14/10 + 23/10 — khách TỰ nói đã từng dùng/mua ĐÚNG Hồng sâm lát và hỏi mua lại Hồng sâm lát (từng dùng sản phẩm khác → báo combo khách mới): cảm ơn khách đã tin dùng lại; báo giá 1 hộp + ưu đãi tri ân khách hàng thân thiết (lấy đúng bảng programs.returning_customer, mỗi mốc 1 dòng 🎁; bảng 17/11 mã 2026/TP-TBBL.HSVN-C06; quà có 'hoặc' = khách chọn 1); KHÔNG báo combo khách mới; 1 câu chốt hỏi số lượng. Chốt đơn bằng build_order customer_type=returning.",
   "origin": "Chốt 15/10 (chị Nga) — khách hỏi nguồn gốc sâm / sâm ở đâu ra: 'Dạ nguyên liệu sâm trước khi đưa vào nhà máy Thái Minh để sản xuất sẽ được kiểm soát nghiêm ngặt chất lượng đầu vào. Hồng sâm Thái Minh là công trình chuyển giao từ Viện Nghiên cứu Sâm và Dược liệu Việt Nam (VIGH), nên anh/chị hoàn toàn yên tâm về chất lượng ạ.' KHÔNG tự nhắc vườn sâm. CHỈ KHI khách hỏi THẲNG 'Thái Minh có vườn sâm không / sâm có phải tự trồng không' → 'Dạ Thái Minh có vườn trồng sâm tại Sìn Hồ – Lai Châu và Lâm Đồng ạ. Nguyên liệu sâm đưa vào sản xuất đều có nguồn gốc rõ ràng, hóa đơn chứng từ đầy đủ và được kiểm soát chặt chẽ chất lượng đầu vào ạ.' (chốt 23/10: KHÔNG nói 'toàn bộ sâm đưa vào nhà máy đều trồng ở Sìn Hồ / Lai Châu') KHÔNG BAO GIỜ nói 'toàn bộ sâm do Thái Minh tự trồng'. Website samthaiminh.com.",
   "where_buy": "Chốt 14/10 — khách hỏi mua ở đâu / nhà thuốc nào có bán: gửi link tra điểm bán https://samthaiminh.com/diem-ban, đồng thời khuyến khích đặt online qua page để được giao tận nhà và hưởng ưu đãi tốt nhất.",
   "marketplace": "Khách nói mua trên sàn rẻ hơn: bên em chỉ đảm bảo nguồn gốc, hạn dùng, bảo quản khi mua trực tiếp công ty/cửa hàng; đặt hôm nay có ưu đãi + được kiểm tra hàng; sau khi mua được chuyên viên chăm sóc và áp dụng CTKM dành riêng cho khách hàng thân thiết. Không nêu tên shop trên sàn.",
@@ -2655,8 +2779,8 @@
   "vat_invoice": "Chốt 15/10 (chị Nga) — khách hỏi có xuất hóa đơn VAT / hóa đơn đỏ không: 'Dạ có ạ, Sâm Thái Minh có xuất hóa đơn VAT cho cả khách hàng cá nhân và công ty ạ. Giá sản phẩm đã bao gồm VAT nên anh/chị không phải trả thêm ạ.' (xuống dòng) 'Anh/chị gửi giúp em: tên công ty (hoặc họ tên cá nhân), mã số thuế (nếu có), địa chỉ ghi trên hóa đơn và email nhận hóa đơn điện tử, em ghi chú vào đơn để bên em xuất cho anh/chị nhé ạ.' Ghi đủ thông tin hóa đơn vào ghi chú đơn / lý do HANDOFF level 1. KHÔNG hứa ngày gửi hóa đơn cụ thể.",
   "breastfeeding": "Chốt 15/10 (chị Nga) — người dùng ĐANG CHO CON BÚ (hỏi bất kỳ sản phẩm nào): 'Dạ trong thời gian đang cho con bú, chị chưa nên dùng các sản phẩm sâm ạ. Khi bé cai sữa, chị nhắn em để em tư vấn sản phẩm phù hợp nhé ạ. Nếu chị muốn mua làm quà bồi bổ cho bố mẹ hoặc người thân, em tư vấn ngay cho chị ạ.' KHÔNG gợi ý sản phẩm nào cho mẹ đang cho con bú, KHÔNG nói tiết sữa/lợi sữa, không chuyển chuyên viên.",
   "credit_sale": "Chốt 23/10 (chị Nga: công ty KHÔNG bán nợ) — khách hỏi BÁN CHỊU / mua chịu / bán nợ / trả sau / trả góp ('bán chiu', 'mua chiu'): 'Dạ hiện bên em chưa áp dụng hình thức bán chịu ạ. Bên em giao hàng tận nơi, anh/chị nhận hàng, kiểm tra đúng sản phẩm rồi mới thanh toán cho bên giao hàng ạ.' Khách nói không có tiền / chưa đủ tiền → đồng cảm, mời 1 lần Nước Hồng sâm Thái Minh mật ong dạng túi (price_objection_switch) hoặc xin SĐT để báo khi có chương trình mới (soft_ask_phone). KHÔNG hiểu nhầm 'chịu/chiu' thành 'rượu', KHÔNG giới thiệu Rượu sâm.",
-  "price_quote_duongsam": "Duyệt 21/10 (chị Nga) — khách hỏi giá / chương trình Dương Sâm Linh Đan → đúng 3 phần, 1 lượt: (1) câu dẫn: 'Dạ Dương Sâm Linh Đan giá 990.000đ/hộp 10 viên, mỗi ngày anh dùng 1 viên lúc 8–9 giờ tối. Liệu trình khuyên dùng 3 tháng (khoảng 9 hộp) để hiệu quả bền vững ạ.'; (2) 'Chương trình tri ân khách hàng mới:' + mỗi gói 1 dòng: '🎁 Liệu trình 1 tháng (3 hộp): 2.970.000đ – tặng 2 hộp Trà sâm 1700 (10 gói)' / '🎁 Liệu trình 2 tháng (6 hộp): 5.940.000đ – tặng 1 chai Nước Hồng sâm mật ong (hoặc đổi sang 2 hộp Bổ Gan Thái Minh + 1 hộp Trà sâm 1700 loại 10 gói)' / '🎁 Liệu trình 3 tháng (9 hộp): 8.910.000đ – tặng 2 chai nước Hồng sâm mật ong' + dòng '✅ Miễn phí vận chuyển toàn quốc, nhận hàng kiểm tra rồi mới thanh toán'; (3) ĐÚNG 1 câu chốt: 'Anh muốn bắt đầu liệu trình 1 tháng (3 hộp) trước, hay lấy luôn liệu trình 3 tháng (9 hộp) cho đủ liệu trình cơ bản ạ?'. KHÔNG liệt kê dòng 1 hộp, 2 hộp (chỉ nói khi khách hỏi mua lẻ / ít hộp / dùng thử / chê đắt: 1 hộp không quà, 2 hộp tặng 1 Trà sâm 1700 loại 10 gói). Mốc 6 hộp: ƯU TIÊN báo tặng 1 chai Nước Hồng sâm mật ong; khách không thích Nước Hồng sâm mới đổi 2 hộp Bổ Gan + 1 Trà sâm 10 gói. Khách mới từ 10 hộp trở lên: quà mốc 9 hộp, KHÔNG chuyển nhân viên xin thêm ưu đãi.",
-  "returning_quote_duongsam": "Duyệt 21/10 — khách TỰ nói đã từng dùng ĐÚNG Dương Sâm Linh Đan (chốt 23/10: từng dùng sản phẩm khác → báo CTKM khách mới): cảm ơn anh đã tin dùng lại; báo giá 1 hộp + ưu đãi tri ân khách hàng thân thiết lấy đúng bảng programs.returning_customer (mốc 4 / 7 / 10 / 15 hộp, mỗi mốc 1 dòng 🎁; 2, 3, 6, 9 hộp quà như khách mới); 1 câu chốt hỏi số lượng; chốt đơn bằng build_order customer_type=returning.",
+  "price_quote_duongsam": "Duyệt 21/10 (chị Nga) — khách hỏi giá / chương trình Dương Sâm Linh Đan → đúng 3 phần, 1 lượt: (1) câu dẫn: 'Dạ Dương Sâm Linh Đan giá 990.000đ/hộp 10 viên, mỗi ngày anh dùng 1 viên lúc 8–9 giờ tối. Liệu trình khuyên dùng 3 tháng (khoảng 9 hộp) để hiệu quả bền vững ạ.'; (2) 'Chương trình tri ân khách hàng mới:' + mỗi gói 1 dòng: '🎁 Liệu trình 1 tháng (3 hộp): 2.970.000đ – tặng 2 hộp Trà sâm 1700 (10 gói)' / '🎁 Liệu trình 2 tháng (6 hộp): 5.940.000đ – tặng 2 lọ Bổ gan Thái Minh (30 viên) + 1 hộp Trà sâm 1700 (10 gói)' / '🎁 Liệu trình 3 tháng (9 hộp): 8.910.000đ – tặng 2 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)' + dòng '✅ Miễn phí vận chuyển toàn quốc, nhận hàng kiểm tra rồi mới thanh toán'; (3) ĐÚNG 1 câu chốt: 'Anh muốn bắt đầu liệu trình 1 tháng (3 hộp) trước, hay lấy luôn liệu trình 3 tháng (9 hộp) cho đủ liệu trình cơ bản ạ?'. KHÔNG liệt kê dòng 1 hộp, 2 hộp (chỉ nói khi khách hỏi mua lẻ / ít hộp / dùng thử / chê đắt — bảng 17/11: 1 hộp và 2 hộp đều tặng 1 lọ dầu nóng Khương Thảo Đan). Quà có chữ 'hoặc' = khách CHỌN 1, nói đủ các phương án (bảng 17/11). Khách mới từ 10 hộp trở lên: quà mốc 9 hộp, KHÔNG chuyển nhân viên xin thêm ưu đãi.",
+  "returning_quote_duongsam": "Duyệt 21/10 — khách TỰ nói đã từng dùng ĐÚNG Dương Sâm Linh Đan (chốt 23/10: từng dùng sản phẩm khác → báo CTKM khách mới): cảm ơn anh đã tin dùng lại; báo giá 1 hộp + ưu đãi tri ân khách hàng thân thiết lấy đúng bảng programs.returning_customer (bảng 17/11 mã 2026/TP-TBBL.DSLĐ-C06: mốc 4 / 7 / 10 / 15 hộp, mỗi mốc 1 dòng 🎁; 1, 2, 3, 6, 9 hộp quà như khách mới; quà có 'hoặc' = khách chọn 1); 1 câu chốt hỏi số lượng; chốt đơn bằng build_order customer_type=returning.",
   "price_why_duongsam": "Duyệt 21/10 (chị Nga) — khách chê đắt Dương Sâm, dùng ĐÚNG 2 câu, mỗi lần 1 câu, KHÔNG chuyển sang Nước Hồng sâm: LẦN 1: 'Dạ em hiểu anh ạ. So với dùng thuốc tây hay tiêm hormone thì chi phí Dương Sâm Linh Đan nhẹ nhàng hơn nhiều, lại từ thảo dược nên anh yên tâm hơn, bồi bổ từ gốc. Tính ra mỗi ngày chỉ khoảng bằng 2 ly cà phê thôi ạ.' | LẦN 2: 'Dạ loại rẻ mà dùng vài tháng không cải thiện thì anh vừa mất tiền vừa mất thời gian ạ. Dương Sâm Linh Đan dùng khoảng 10–14 ngày nhiều anh đã thấy tỉnh táo hơn, đỡ đau lưng mỏi gối, buổi sáng chào cờ nhạy hơn ạ.' Vẫn chưa mua → soft ask SĐT 1 lần rồi cảm ơn.",
   "new_product_doubt": "Duyệt 21/10 — khách hỏi uy tín / sản phẩm mới, sợ không đúng quảng cáo: thừa nhận trước ('Vâng anh ạ, sản phẩm mới thì anh cũng cần tìm hiểu kỹ thông tin ạ'), rồi: 'Dương Sâm Linh Đan là sản phẩm được Thái Minh đầu tư rất nhiều chất xám, được sản xuất và phân phối bởi Công ty Dược phẩm Thái Minh, thương hiệu gần 15 năm, đã có nhiều sản phẩm nổi tiếng như Khương Thảo Đan, Vương Bảo, Bình Vị...' + công thức Sâm Lai Châu + Cao xương dê, 'Khỏe bên trong, mạnh bên ngoài'; dùng đủ liệu trình 3 tháng hiệu quả bền vững hơn.",
   "doctor_htk": "Duyệt 21/10 — CHỈ khi khách HỎI có bác sĩ / chuyên gia tư vấn không: 'Dạ sản phẩm Dương Sâm Linh Đan đang được các bác sĩ trực tiếp tư vấn và chia sẻ trên các kênh đài uy tín như VOV, truyền hình Quốc Phòng... ạ.' KHÔNG nêu tên bác sĩ cụ thể; KHÔNG tự nhắc bác sĩ khi khách không hỏi.",
@@ -2670,7 +2794,7 @@
   "expert_referral": "Dạ câu hỏi của anh/chị cần chuyên viên có chuyên môn tư vấn mới chính xác được ạ. Anh/chị cho em xin số điện thoại, chuyên viên bên em sẽ gọi lại hỗ trợ anh/chị sớm ạ.",
   "payment": "Chốt 16/11 (chị Nga) — khách hỏi cách thanh toán / trả bằng thẻ / chuyển khoản / COD. Nói đúng 2 cách, KHÔNG tự nói 'chưa hỗ trợ quẹt thẻ', 'chỉ nhận tiền mặt', KHÔNG tự đưa số tài khoản: 'Dạ bên em có 2 cách thanh toán ạ: anh/chị nhận hàng, kiểm tra rồi mới thanh toán; hoặc anh/chị chuyển khoản trước qua tài khoản của công ty, khi nhận hàng anh/chị không phải trả thêm đồng nào ạ.' Khách chọn chuyển khoản trước → 'Dạ bên em sẽ gửi thông tin tài khoản công ty cho anh/chị khi gọi xác nhận đơn ạ.' + [HANDOFF: khách muốn chuyển khoản trước - gửi số tài khoản công ty | SĐT | 2].",
   "symposium_trust": "Chốt 05/11 (chị Nga) — thông điệp Hội nghị Quốc tế về Sâm lần thứ 14 (Jeju, Hàn Quốc, 26–29/10/2026), dùng cho Hồng sâm lát và Nước Hồng sâm khi khách băn khoăn chất lượng / uy tín / nguồn gốc / hàng thật giả, so với sâm Hàn Quốc, hỏi sâm Việt có tốt không; hoặc làm lần thuyết phục thứ 2 khi khách chê đắt; hoặc khách còn lưỡng lự sau khi nghe giá. TỐI ĐA 1 LẦN/hội thoại. BẮT BUỘC kèm ĐÚNG 2 ảnh [IMG: hoi-nghi-sam-han-quoc] [IMG: ts-thai-bao-cao-han-quoc]. Nói NGUYÊN VĂN (chỉ đổi 'cô chú' theo đúng xưng hô với khách): 'Hồng sâm Thái Minh là dòng hồng sâm đầu tiên làm từ sâm Việt Nam mình. Cuối tháng 10 vừa rồi, sản phẩm đã được giới thiệu tại Hội nghị Quốc tế về Sâm ngay tại Hàn Quốc. Đích thân Tiến sĩ Nguyễn Quang Thái – Chủ tịch Thái Minh – đã trực tiếp báo cáo khoa học trước chuyên gia 12 nước và được chính các nhà khoa học đánh giá rất cao. Chất lượng và uy tín đã được khẳng định từ nguồn sâm Việt mình, nên cô chú cứ hoàn toàn an tâm sử dụng nhé ạ!' KHÔNG thêm chi tiết ngoài câu này (không tự nói giải thưởng, tên hội nghị tiếng Anh, tên thành phố).",
-  "price_quote_nhs": "Bot Nước Hồng sâm (v0.5.0, học theo luồng báo giá Hồng sâm lát v0.1.106) — khách hỏi giá / chương trình Nước Hồng sâm (mặc định DẠNG TÚI). BÁO GIÁ LẦN ĐẦU (code tự xoay vòng): CHỦ YẾU (3/4 khách) = câu dẫn giá 1 hộp + câu khuyên dùng đều + ĐÚNG 1 câu hỏi tình hình sức khỏe (price_probe_nhs K1 hoặc price_discovery_nhs D2), CHƯA gửi bảng combo; 1/4 khách gửi bảng combo ngay. Khách hỏi thẳng combo / ưu đãi / khách vội → gửi bảng combo luôn. (1) CÂU DẪN: 'Dạ Nước Hồng sâm Thái Minh mật ong dạng túi giá 620.000đ/hộp 20 túi, mỗi ngày anh/chị dùng 1–2 túi, ăn trực tiếp hoặc pha với 100ml nước ấm khoảng 60°C ạ.' + CÂU KHUYÊN: 'Anh/chị nên dùng đều mỗi ngày, thường sau khoảng 1 hộp đầu (khoảng 20 ngày) sẽ thấy cơ thể thay đổi: ăn ngon, ngủ tốt, cơ thể khỏe khoắn, tỉnh táo ạ.' NGAY SAU câu dẫn, xuống dòng thành 1 đoạn riêng, thêm ĐÚNG 1 trong 3 đoạn phù hợp (không lặp đoạn đã dùng): Ⓐ MẶC ĐỊNH: 'Nước Hồng sâm rất hợp với người hay mệt mỏi, căng thẳng, ngủ không sâu ạ. Vị ngọt nhẹ của mật ong nên dễ uống, túi nhỏ tiện mang theo đi làm, đi xa ạ.' | Ⓑ NGẮN: 'Nước Hồng sâm dễ uống, tiện mang theo, rất hợp với người hay mệt mỏi, ngủ không sâu ạ.' | Ⓒ MUA CHO BỐ MẸ: 'Bố mẹ lớn tuổi hay mệt, ngủ không sâu thì dùng Nước Hồng sâm rất hợp, vị ngọt nhẹ dễ uống, không phải nhai hay sắc nấu ạ.'. (2) BẢNG COMBO (3 gói 2 / 4 / 6 hộp, xoay vòng kiểu trình bày, giữ NGUYÊN giá, số hộp, quà): KIỂU 1: 'Chương trình tri ân khách hàng mới (từ 2 hộp miễn phí vận chuyển):' + '🎁 Combo 2 hộp (40 túi): 1.240.000đ – tặng 1 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 4 hộp (80 túi): 2.480.000đ – tặng 3 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 6 hộp (120 túi): 3.720.000đ – tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 2: 'Hiện bên em đang có ưu đãi quà tặng cho khách mới ạ:' + '✅ Combo 2 hộp – 1.240.000đ – tặng 1 hộp Trà sâm 1700 (10 gói)' / '✅ Combo 4 hộp – 2.480.000đ – tặng 3 hộp Trà sâm 1700 (10 gói)' / '✅ Combo 6 hộp – 3.720.000đ – tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 3: 'Anh/chị mua theo combo sẽ được tặng thêm quà và miễn phí vận chuyển ạ:' + '🎁 Combo 2 hộp giá 1.240.000đ: tặng ngay 1 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 4 hộp giá 2.480.000đ: tặng ngay 3 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 6 hộp giá 3.720.000đ: tặng ngay 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 4: 'Ưu đãi dành riêng cho khách hàng mới, áp dụng đến hết 31/12/2026:' + '🌿 Combo 2 hộp (40 túi): 1.240.000đ, tặng kèm 1 hộp Trà sâm 1700 (10 gói)' / '🌿 Combo 4 hộp (80 túi): 2.480.000đ, tặng kèm 3 hộp Trà sâm 1700 (10 gói)' / '🌿 Combo 6 hộp (120 túi): 3.720.000đ, tặng kèm 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 5: 'Bên em có 3 gói kèm quà, combo 6 hộp được tặng nhiều quà nhất ạ:' + '⭐ Combo 6 hộp: 3.720.000đ – tặng 5 hộp Trà sâm 1700 (10 gói)' / '▫️ Combo 4 hộp: 2.480.000đ – tặng 3 hộp Trà sâm 1700 (10 gói)' / '▫️ Combo 2 hộp: 1.240.000đ – tặng 1 hộp Trà sâm 1700 (10 gói)' || KIỂU 6: 'Mua theo combo anh/chị được tặng thêm Trà sâm ạ:' + '- Combo 2 hộp → 1.240.000đ, tặng 1 hộp Trà sâm 1700 (10 gói)' / '- Combo 4 hộp → 2.480.000đ, tặng 3 hộp Trà sâm 1700 (10 gói)' / '- Combo 6 hộp → 3.720.000đ, tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 7: 'Anh/chị chọn gói theo nhu cầu nhé ạ:' + '🎁 Combo 2 hộp – dùng thử cảm nhận: 1.240.000đ, tặng 1 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 4 hộp – dùng đều cả nhà: 2.480.000đ, tặng 3 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 6 hộp – quà nhiều nhất: 3.720.000đ, tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 8: 'Ưu đãi khách mới đang áp dụng theo từng combo ạ:' + '1️⃣ Combo 2 hộp: 1.240.000đ – quà tặng: 1 hộp Trà sâm 1700 (10 gói)' / '2️⃣ Combo 4 hộp: 2.480.000đ – quà tặng: 3 hộp Trà sâm 1700 (10 gói)' / '3️⃣ Combo 6 hộp: 3.720.000đ – quà tặng: 5 hộp Trà sâm 1700 (10 gói)'; (3) ĐÚNG 1 CÂU CHỐT theo tình huống, xoay vòng không lặp: Ⓐ HỎI CHỌN ƯU ĐÃI: 'Trong 3 ưu đãi trên, anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?' | Ⓑ GỢI Ý ƯU ĐÃI TỐT NHẤT: 'Với tình trạng của anh/chị, em gợi ý combo 6 hộp ạ: dùng đều mỗi ngày được lâu, lại được tặng nhiều quà nhất (5 hộp Trà sâm 1700 (10 gói)). Em lên đơn combo 6 hộp cho anh/chị nhé?' | Ⓒ DẪN DẮT 2 HỘP HAY 6 HỘP: 'Anh/chị muốn lấy combo 2 hộp dùng trước, hay lấy luôn combo 6 hộp để dùng đều và nhận thêm 5 hộp Trà sâm ạ?' | Ⓓ BẮT ĐẦU NHẸ: 'Lần đầu dùng anh/chị có thể bắt đầu combo 2 hộp để cảm nhận trước, vẫn được tặng 1 hộp Trà sâm 1700 (10 gói) và miễn phí vận chuyển. Em lên đơn combo 2 hộp cho anh/chị nhé?' | Ⓔ MUA CHO CẢ NHÀ / BIẾU BỐ MẸ: 'Nước Hồng sâm cả nhà dùng chung được, anh/chị lấy combo 4 hoặc 6 hộp vừa đủ dùng vừa có Trà sâm làm quà nhé?' | Ⓕ CHỐT NHẸ: 'Anh/chị chọn combo nào thì chỉ cần nhắn em tên, số điện thoại và địa chỉ, em lên đơn ngay ạ. Hàng giao tận nơi, kiểm tra rồi mới thanh toán nên anh/chị yên tâm nhé.' | Ⓖ HỎI NGƯỜI DÙNG: 'Anh/chị định dùng cho bản thân hay mua cho người thân ạ, để em gợi ý gói phù hợp nhất cho anh/chị ạ?' | Ⓗ BẮT ĐẦU RỒI DÙNG TIẾP: 'Nhiều anh chị bắt đầu combo 2 hộp để cảm nhận, dùng hợp thì lấy tiếp combo lớn hơn ạ. Anh/chị muốn em lên đơn combo nào ạ?' | Ⓘ YÊN TÂM NHẬN HÀNG: 'Bên em giao tận nhà, anh/chị nhận hàng kiểm tra rồi mới thanh toán ạ. Anh/chị chọn combo 2 hộp hay 6 hộp để em lên đơn luôn ạ?'. Gói 1 hộp (620.000đ, không quà, mua 1 hộp phí ship 15.000đ nội thành Hà Nội, 20.000đ nơi khác; từ 2 hộp miễn phí vận chuyển) chỉ là câu dẫn giá; KHÔNG chào mời mua 1 hộp. Hộp nhỏ 10 túi (330.000đ, chưa có quà) CHỈ nói khi khách hỏi gói nhỏ hoặc vẫn chê đắt sau 2 lần thuyết phục. Mốc 3 hộp (1.860.000đ – tặng 2 hộp Trà sâm 1700 (10 gói)) và 10 hộp (6.200.000đ – tặng 1 hộp nước Hồng sâm dạng túi cùng loại + 3 hộp Trà sâm 1700 (10 gói)) chỉ nói khi khách hỏi đúng số đó. KHÔNG gọi các combo là '1 tháng / 2 tháng / 3 tháng' (số ngày dùng tùy 1 hay 2 túi/ngày); KHÔNG quy đổi giá theo ngày khi khách không hỏi; KHÔNG nói 'giảm giá / tiết kiệm' cho combo. Khách có liều riêng (tiểu đường: 1 túi buổi sáng trước ăn 30 phút) → câu dẫn ghi đúng liều riêng đó.",
+  "price_quote_nhs": "Bot Nước Hồng sâm (v0.5.0, học theo luồng báo giá Hồng sâm lát v0.1.106) — khách hỏi giá / chương trình Nước Hồng sâm (mặc định DẠNG TÚI). BÁO GIÁ LẦN ĐẦU (code tự xoay vòng): CHỦ YẾU (3/4 khách) = câu dẫn giá 1 hộp + câu khuyên dùng đều + ĐÚNG 1 câu hỏi tình hình sức khỏe (price_probe_nhs K1 hoặc price_discovery_nhs D2), CHƯA gửi bảng combo; 1/4 khách gửi bảng combo ngay. Khách hỏi thẳng combo / ưu đãi / khách vội → gửi bảng combo luôn. (1) CÂU DẪN: 'Dạ Nước Hồng sâm Thái Minh mật ong dạng túi giá 620.000đ/hộp 20 túi, mỗi ngày anh/chị dùng 1–2 túi, ăn trực tiếp hoặc pha với 100ml nước ấm khoảng 60°C ạ.' + CÂU KHUYÊN: 'Anh/chị nên dùng đều mỗi ngày, thường sau khoảng 1 hộp đầu (khoảng 20 ngày) sẽ thấy cơ thể thay đổi: ăn ngon, ngủ tốt, cơ thể khỏe khoắn, tỉnh táo ạ.' NGAY SAU câu dẫn, xuống dòng thành 1 đoạn riêng, thêm ĐÚNG 1 trong 3 đoạn phù hợp (không lặp đoạn đã dùng): Ⓐ MẶC ĐỊNH: 'Nước Hồng sâm rất hợp với người hay mệt mỏi, căng thẳng, ngủ không sâu ạ. Vị ngọt nhẹ của mật ong nên dễ uống, túi nhỏ tiện mang theo đi làm, đi xa ạ.' | Ⓑ NGẮN: 'Nước Hồng sâm dễ uống, tiện mang theo, rất hợp với người hay mệt mỏi, ngủ không sâu ạ.' | Ⓒ MUA CHO BỐ MẸ: 'Bố mẹ lớn tuổi hay mệt, ngủ không sâu thì dùng Nước Hồng sâm rất hợp, vị ngọt nhẹ dễ uống, không phải nhai hay sắc nấu ạ.'. (2) BẢNG COMBO (3 gói 2 / 4 / 6 hộp, xoay vòng kiểu trình bày, giữ NGUYÊN giá, số hộp, quà): KIỂU 1: 'Chương trình tri ân khách hàng mới (từ 2 hộp miễn phí vận chuyển):' + '🎁 Combo 2 hộp (40 túi): 1.240.000đ – tặng 1 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 4 hộp (80 túi): 2.480.000đ – tặng 3 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 6 hộp (120 túi): 3.720.000đ – tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 2: 'Hiện bên em đang có ưu đãi quà tặng cho khách mới ạ:' + '✅ Combo 2 hộp – 1.240.000đ – tặng 1 hộp Trà sâm 1700 (10 gói)' / '✅ Combo 4 hộp – 2.480.000đ – tặng 3 hộp Trà sâm 1700 (10 gói)' / '✅ Combo 6 hộp – 3.720.000đ – tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 3: 'Anh/chị mua theo combo sẽ được tặng thêm quà và miễn phí vận chuyển ạ:' + '🎁 Combo 2 hộp giá 1.240.000đ: tặng ngay 1 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 4 hộp giá 2.480.000đ: tặng ngay 3 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 6 hộp giá 3.720.000đ: tặng ngay 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 4: 'Ưu đãi dành riêng cho khách hàng mới, áp dụng đến hết 31/12/2026:' + '🌿 Combo 2 hộp (40 túi): 1.240.000đ, tặng kèm 1 hộp Trà sâm 1700 (10 gói)' / '🌿 Combo 4 hộp (80 túi): 2.480.000đ, tặng kèm 3 hộp Trà sâm 1700 (10 gói)' / '🌿 Combo 6 hộp (120 túi): 3.720.000đ, tặng kèm 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 5: 'Bên em có 3 gói kèm quà, combo 6 hộp được tặng nhiều quà nhất ạ:' + '⭐ Combo 6 hộp: 3.720.000đ – tặng 5 hộp Trà sâm 1700 (10 gói)' / '▫️ Combo 4 hộp: 2.480.000đ – tặng 3 hộp Trà sâm 1700 (10 gói)' / '▫️ Combo 2 hộp: 1.240.000đ – tặng 1 hộp Trà sâm 1700 (10 gói)' || KIỂU 6: 'Mua theo combo anh/chị được tặng thêm Trà sâm ạ:' + '- Combo 2 hộp → 1.240.000đ, tặng 1 hộp Trà sâm 1700 (10 gói)' / '- Combo 4 hộp → 2.480.000đ, tặng 3 hộp Trà sâm 1700 (10 gói)' / '- Combo 6 hộp → 3.720.000đ, tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 7: 'Anh/chị chọn gói theo nhu cầu nhé ạ:' + '🎁 Combo 2 hộp – dùng thử cảm nhận: 1.240.000đ, tặng 1 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 4 hộp – dùng đều cả nhà: 2.480.000đ, tặng 3 hộp Trà sâm 1700 (10 gói)' / '🎁 Combo 6 hộp – quà nhiều nhất: 3.720.000đ, tặng 5 hộp Trà sâm 1700 (10 gói)' || KIỂU 8: 'Ưu đãi khách mới đang áp dụng theo từng combo ạ:' + '1️⃣ Combo 2 hộp: 1.240.000đ – quà tặng: 1 hộp Trà sâm 1700 (10 gói)' / '2️⃣ Combo 4 hộp: 2.480.000đ – quà tặng: 3 hộp Trà sâm 1700 (10 gói)' / '3️⃣ Combo 6 hộp: 3.720.000đ – quà tặng: 5 hộp Trà sâm 1700 (10 gói)'; (3) ĐÚNG 1 CÂU CHỐT theo tình huống, xoay vòng không lặp: Ⓐ HỎI CHỌN ƯU ĐÃI: 'Trong các ưu đãi trên, anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?' | Ⓑ GỢI Ý ƯU ĐÃI TỐT NHẤT: 'Với tình trạng của anh/chị, em gợi ý combo 6 hộp ạ: dùng đều mỗi ngày được lâu, lại được tặng nhiều quà nhất (5 hộp Trà sâm 1700 (10 gói)). Em lên đơn combo 6 hộp cho anh/chị nhé?' | Ⓒ DẪN DẮT 2 HỘP HAY 6 HỘP: 'Anh/chị muốn lấy combo 2 hộp dùng trước, hay lấy luôn combo 6 hộp để dùng đều và nhận thêm 5 hộp Trà sâm ạ?' | Ⓓ BẮT ĐẦU NHẸ: 'Lần đầu dùng anh/chị có thể bắt đầu combo 2 hộp để cảm nhận trước, vẫn được tặng 1 hộp Trà sâm 1700 (10 gói) và miễn phí vận chuyển. Em lên đơn combo 2 hộp cho anh/chị nhé?' | Ⓔ MUA CHO CẢ NHÀ / BIẾU BỐ MẸ: 'Nước Hồng sâm cả nhà dùng chung được, anh/chị lấy combo 4 hoặc 6 hộp vừa đủ dùng vừa có Trà sâm làm quà nhé?' | Ⓕ CHỐT NHẸ: 'Anh/chị chọn combo nào thì chỉ cần nhắn em tên, số điện thoại và địa chỉ, em lên đơn ngay ạ. Hàng giao tận nơi, kiểm tra rồi mới thanh toán nên anh/chị yên tâm nhé.' | Ⓖ HỎI NGƯỜI DÙNG: 'Anh/chị định dùng cho bản thân hay mua cho người thân ạ, để em gợi ý gói phù hợp nhất cho anh/chị ạ?' | Ⓗ BẮT ĐẦU RỒI DÙNG TIẾP: 'Nhiều anh chị bắt đầu combo 2 hộp để cảm nhận, dùng hợp thì lấy tiếp combo lớn hơn ạ. Anh/chị muốn em lên đơn combo nào ạ?' | Ⓘ YÊN TÂM NHẬN HÀNG: 'Bên em giao tận nhà, anh/chị nhận hàng kiểm tra rồi mới thanh toán ạ. Anh/chị chọn combo 2 hộp hay 6 hộp để em lên đơn luôn ạ?'. Gói 1 hộp (620.000đ, không quà, mua 1 hộp phí ship 15.000đ nội thành Hà Nội, 20.000đ nơi khác; từ 2 hộp miễn phí vận chuyển) chỉ là câu dẫn giá; KHÔNG chào mời mua 1 hộp. Hộp nhỏ 10 túi (330.000đ, chưa có quà) CHỈ nói khi khách hỏi gói nhỏ hoặc vẫn chê đắt sau 2 lần thuyết phục. Mốc 3 hộp (1.860.000đ – tặng 2 hộp Trà sâm 1700 (10 gói)) và 10 hộp (6.200.000đ – tặng 1 hộp nước Hồng sâm dạng túi cùng loại + 3 hộp Trà sâm 1700 (10 gói)) chỉ nói khi khách hỏi đúng số đó. KHÔNG gọi các combo là '1 tháng / 2 tháng / 3 tháng' (số ngày dùng tùy 1 hay 2 túi/ngày); KHÔNG quy đổi giá theo ngày khi khách không hỏi; KHÔNG nói 'giảm giá / tiết kiệm' cho combo. Khách có liều riêng (tiểu đường: 1 túi buổi sáng trước ăn 30 phút) → câu dẫn ghi đúng liều riêng đó.",
   "price_discovery_nhs": "Bot Nước Hồng sâm — câu KHƠI GỢI khi báo giá lần đầu (xoay vòng, tối đa 1 lần/hội thoại): ⓀD1 'Để em tư vấn đúng nhu cầu nhất, anh/chị cho em hỏi anh/chị đang muốn bồi bổ sức khỏe cho bản thân hay mua cho người thân ạ?' | ⓀD2 'Anh/chị có hay gặp tình trạng mệt mỏi, căng thẳng hay ngủ không sâu không ạ, để em gợi ý cách dùng phù hợp nhất ạ?' | ⓀD4 'Trước đây anh/chị đã dùng sâm hay sản phẩm bồi bổ nào chưa ạ, để em tư vấn phù hợp nhất cho anh/chị ạ?' KHÔNG dùng khi khách hỏi thẳng combo / khuyến mãi / ưu đãi / bảng giá, khi khách đã nói rõ nhu cầu, hoặc đã hỏi khơi gợi 1 lần.",
   "price_probe_nhs": "Bot Nước Hồng sâm — CÂU KHAI THÁC khi khách hỏi giá (theo TH1–TH11 của Hồng sâm lát). Luôn báo giá trước; mỗi lượt 1 câu; tối đa 2 câu khai thác (tính cả câu khơi gợi D) trước khi gửi bảng combo; câu hỏi phải bám điều khách vừa nói: ⓀK1 'Anh/chị có đang điều trị huyết áp, tiểu đường hay bệnh nền nào không ạ, để em hướng dẫn cách dùng an toàn, đúng liều ạ?' | ⓀK2 'Anh/chị có đang dùng thuốc gì hằng ngày không ạ, để em dặn khoảng cách dùng sâm với thuốc cho phù hợp ạ?' | ⓀK3 'Giấc ngủ của anh/chị dạo này thế nào ạ: khó vào giấc hay ngủ không sâu, hay thức dậy giữa đêm ạ?' | ⓀK4 'Anh/chị thấy mệt nhiều vào thời điểm nào ạ: buổi sáng khó tỉnh hay chiều tối hay đuối sức ạ?' | ⓀK5 'Anh/chị năm nay khoảng bao nhiêu tuổi ạ, để em tư vấn cách dùng phù hợp ạ?' | ⓀK5b 'Anh/chị năm nay khoảng bao nhiêu tuổi và có đang dùng thuốc gì hằng ngày không ạ, để em tư vấn cách dùng phù hợp ạ?' | ⓀK7 'Anh/chị định mua biếu ông bà, bố mẹ hay mua cho cả nhà cùng dùng ạ, để em gợi ý gói phù hợp nhất ạ?' | ⓀK8 'Công việc của anh/chị có hay thức khuya, áp lực hay phải đi lại nhiều không ạ, để em gợi ý cách dùng giúp anh/chị tỉnh táo hơn ban ngày ạ?' KHÔNG khai thác khi: khách hỏi thẳng combo / khuyến mãi / ưu đãi; khách vội ('giá thôi', 'nhanh', 'ok'); khách hỏi lại giá lần 2; khách đã chốt mua. Khách kể bệnh → compliance_check trước. Khai thác xong → bảng combo Nước Hồng sâm + câu chốt hợp nhu cầu (bố mẹ / cả nhà → Ⓔ; tình trạng/bệnh → Ⓑ; lưỡng lự → Ⓓ; vội → Ⓕ).",
   "price_why_nhs": "Bot Nước Hồng sâm — khách chê đắt LẦN 1 (đồng cảm trước, nêu GIÁ TRỊ): 'Dạ em hiểu băn khoăn của anh/chị ạ. Nước Hồng sâm Thái Minh là tinh chất Hồng sâm Lai Châu trong mật ong, cứ 10ml có 11.000mg tinh chất, tương đương 1.200mg Hồng sâm Lai Châu ạ. Sâm Việt Nam có hoạt chất MR2 mà sâm Hàn Quốc không có, và Hồng sâm Thái Minh là công trình chuyển giao từ Viện Nghiên cứu Sâm và Dược liệu Việt Nam (VIGH) ạ.' + nhắc ưu đãi đang có (từ 2 hộp tặng Trà sâm, miễn phí ship). LẦN 2 (ý KHÁC): hỏi khéo còn băn khoăn gì → uy tín Dược phẩm Thái Minh gần 15 năm (Khương Thảo Đan, Vương Bảo, Bình Vị...); nhận hàng kiểm tra rồi mới thanh toán; thường khoảng 2 hộp bắt đầu cảm nhận. Áp cho cả 'đắt quá', 'chưa đủ tiền', 'không có tiền', 'đắt quá thôi'. Đã thuyết phục ĐỦ 2 LẦN mà khách vẫn từ chối → mới mời HỘP NHỎ 10 TÚI (330.000đ) (câu chuẩn price_objection_nhs). KHÔNG gợi ý Trà sâm hay sản phẩm khác rẻ hơn, KHÔNG quy đổi giá/ngày khi khách không hỏi.",

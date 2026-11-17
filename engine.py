@@ -190,7 +190,8 @@ TOOLS = [
             "properties": {
                 "items": {"type": "array", "items": {
                     "type": "object",
-                    "properties": {"sku": {"type": "string", "description": SKUS}, "qty": {"type": "integer"}},
+                    "properties": {"sku": {"type": "string", "description": SKUS}, "qty": {"type": "integer"},
+                                   "gift_choice": {"type": "string", "description": "CHỈ điền khi khách XIN ĐỔI quà: ghi đúng 1 phương án trong gift_options_if_customer_asks (bảng 17/11). Không điền = quà mặc định."}},
                     "required": ["sku", "qty"],
                 }},
                 "name": {"type": "string"}, "phone": {"type": "string"}, "addr": {"type": "string"},
@@ -1842,7 +1843,7 @@ Khách TỰ nói đã từng mua ĐÚNG sản phẩm này (khách CŨ, chốt 14
 KHÔNG hứa hoàn tiền; gợi ý bắt đầu 1 hộp (được kiểm tra hàng khi nhận) hoặc Nước Hồng sâm mật ong giá nhẹ hơn.
 5s. CHỐT ĐƠN (brief 25/09): xin họ tên, SĐT, địa chỉ nhận hàng, số lượng (và tên sản phẩm nếu khách đã hỏi từ 2 sản phẩm trở lên). \
 CHỈ sang bước xin thông tin khi khách nói rõ mua / chốt / lấy combo / đặt thử — xin tên, SĐT, địa chỉ trong 1 tin; thiếu phần nào hỏi đúng phần đó. \
-Đơn Hồng sâm lát: 1 hộp → mời lên Combo 1 tháng 2 hộp; 2 hộp → mời lên Combo 2 tháng 4 hộp — THỨ TỰ (chốt 25/10, chị Nga): \
+Đơn Hồng sâm lát: 1 hộp → mời lên combo 2 hộp; 2 hộp → mời lên combo 3 hộp (bảng 17/11) — THỨ TỰ (chốt 25/10, chị Nga): \
 gửi TỔNG HỢP ĐƠN trước (tin đó KHÔNG mời thêm gì) → khách XÁC NHẬN đúng → lượt sau mới mời ĐÚNG 1 LẦN trong 1 tin riêng \
 (scripts_approved.upsell_double), kèm ghi nhận đơn hiện tại; khách không đồng ý / không trả lời rõ → giữ đơn. KHÔNG làm 2 việc trong 1 tin. \
 THÔNG TIN ĐƠN (v0.1.18): tên/SĐT/địa chỉ đưa vào build_order PHẢI chép đúng từ tin khách gửi, KHÔNG tự điền, tự đoán, tự sửa số. build_order trả guard_notes (phone_not_from_customer / addr_not_from_customer) → hỏi lại khách đúng trường đó, chưa gửi tổng hợp đơn. KHÔNG BAO GIỜ viết ra cho khách phần suy nghĩ, kế hoạch, tên công cụ hay tên luật nội bộ. \
@@ -2520,6 +2521,8 @@ def _hesitate_offer_nhs(text: str, transcript: list) -> tuple:
     turns = [(m.get("role"), str(m.get("text") or m.get("content") or "")) for m in transcript or []]
     if not turns or turns[-1][0] != "user" or not _RE_HESITATE.search(turns[-1][1]):
         return text, 0
+    if _is_long_msg(turns[-1][1]) and ("?" in turns[-1][1] or _RE_USER_Q.search(turns[-1][1])):
+        return text, 0            # v0.5.15: tin dài có câu hỏi khác → giữ câu trả lời AI (đã đọc cả đoạn), không thay bằng bảng ưu đãi
     said = " ".join(t for r, t in turns if r == "assistant") + " " + text
     if re.search(r"combo\s*2\s*hộp", said, re.I) or _is_order_summary(text):
         return text, 0
@@ -2567,6 +2570,10 @@ def _symposium_net(text: str, transcript: list) -> tuple:
     text = _RE_SYMPO_IMG.sub("", text).strip()       # ảnh hội nghị chỉ đi cùng thông điệp — gắn lại bên dưới
     if not has:
         last_u = turns[-1][1] if turns and turns[-1][0] == "user" else ""
+        _strong = re.search(r"uy tín|chính hãng|hàng (?:thật|giả|nhái)|có (?:phải )?(?:thật|giả) không|tin (?:được|tưởng)|có tốt (?:không|bằng|hơn)|"
+                            r"tốt bằng|thua sâm|kém sâm|chất lượng (?:thế nào|ra sao|có tốt|có đảm bảo)", last_u, re.I)
+        if _is_long_msg(last_u) and not _strong:
+            return text, int(text != t0)   # v0.5.15: tin dài chỉ nhắc "sâm Hàn" / "nguồn gốc" khi kể chuyện → không tự chèn thông điệp
         if sent_before or not _RE_DOUBT_TRUST.search(last_u) or _is_order_summary(text) or "[HANDOFF:" in text \
                 or re.search(r"cho con bú|có thai|mang thai|dưới 3 tuổi|không dùng được|chưa nên dùng", text, re.I):
             return text, int(text != t0)
@@ -2852,7 +2859,16 @@ def _nhs_gift_table_txt() -> str:
             f". Hộp nhỏ 10 túi ({tools_core.fmt_vnd(p10)}) KHÔNG có quà. Số hộp nằm giữa 2 mốc → quà mốc thấp hơn. "
             "Kể quà các gói thì chép đúng từng dòng trên; không chắc → gọi build_order / gửi bảng combo chuẩn.\n"
             "(n) (16/11) THANH TOÁN: khách hỏi trả bằng thẻ / chuyển khoản / thanh toán thế nào → câu chuẩn scripts_approved.payment (2 cách: nhận hàng kiểm tra "
-            "rồi mới thanh toán, hoặc chuyển khoản trước qua tài khoản công ty, nhận hàng 0 đồng). KHÔNG tự nói 'chưa hỗ trợ quẹt thẻ', KHÔNG tự đưa số tài khoản.\n")
+            "rồi mới thanh toán, hoặc chuyển khoản trước qua tài khoản công ty, nhận hàng 0 đồng). KHÔNG tự nói 'chưa hỗ trợ quẹt thẻ', KHÔNG tự đưa số tài khoản.\n"
+            "(o) (17/11) ĐỌC HẾT TIN KHÁCH: khách viết đoạn dài / nhiều câu / gửi liền nhiều tin → đọc TOÀN BỘ trước khi trả lời, tách ra từng ý, "
+            "trả lời ĐỦ từng câu hỏi theo đúng thứ tự khách hỏi, bám đúng hoàn cảnh khách kể (ai dùng, bệnh gì, đang dùng gì, đã mua chưa). "
+            "KHÔNG trả lời theo 1–2 từ khóa nhặt được (thấy chữ 'giá' không có nghĩa là khách hỏi giá; thấy 'để sau' không có nghĩa là khách từ chối). "
+            "Ý nào chưa rõ → hỏi lại ĐÚNG ý đó, không đoán.\n"
+            "(p) (17/11) CTKM Hồng sâm lát (hộp 14 gói, hộp 50 gói) và Dương Sâm Linh Đan: bảng mới 17/11 trong programs (khách mới / khách cũ). "
+            "CHỈ nói khi khách HỎI đúng sản phẩm đó; báo đúng từng mốc như bảng. MỖI MỐC CHỈ NÊU 1 QUÀ (trường gift) — KHÔNG liệt kê các phương án đổi. "
+            "Khách hỏi đổi quà / không thích quà đó / hỏi có quà khác không → mới đưa các phương án trong gift_options (kb) / gift_options_if_customer_asks (build_order); "
+            "khách chọn phương án nào → build_order lại với items[].gift_choice = đúng phương án đó (tổng hợp đơn tự ghi quà mới). "
+            "KHÔNG dùng bảng quà cũ (Combo 1 tháng / 2 tháng / 3 tháng của Hồng sâm lát).\n")
 
 
 if IS_NHS:
@@ -2872,8 +2888,10 @@ def _nhs_gift_for(rules: dict, n: int) -> str:
 # → lưới cũ chỉ bắt dòng có chữ "combo". Nay bắt MỌI dòng / câu "N hộp … tặng …" của Nước Hồng sâm 20 túi, sửa quà theo bảng.
 _RE_NHS_GIFT_SEG = re.compile(
     r"(?P<pre>(?<![\d.])(?P<n>\d{1,2})\s*hộp(?!\s*(?:trà|nước|nhỏ))[^\n]{0,80}?\btặng(?:\s+(?:ngay|kèm|thêm|luôn))?\s*:?\s*)"
-    r"(?P<gift>[^\n]+?)(?=\s+[-–]\s|\s*[;,]\s|\.\s|\s*\.?\s*$|\s*\n)", re.I | re.M)
-_RE_NHS_GIFT_SKIP = re.compile(r"lát|14 gói|tháng|10 túi|hộp nhỏ|dương sâm|long sâm|khách cũ|thân thiết|tri ân khách hàng thân", re.I)
+    r"(?P<gift>[^\n]+?)(?=\s+[-–]\s|\s*[;,]\s(?!hoặc)|\.\s|\s*\.?\s*$|\s*\n)", re.I | re.M)
+_RE_NHS_GIFT_SKIP = re.compile(r"50 gói|tháng|10 túi|hộp nhỏ|long sâm|khách cũ|thân thiết|tri ân khách hàng thân", re.I)
+_RE_GIFT_LAT = re.compile(r"lát|14 gói", re.I)                      # v0.5.15: câu nói về Hồng sâm lát → bảng quà Hồng sâm lát (17/11)
+_RE_GIFT_DS = re.compile(r"dương sâm|dslđ|linh đan", re.I)          # v0.5.15: câu nói về Dương Sâm Linh Đan → bảng quà Dương Sâm (17/11)
 
 
 PAYMENT_MSG = ("Dạ bên em có 2 cách thanh toán ạ: anh/chị nhận hàng, kiểm tra rồi mới thanh toán; hoặc anh/chị chuyển khoản trước qua tài khoản "
@@ -2915,15 +2933,19 @@ def _fix_payment_nhs(text: str, last_user: str) -> tuple:
     return "\n\n".join(out).strip(), 1
 
 
-def _fix_nhs_packages(text: str, bot_texts: list = None) -> str:
+def _fix_nhs_packages(text: str, bot_texts: list = None, user_texts: list = None) -> str:
     if not IS_NHS or not text or is_returning_ctx(text, bot_texts or []):   # v0.5.0: khách cũ → bảng khách cũ, không ép quà khách mới
         return text
+    text_all_users = " ".join((user_texts or [])[-3:])
     sku = "hsmo-chai" if PAGE_FOCUS_PRODUCT == "hsmo_chai" else "hsmo-tui"
     try:
         kb = tools_core.load_kb()
         _, pkg = tools_core.find_package(kb, sku)
         rules = {r["min_qty"]: r.get("gift") or "" for r in kb["programs"]["new_customer"]["rules"]
                  if r.get("if_sku") == sku and not r.get("condition")}
+        rules_by = {k: {r["min_qty"]: r.get("gift") or "" for r in kb["programs"]["new_customer"]["rules"]
+                        if r.get("if_sku") == k and not r.get("condition")} for k in ("hsvn-lat-14", "duongsam-10")}
+        _alts = [o for r in kb["programs"]["new_customer"]["rules"] for o in (r.get("gift_options") or [])]
     except Exception:  # noqa: BLE001
         return text
 
@@ -2941,11 +2963,20 @@ def _fix_nhs_packages(text: str, bot_texts: list = None) -> str:
 
     def _seg(m):
         n = int(m.group("n"))
-        g = _nhs_gift_for(rules, n)
         _b = max(text.rfind("\n", 0, m.start()), *[text.rfind(c + " ", 0, m.start()) for c in ".!?"])
         line = text[_b + 1: m.end()]          # câu chứa đoạn này (không lấy câu khác cùng dòng)
-        if not g or n < 2 or _RE_NHS_GIFT_SKIP.search(line) or not re.search(r"trà sâm|hồng sâm|hộp", m.group("gift"), re.I):
+        if _RE_GIFT_LAT.search(line):
+            g, nmin = _nhs_gift_for(rules_by["hsvn-lat-14"], n), 1
+        elif _RE_GIFT_DS.search(line):
+            g, nmin = _nhs_gift_for(rules_by["duongsam-10"], n), 1
+        else:
+            g, nmin = _nhs_gift_for(rules, n), 2
+        if not g or n < nmin or _RE_NHS_GIFT_SKIP.search(line) \
+                or not re.search(r"trà sâm|hồng sâm|hộp|dầu|heviho|viên|bổ gan|lọ", m.group("gift"), re.I):
             return m.group(0)
+        _g0 = re.sub(r"\s+", " ", m.group("gift").lower())
+        if any(o.lower() in _g0 for o in _alts) and re.search(r"đổi|thay|chọn|thích|quà khác|lấy quà", text_all_users, re.I):
+            return m.group(0)      # v0.5.16: khách đã xin đổi quà → giữ phương án khách chọn (đúng bảng)
         gift0 = m.group("gift")
         tail = " ạ" if re.search(r"\s+ạ\s*$", gift0) else ""
         extra = gift0.count(")") - gift0.count("(")      # ngoặc đóng của câu bao ngoài "(tặng …)" → giữ lại
@@ -3442,6 +3473,30 @@ def _fix_pronoun(text: str, profile: str, user_texts: list = None) -> str:
 #     → Khách CHƯA nói muốn mua (lấy/đặt/chốt/ship/gửi về…), chưa gửi SĐT → CẤM xác nhận đơn / xin địa chỉ. AI vẫn làm → viết lại 1 lần,
 #       vẫn sai → code tự đổi câu xác nhận thành câu báo giá + 1 câu khơi gợi.
 _RE_PRICE_Q = re.compile(r"bao nhi[eê]u|bao nhieu|\bbn\b|bnhieu|\bgi[áa]\b(?! tr[ịi]| đình| h[ạa]n)|nhi[eê]u ti[eề]n|m[aấ]y ti[eề]n|h[eế]t bao|\bnhiu\b", re.I)
+# v0.5.15 (17/11, chị Nga: "khách viết 1 đoạn dài phải đọc hết để hiểu ý, không đọc 1–2 từ rồi đoán ý"):
+# tin dài → các lưới bắt TỪ KHÓA (hỏi giá, lưỡng lự…) không được thay / chèn cả câu trả lời chỉ vì 1 chữ xuất hiện trong đoạn dài.
+_RE_PRICE_ASK_STRONG = re.compile(r"bao nhi[eê]u|nhi[eê]u ti[eề]n|m[aấ]y ti[eề]n|\bbn\b|b[áa]o gi[áa]|xin gi[áa]|gi[áa] (?:sao|th[ếe] n[àa]o|nh[ưu] n[àa]o|ntn|bao|ra sao)\b|h[eế]t bao", re.I)
+
+
+def _is_long_msg(u: str) -> bool:
+    """Tin khách dài: từ 18 chữ trở lên, hoặc từ 12 chữ và có từ 2 câu / ý trở lên."""
+    w = len(re.findall(r"\w+", u or ""))
+    sents = [x for x in re.split(r"[.!?\n;]+", u or "") if len(re.findall(r"\w+", x)) >= 2]
+    return w >= 18 or (w >= 12 and len(sents) >= 2)
+
+
+def _asks_price(u: str) -> bool:
+    """Khách có HỎI GIÁ thật không. Tin ngắn: có từ khóa giá là đủ. Tin dài: phải có câu hỏi giá rõ ràng
+    ("bao nhiêu", "giá thế nào", "báo giá"…) hoặc câu chứa chữ giá có dấu hỏi — không bắt chữ "giá" nằm lẫn trong đoạn kể chuyện."""
+    if not _RE_PRICE_Q.search(u or ""):
+        return False
+    if not _is_long_msg(u):
+        return True
+    if _RE_PRICE_ASK_STRONG.search(u or ""):
+        return True
+    return any(_RE_PRICE_Q.search(x) and "?" in x for x in re.split(r"(?<=[.!?\n])", u or ""))
+
+
 _RE_ADVICE_Q = re.compile(r"t[ưu] v[ấa]n|t[ìi]m hi[ểe]u|th[ôo]ng tin|c[ôo]ng d[ụu]ng|d[ùu]ng (th[ếe]|nh[ưu]) n[àa]o|c[óo] t[ốo]t", re.I)
 _RE_ORDER_INTENT = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])(l[ấa]y|đặt|dat hang|đ[ặa]t h[àa]ng|ch[ốo]t|l[êe]n đ[ơo]n|ship|order|g[ửu]i (cho|v[ềe]|h[àa]ng|t[ớo]i)|"
                               r"giao (cho|v[ềe]|h[àa]ng|t[ớo]i)|mua (lu[ôo]n|ngay|th[êe]m|\d|m[ộo]t|hai|ba)|đồng ý|"
@@ -4572,7 +4627,7 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
             debug["claim_violations"] = claim_violations(text, user_texts_real)[:5]
             text, _cd = _drop_claim_sentences(text, user_texts_real)   # v0.1.99: vẫn vượt tài liệu → bỏ câu đó
             debug["claim_sentences_dropped"] = _cd
-            if not re.sub(r"\[[^\]]*\]", "", text).strip() and _RE_PRICE_Q.search((user_texts_real or [""])[-1] or ""):
+            if not re.sub(r"\[[^\]]*\]", "", text).strip() and _asks_price((user_texts_real or [""])[-1] or ""):
                 text = auto_answer((user_texts_real or [""])[-1], focus or "")[0]     # v0.1.104: hỏi giá → báo giá đúng tài liệu
                 debug["claim_fallback_quote"] = True
             if not re.sub(r"\[[^\]]*\]", "", text).strip():
@@ -4614,7 +4669,7 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         if _bm:
             debug["parents_dropped"] = _bm
         text = _fix_ds_packages(text)   # v0.3.0: gói Dương Sâm đúng giá/quà
-        text = _fix_nhs_packages(text, [str(m.get("text") or "") for m in transcript_orig if m.get("role") == "assistant"])   # v0.4.0: gói Nước Hồng sâm đúng giá/quà
+        text = _fix_nhs_packages(text, [str(m.get("text") or "") for m in transcript_orig if m.get("role") == "assistant"], user_texts_real)   # v0.4.0: gói Nước Hồng sâm đúng giá/quà
         text, _g10 = _gate_10tui(text, transcript_orig)   # v0.5.8: chưa thuyết phục đủ 2 lần → chưa mời hộp 10 túi
         text, _wb = _add_where_buy(text, (user_texts_real or [""])[-1])   # v0.5.8: hỏi nhà thuốc / mua ở đâu → link điểm bán
         text, _ho = _hesitate_offer_nhs(text, transcript_orig)   # v0.5.12: khách lưỡng lự mà chưa thấy combo → gửi ưu đãi + xin SĐT
@@ -4718,7 +4773,7 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
                 is_fb = True
             debug["fallback_used"] = "auto_quote" if not _hr else "handoff"
         # v0.1.104: KHÁCH HỎI GIÁ → TIN GỬI ĐI PHẢI CÓ GIÁ (dù lưới nào làm mất / AI để giá trong ghi chú) — chèn câu giá đúng tài liệu
-        if text.strip() and not handoffs and _RE_PRICE_Q.search(_lu) and not _RE_HAS_PRICE.search(text) and not is_fb:
+        if text.strip() and not handoffs and _asks_price(_lu) and not _RE_HAS_PRICE.search(text) and not is_fb:
             _ps = price_sentence(_lu, focus or "")
             if _ps:
                 text = _ps + "\n\n" + re.sub(r"^\s*Dạ[,\s]+", "", text.strip())

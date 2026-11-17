@@ -537,6 +537,49 @@ def test_41_gia_dung_bang():
         assert f(keep) == keep, keep
 
 
+# 42 ─ (17/11, chị Nga) CTKM mới Hồng sâm lát (HSVN-M04 / C06) và Dương Sâm Linh Đan (DSLĐ-M03 / C06);
+#       báo giá CHỈ nêu 1 quà, khách xin đổi mới áp quà khác (gift_choice)
+def test_42_ctkm_lat_ds_moi():
+    bo = lambda sku, q, ct="new", ch=None: t.build_order([dict({"sku": sku, "qty": q}, **({"gift_choice": ch} if ch else {}))],
+                                                         "A", "0912345678", "SN 1 Cầu Giấy, Hà Nội", customer_type=ct)
+    g = lambda *a: bo(*a)["promo_applied"][0]["gift"]
+    for sku, q, ct in [("hsvn-lat-14", 1, "new"), ("hsvn-lat-14", 2, "new"), ("hsvn-lat-14", 5, "returning"), ("duongsam-10", 6, "new"), ("hsvn-lat-50", 1, "new")]:
+        assert "hoặc" not in g(sku, q, ct) and "chọn 1" not in g(sku, q, ct), (sku, q, g(sku, q, ct))
+    assert g("hsvn-lat-14", 2) == "1 hộp Trà sâm 1700 (20 gói)" and g("hsvn-lat-14", 4) == g("hsvn-lat-14", 3)
+    assert g("hsvn-lat-14", 5) == "3 hộp Trà sâm 1700 (20 gói)" and "Nước Hồng sâm" in g("hsvn-lat-14", 10)
+    assert "3 hộp Hồng sâm lát" in g("hsvn-lat-14", 50) and "Nước Hồng sâm" in g("hsvn-lat-50", 5)
+    assert "Nước Hồng sâm" in g("hsvn-lat-50", 2, "returning") and "Bổ gan" in g("duongsam-10", 7, "returning")
+    assert "2 hộp Nước Hồng sâm" in g("duongsam-10", 9) and "Dương Sâm Linh Đan" in g("duongsam-10", 12, "returning")
+    o = bo("hsvn-lat-14", 2)
+    assert o["promo_applied"][0]["gift_options_if_customer_asks"] == ["2 hộp viên ngậm Heviho", "2 lọ dầu nóng Khương Thảo Đan"]
+    assert "Heviho" not in o["confirm_text"]                                  # tổng hợp đơn chỉ ghi 1 quà
+    o2 = bo("hsvn-lat-14", 2, "new", "2 hộp viên ngậm Heviho")              # khách xin đổi
+    assert o2["promo_applied"][0]["gift"] == "2 hộp viên ngậm Heviho" and "2 hộp viên ngậm Heviho" in o2["confirm_text"]
+    assert g("hsvn-lat-14", 2, "new", "1 chai rượu sâm") == "1 hộp Trà sâm 1700 (20 gói)"   # quà ngoài bảng → không nhận
+    assert "Combo 1 tháng" not in KB["combo_tiers_note"] and "hoặc" not in KB["combo_tiers_note"]
+    assert "MỖI MỐC CHỈ NÊU 1 QUÀ" in engine.NHS_BLOCK
+    # lưới quà: sửa theo đúng bảng của sản phẩm trong câu; khách đã xin đổi thì giữ phương án khách chọn
+    a = engine._fix_nhs_packages("Combo 3 hộp Hồng sâm lát: 4.260.000đ – tặng 2 hộp Trà sâm 1700 (20 gói)", [])
+    assert a.endswith("tặng 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan")
+    b = engine._fix_nhs_packages("Mua 6 hộp Dương Sâm Linh Đan được tặng 1 chai Nước Hồng sâm mật ong ạ.", [])
+    assert "Bổ gan" in b and "hoặc" not in b and b.endswith("ạ.")
+    c = "Dạ vâng, combo 2 hộp Hồng sâm lát em đổi sang tặng 2 hộp viên ngậm Heviho cho anh ạ."
+    assert engine._fix_nhs_packages(c, [], ["có quà khác không em, anh thích viên ngậm hơn"]) == c
+
+
+# 43 ─ (17/11, chị Nga) khách viết đoạn dài: không bắt 1–2 từ khóa rồi thay câu trả lời
+def test_43_doc_het_tin_dai():
+    dai = ("Chị mua cho mẹ chị năm nay 70 tuổi, mẹ bị tiểu đường và huyết áp cao đang uống thuốc hằng ngày, "
+           "trước mẹ dùng sâm Hàn thấy nóng, giá cả không quan trọng chị chỉ muốn biết mẹ dùng có được không và uống lúc nào")
+    assert engine._is_long_msg(dai) and not engine._asks_price(dai)
+    assert engine._asks_price("giá sao em") and engine._asks_price(dai + ". Mà 1 hộp bao nhiêu tiền em?")
+    T = lambda *x: [{"role": r, "text": tx} for r, tx in x]
+    tr = T(("user", "giá"), ("assistant", "Dạ 620.000đ/hộp 20 túi ạ."),
+           ("user", "để chị hỏi ý kiến chồng đã, mà nước sâm này người tiểu đường uống được không em, uống lúc nào thì tốt?"))
+    assert engine._hesitate_offer_nhs("Dạ người tiểu đường dùng được ạ...", tr)[1] == 0
+    assert "(o)" in engine.NHS_BLOCK and "ĐỌC HẾT TIN KHÁCH" in engine.NHS_BLOCK
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted((k, v) for k, v in globals().items() if k.startswith("test_")):

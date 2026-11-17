@@ -1,3 +1,4 @@
+import re
 """Sinh brain/kb.json cho Sâm Thái Minh — theo schema Bình Vị v1.0 (docs/05 mục 4.2), mở rộng đa sản phẩm.
 Nguồn: 'Sâm Thái Minh 1.xlsx' + thông tin chị Nga bổ sung/chốt qua chat 23–25/09/2026
 + file 'RV-Sâm Thái Minh BRIEF_ THÔNG TIN TRAINING BUSINESS AI chuẩn.docx' (25/09/2026: bảng quà Hồng sâm lát, quy trình 7 bước, bám khách 4 bước)
@@ -39,7 +40,7 @@ P["hsvn_lat"] = {
    "antibiotic": "Đang dùng kháng sinh hoặc thuốc tây: dùng cách thuốc khoảng 2 giờ (chốt 15/10).",
    "course": "Liệu trình cơ bản 3–6 tháng, có thể dùng hằng ngày lâu dài. Khách lăn tăn chi phí: dùng liệu trình 3 tháng, mỗi năm nhắc lại 1–2 đợt.",
    "expect": "Theo brief 25/09: thông thường sau khi dùng hết 2 hộp đầu tiên, cơ thể bắt đầu hấp thụ dưỡng chất từ sâm — anh/chị sẽ thấy ăn ngon, ngủ sâu hơn, khỏe khoắn hơn, giảm mệt mỏi, tinh thần tỉnh táo ban ngày. Tùy cơ địa, không hứa nhanh hơn."},
- "packages": [pk("hsvn-lat-14", "Hộp thiếc 14 gói x 2g (mỗi gói 1–2 lát sâm)", 14, 1420000), pk("hsvn-lat-50", "Hộp 50 gói x 2g", 50, 5000000, note="chốt 16/10 (chị Nga): ĐÃ CÓ HÀNG — chỉ nói khi khách hỏi; mua hộp 50 gói hiện KHÔNG có CTKM (không quà)")],
+ "packages": [pk("hsvn-lat-14", "Hộp thiếc 14 gói x 2g (mỗi gói 1–2 lát sâm)", 14, 1420000), pk("hsvn-lat-50", "Hộp 50 gói x 2g", 50, 5000000, note="chốt 16/10 (chị Nga): ĐÃ CÓ HÀNG — chỉ nói khi khách hỏi; CTKM riêng từ 17/11 (mốc 1 / 2 / 5 hộp khách mới, 1 / 2 / 4 hộp khách cũ)")],
  "recommended_package": "hsvn-lat-14", "days_per_unit": {"hsvn-lat-14": 14},
  "hotline": "1800 1120 (chính), 1800 8396",
  "registration": "Số tự công bố 08/CNCTHAIMINH/2025 — Công ty Cổ phần Công nghệ Cao Thái Minh sản xuất",
@@ -342,12 +343,18 @@ def R(sku, q, gift, ship_free, condition=None, label=None):
     return d
 RULES = [
  # Chốt 25/09 (brief chị Nga): bảng quà Hồng sâm lát MỚI — thay bảng Excel cũ. Freeship giữ như bảng Excel (brief không nhắc).
- R("hsvn-lat-14", 1, "1 hộp Trà sâm 1700 loại 10 gói (trị giá 120.000đ)", True, condition="price_objection"),   # CHỈ khi khách chê đắt / chưa đủ tiền
- R("hsvn-lat-14", 2, "1 hộp Trà sâm 1700 loại 20 gói (trị giá 190.000đ)", True, label="Combo 1 tháng"),
- R("hsvn-lat-14", 4, "2 hộp Trà sâm 1700 loại 20 gói (trị giá 380.000đ)", True, label="Combo 2 tháng"),
- R("hsvn-lat-14", 6, "5 hộp Trà sâm 1700 loại 10 gói", True, label="Combo 3 tháng"),
- R("hsvn-lat-14", 10, "1 chai Nước Hồng Sâm Mật Ong (trị giá 550.000đ)", True),
- R("hsvn-lat-14", 15, "1 hộp Hồng sâm Việt Nam Thái Minh cùng loại + 1 hộp Trà sâm 1700 (20 gói)", True),
+ # Chốt 17/11 (chị Nga): bảng CTKM MỚI Hồng sâm lát — mã QĐ trên Nhanh 2026/TP-TBBL.HSVN-M04 (khách mới). Quà có dấu "hoặc" = khách CHỌN 1.
+ R("hsvn-lat-14", 1, "1 hộp Trà sâm 1700 (10 gói), hoặc 1 hộp Trà sâm 1700 (20 gói), hoặc 1 lọ dầu nóng Khương Thảo Đan (10ml), hoặc 2 hộp viên ngậm Heviho (18 viên) (chọn 1; chỉ áp dụng 1 lần duy nhất cho khách hàng mới)", True),
+ R("hsvn-lat-14", 2, "1 hộp Trà sâm 1700 (20 gói), hoặc 2 hộp viên ngậm Heviho, hoặc 2 lọ dầu nóng Khương Thảo Đan (chọn 1)", True, label="Combo"),
+ R("hsvn-lat-14", 3, "1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan, hoặc 2 hộp Trà sâm 1700 (10 gói), hoặc 2 hộp viên ngậm Heviho + 1 lọ dầu nóng Khương Thảo Đan (chọn 1)", True, label="Combo"),
+ R("hsvn-lat-14", 5, "3 hộp Trà sâm 1700 (20 gói), hoặc 6 hộp viên ngậm Heviho (chọn 1)", True, label="Combo"),
+ R("hsvn-lat-14", 6, "5 hộp Trà sâm 1700 (10 gói), hoặc 3 hộp Trà sâm 1700 (10 gói) + 1 lọ Bổ gan Thái Minh (30 viên) (chọn 1)", True, label="Combo"),
+ R("hsvn-lat-14", 10, "1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi) + 2 hộp Trà sâm 1700 (20 gói)", True),
+ R("hsvn-lat-14", 15, "1 hộp Hồng sâm lát cùng loại (14 gói) + 1 hộp Trà sâm 1700 (20 gói), hoặc 1 hộp Hồng sâm lát cùng loại (14 gói) + 2 hộp viên ngậm Heviho (chọn 1)", True),
+ R("hsvn-lat-14", 50, "3 hộp Hồng sâm lát cùng loại (14 gói) + 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)", True),
+ R("hsvn-lat-50", 1, "4 hộp Trà sâm 1700 (10 gói), hoặc 4 lọ dầu nóng Khương Thảo Đan (chọn 1)", True),
+ R("hsvn-lat-50", 2, "6 hộp Trà sâm 1700 (10 gói), hoặc 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi) (chọn 1)", True),
+ R("hsvn-lat-50", 5, "1 hộp Hồng sâm lát (14 gói) + 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)", True),
  R("hsmo-chai", 1, "", False),
  R("hsmo-chai", 2, "1 hộp Trà sâm 1700 (10 gói)", True),   # chốt 23/09: miễn phí ship
  R("hsmo-chai", 3, "2 hộp Trà sâm 1700 (10 gói)", True),
@@ -362,11 +369,12 @@ RULES = [
  R("hsmo-tui", 10, "1 hộp nước Hồng sâm dạng túi cùng loại + 3 hộp Trà sâm 1700 (10 gói)", True),
  R("hsmo-tui-10", 1, "", False),   # chốt 14/10: hộp nhỏ 10 túi — chưa có quà; ship như Hồng sâm dạng nước
  R("hsmo-tui-10", 2, "", True),
- R("duongsam-10", 1, "", True),
- R("duongsam-10", 2, "1 hộp Trà sâm 1700 (10 gói)", True),
- R("duongsam-10", 3, "2 hộp Trà sâm 1700 (10 gói)", True, label="Liệu trình 1 tháng"),
- R("duongsam-10", 6, "1 chai Nước Hồng sâm mật ong (hoặc đổi sang 2 hộp Bổ Gan Thái Minh + 1 hộp Trà sâm 1700 loại 10 gói)", True, label="Liệu trình 2 tháng"),   # bảng CTKM DSLĐ 01/07–31/12/2026 (chị Nga 19/10)
- R("duongsam-10", 9, "2 chai nước Hồng sâm mật ong", True, label="Liệu trình 3 tháng"),
+ # Chốt 17/11 (chị Nga): bảng CTKM MỚI Dương Sâm Linh Đan — mã QĐ 2026/TP-TBBL.DSLĐ-M03 (khách mới). Quà có "hoặc" = khách CHỌN 1.
+ R("duongsam-10", 1, "1 lọ dầu nóng Khương Thảo Đan, hoặc 1 hộp Trà sâm 1700 (10 gói), hoặc 1 Viên sủi Super Cool Thái Minh, hoặc 1 hộp viên ngậm Heviho (18 viên) (chọn 1)", True),
+ R("duongsam-10", 2, "1 lọ dầu nóng Khương Thảo Đan, hoặc 1 hộp Trà sâm 1700 (10 gói), hoặc 1 Viên sủi Super Cool Thái Minh, hoặc 1 hộp viên ngậm Heviho (18 viên) (chọn 1)", True),
+ R("duongsam-10", 3, "2 hộp Trà sâm 1700 (10 gói), hoặc 2 hộp Trà sâm 1700 (10 gói) + 1 lọ dầu nóng Khương Thảo Đan, hoặc 2 hộp viên ngậm Heviho (chọn 1)", True, label="Liệu trình 1 tháng"),
+ R("duongsam-10", 6, "2 lọ Bổ gan Thái Minh (30 viên) + 1 hộp Trà sâm 1700 (10 gói), hoặc 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi), hoặc 2 hộp Nước Hồng sâm Thái Minh mật ong (hộp 10 túi) (chọn 1)", True, label="Liệu trình 2 tháng"),
+ R("duongsam-10", 9, "2 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)", True, label="Liệu trình 3 tháng"),
  R("longsam-6", 1, "1 hộp Trà sâm 1700 (10 gói)", True),
  R("longsam-6", 3, "2 hộp Trà sâm 1700 (10 gói)", True),
  R("longsam-6", 6, "1 chai nước Hồng sâm mật ong", True),
@@ -387,74 +395,89 @@ RULES = [
  R("dongtrung-30", 2, "2 hộp Trà sâm 1700 (10 gói)", True),
  R("dongtrung-30", 4, "1 hộp Đông trùng hạ thảo 30 viên", True),
 ]
+
+def _split_gift_options(rules):
+    """v0.5.16 (17/11, chị Nga): báo giá kèm quà CHỈ nêu 1 quà (phương án đầu của bảng); khách muốn đổi mới đưa phương án khác.
+    'A, hoặc B, hoặc C (chọn 1; ghi chú)' → gift = 'A (ghi chú)', gift_options = ['B', 'C']."""
+    for r in rules:
+        m = re.match(r"^(.*?)\s*\(chọn 1(?:;\s*(.*?))?\)\s*$", r.get("gift") or "")
+        if not m or "hoặc" not in m.group(1):
+            continue
+        parts = [x.strip() for x in re.split(r",\s*hoặc\s+|\s+hoặc\s+", m.group(1)) if x.strip()]
+        r["gift"] = parts[0] + (f" – {m.group(2)}" if m.group(2) else "")
+        r["gift_options"] = parts[1:]
+    return rules
+_split_gift_options(RULES)
 # v0.1.15 (13/10): MỌI câu có giá/quà Hồng sâm lát sinh từ đây — đổi giá/quà chỉ sửa P["hsvn_lat"] và RULES.
 def vnd(n): return f"{n:,.0f}đ".replace(",", ".")
 LAT_PRICE = P["hsvn_lat"]["packages"][0]["price_retail"]
 LAT_PRICE_OLD = 1320000        # giá trước lần điều chỉnh (để trả lời "sao tăng giá")
 def lat_rule(q, cond=None):
     return next(r for r in RULES if r["if_sku"] == "hsvn-lat-14" and r["min_qty"] == q and r.get("condition") == cond)
+def combo_name(q):
+    return f"Combo {q} hộp Hồng sâm lát"     # v0.5.15 (17/11): bảng mới không còn "combo tháng"; luôn có chữ "Hồng sâm lát" để lưới Nước Hồng sâm không đụng
 def combo_line(q):
     r = lat_rule(q)
-    return f"{r['label']} ({q} hộp): {vnd(LAT_PRICE * q)} – tặng {r['gift']}"
+    return f"{combo_name(q)}: {vnd(LAT_PRICE * q)} – tặng {r['gift']}"
 LAT_COMBOS = [r["min_qty"] for r in RULES if r["if_sku"] == "hsvn-lat-14" and r.get("label")]
 COMBO_TXT = " / ".join(f"'🎁 {combo_line(q)}'" for q in LAT_COMBOS)
 # v0.1.71 (25/10, chị Nga): đa dạng cách trình bày phần combo — 4 kiểu, giá/quà vẫn sinh từ bảng khuyến mại
 def _combo_style(q, k):
     r = lat_rule(q)
+    nm = combo_name(q)
     if k == 2:
-        return f"✅ {r['label']} ({q} hộp) – {vnd(LAT_PRICE * q)} – tặng {r['gift']}"
+        return f"✅ {nm} – {vnd(LAT_PRICE * q)} – tặng {r['gift']}"
     if k == 3:
-        return f"🎁 {r['label']} ({q} hộp) giá {vnd(LAT_PRICE * q)}: tặng ngay {r['gift']}"
+        return f"🎁 {nm} giá {vnd(LAT_PRICE * q)}: tặng {r['gift']}"
     if k == 4:
-        return f"🌿 {r['label']} ({q} hộp): {vnd(LAT_PRICE * q)}, tặng kèm {r['gift']}"
-    # v0.1.87 (26/10, chị Nga): thêm 4 kiểu — giá/quà vẫn sinh từ bảng khuyến mại
-    _note = {2: "dùng thử cảm nhận", 4: "dùng đều", 6: "đủ liệu trình cơ bản"}.get(q, "")
+        return f"🌿 {nm}: {vnd(LAT_PRICE * q)}, tặng kèm {r['gift']}"
     if k == 5:
-        return f"{'⭐' if q == 6 else '▫️'} {r['label']} ({q} hộp): {vnd(LAT_PRICE * q)} – tặng {r['gift']}"
+        return f"{'⭐' if q == max(LAT_COMBOS) else '▫️'} {nm}: {vnd(LAT_PRICE * q)} – tặng {r['gift']}"
     if k == 6:
-        return f"• {r['label']} ({q} hộp) → {vnd(LAT_PRICE * q)}, tặng {r['gift']}"
+        return f"• {nm} → {vnd(LAT_PRICE * q)}, tặng {r['gift']}"
     if k == 7:
-        return f"🎁 {r['label']} ({q} hộp) – {_note}: {vnd(LAT_PRICE * q)}, tặng {r['gift']}"
+        return f"🎁 {nm}: {vnd(LAT_PRICE * q)}, tặng {r['gift']}"
     if k == 8:
-        return f"{ {2: '1️⃣', 4: '2️⃣', 6: '3️⃣'}.get(q, '•') } {r['label']} ({q} hộp): {vnd(LAT_PRICE * q)} – quà tặng: {r['gift']}"
+        return f"{ {2: '1️⃣', 3: '2️⃣', 5: '3️⃣', 6: '4️⃣'}.get(q, '•') } {nm}: {vnd(LAT_PRICE * q)} – quà tặng: {r['gift']}"
     return f"🎁 {combo_line(q)}"
 COMBO_STYLES = [
     ("Chương trình tri ân khách hàng mới:", 1),
-    ("Hiện bên em đang có ưu đãi quà tặng cho khách mới theo liệu trình ạ:", 2),
+    ("Hiện bên em đang có ưu đãi quà tặng cho khách mới ạ:", 2),
     ("Anh/chị mua theo combo sẽ được tặng thêm quà ạ:", 3),
     ("Ưu đãi dành riêng cho khách hàng mới, áp dụng đến hết 31/12/2026:", 4),
-    ("Bên em có 3 gói liệu trình kèm quà, combo 3 tháng được tặng nhiều quà nhất ạ:", 5),
+    ("Bên em có các gói kèm quà, mua càng nhiều quà càng lớn ạ:", 5),
     ("Mua theo combo anh/chị được tặng thêm Trà sâm ạ:", 6),
     ("Anh/chị chọn gói theo nhu cầu nhé ạ:", 7),
-    ("Ưu đãi khách mới đang áp dụng theo từng liệu trình ạ:", 8),
+    ("Ưu đãi khách mới đang áp dụng theo từng gói ạ:", 8),
 ]
 COMBO_STYLE_TXT = " || ".join(f"KIỂU {i + 1}: '{h}' + " + " / ".join(f"'{_combo_style(q, k)}'"
                                                                     for q in (list(reversed(LAT_COMBOS)) if k == 5 else LAT_COMBOS))
                               for i, (h, k) in enumerate(COMBO_STYLES))
-OBJ_GIFT = lat_rule(1, "price_objection")["gift"]
+OBJ_GIFT = lat_rule(1)["gift"]   # v0.5.15: bảng 17/11 — mua 1 hộp có quà (khách mới, 1 lần duy nhất), không còn điều kiện "chê đắt"
 
 # Chốt 14/10 (chị Nga): CTKM dành riêng cho KHÁCH CŨ đã từng đặt mua — hiện có bảng cho Hồng sâm lát hộp 14 gói.
 RET_RULES = [
- R("hsvn-lat-14", 1, "1 lọ dầu nóng Khương Thảo Đan 10ml (trị giá 55.000đ) hoặc 1 hộp Trà sâm 1700 loại 10 gói", True),
- R("hsvn-lat-14", 2, "2 hộp viên ngậm Heviho + 1 lọ dầu nóng Khương Thảo Đan để xoa bóp", True),
- R("hsvn-lat-14", 3, "4 hộp viên ngậm Heviho", True),
- R("hsvn-lat-14", 5, "8 hộp viên ngậm Heviho", True),
- R("hsvn-lat-14", 12, "1 hộp Hồng sâm cùng loại + 2 hộp viên ngậm Heviho", True),
- R("hsvn-lat-14", 24, "2 hộp Hồng sâm cùng loại + 1 chai Nước Hồng sâm mật ong", True),
- # Chốt 19/10 (chị Nga): Dương Sâm Linh Đan — bảng CTKM 01/07–31/12/2026 (mọi nhãn). Mốc riêng khách cũ: 4, 7, 10, 15 hộp
- # (Multi vitamin C đã hết → thay bằng Bổ Gan Thái Minh). Số lượng KHÔNG có mốc khách cũ → quà mốc khách cũ thấp hơn (19/10 15:22, khách không thiệt quà);
- # riêng 2, 3, 6, 9 hộp quà bảng khách mới nhiều hơn → giữ quà khách mới.
- R("duongsam-10", 1, "", True),
- R("duongsam-10", 2, "1 hộp Trà sâm 1700 (10 gói)", True),
- R("duongsam-10", 3, "2 hộp Trà sâm 1700 (10 gói)", True),
- R("duongsam-10", 4, "2 hộp Trà sâm 1700 (10 gói) + 1 hộp Bổ Gan Thái Minh", True),
- R("duongsam-10", 5, "2 hộp Trà sâm 1700 (10 gói) + 1 hộp Bổ Gan Thái Minh", True),   # chốt 19/10 15:22: áp mốc khách cũ thấp hơn, khách không thiệt quà
- R("duongsam-10", 6, "1 chai Nước Hồng sâm mật ong (hoặc đổi sang 2 hộp Bổ Gan Thái Minh + 1 hộp Trà sâm 1700 loại 10 gói)", True),
- R("duongsam-10", 7, "1 chai nước Hồng sâm mật ong + 1 hộp Bổ Gan Thái Minh (30 viên)", True),
- R("duongsam-10", 8, "1 chai nước Hồng sâm mật ong + 1 hộp Bổ Gan Thái Minh (30 viên)", True),
- R("duongsam-10", 9, "2 chai nước Hồng sâm mật ong", True),
+ # Chốt 17/11 (chị Nga): bảng CTKM KHÁCH CŨ Hồng sâm lát — mã QĐ 2026/TP-TBBL.HSVN-C06. Quà có "hoặc" = khách CHỌN 1.
+ R("hsvn-lat-14", 1, "1 hộp Trà sâm 1700 (10 gói), hoặc 1 lọ dầu nóng Khương Thảo Đan, hoặc 1 hộp viên ngậm Heviho (chọn 1)", True),
+ R("hsvn-lat-14", 2, "1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng Khương Thảo Đan, hoặc 2 hộp viên ngậm Heviho + 1 lọ dầu nóng Khương Thảo Đan (chọn 1)", True),
+ R("hsvn-lat-14", 3, "2 hộp Trà sâm 1700 (20 gói), hoặc 4 hộp viên ngậm Heviho (chọn 1)", True),
+ R("hsvn-lat-14", 5, "4 hộp Trà sâm 1700 (20 gói), hoặc 8 hộp viên ngậm Heviho (chọn 1)", True),
+ R("hsvn-lat-14", 12, "1 hộp Hồng sâm lát cùng loại (14 gói) + 1 hộp Trà sâm 1700 (20 gói), hoặc 1 hộp Hồng sâm lát cùng loại (14 gói) + 2 hộp viên ngậm Heviho (chọn 1)", True),
+ R("hsvn-lat-14", 24, "2 hộp Hồng sâm lát cùng loại (14 gói) + 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)", True),
+ R("hsvn-lat-50", 1, "5 hộp Trà sâm 1700 (10 gói), hoặc 5 lọ dầu nóng Khương Thảo Đan, hoặc 5 hộp viên ngậm Heviho (chọn 1)", True),
+ R("hsvn-lat-50", 2, "1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi) + 3 hộp Trà sâm 1700 (10 gói)", True),
+ R("hsvn-lat-50", 4, "1 hộp Hồng sâm lát (14 gói) + 3 hộp Trà sâm 1700 (10 gói)", True),
+ # Chốt 17/11 (chị Nga): Dương Sâm Linh Đan KHÁCH CŨ — mã QĐ 2026/TP-TBBL.DSLĐ-C06, mốc riêng 4, 7, 10, 15 hộp.
+ # Theo cách đã chốt 19/10: mốc 1, 2, 3, 6, 9 hộp (bảng khách cũ không có) dùng quà bảng khách mới; số hộp nằm giữa 2 mốc → mốc thấp hơn.
+ R("duongsam-10", 1, "1 lọ dầu nóng Khương Thảo Đan, hoặc 1 hộp Trà sâm 1700 (10 gói), hoặc 1 Viên sủi Super Cool Thái Minh, hoặc 1 hộp viên ngậm Heviho (18 viên) (chọn 1)", True),
+ R("duongsam-10", 2, "1 lọ dầu nóng Khương Thảo Đan, hoặc 1 hộp Trà sâm 1700 (10 gói), hoặc 1 Viên sủi Super Cool Thái Minh, hoặc 1 hộp viên ngậm Heviho (18 viên) (chọn 1)", True),
+ R("duongsam-10", 3, "2 hộp Trà sâm 1700 (10 gói), hoặc 2 hộp Trà sâm 1700 (10 gói) + 1 lọ dầu nóng Khương Thảo Đan, hoặc 2 hộp viên ngậm Heviho (chọn 1)", True),
+ R("duongsam-10", 4, "1 Viên sủi Super Cool Thái Minh + 2 hộp Trà sâm 1700 (10 gói), hoặc 3 hộp Trà sâm 1700 (10 gói), hoặc 3 hộp viên ngậm Heviho (chọn 1)", True),
+ R("duongsam-10", 6, "2 lọ Bổ gan Thái Minh (30 viên) + 1 hộp Trà sâm 1700 (10 gói), hoặc 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi), hoặc 2 hộp Nước Hồng sâm Thái Minh mật ong (hộp 10 túi) (chọn 1)", True),
+ R("duongsam-10", 7, "1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi) + 1 lọ Bổ gan Thái Minh (30 viên)", True),
+ R("duongsam-10", 9, "2 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)", True),
  R("duongsam-10", 10, "1 hộp Dương Sâm Linh Đan + 1 hộp Trà sâm 1700 (10 gói)", True),
- R("duongsam-10", 15, "1 hộp Dương Sâm Linh Đan + 1 chai nước Hồng sâm mật ong", True),
+ R("duongsam-10", 15, "1 hộp Dương Sâm Linh Đan + 1 hộp Nước Hồng sâm Thái Minh mật ong (hộp 20 túi)", True),
  # Chốt 26/10 (chị Nga): Nước Hồng sâm dạng túi — CTKM khách cũ, mã QĐ trên Nhanh 2026/TP-TBBL.NHS-C06.
  # 1 hộp: không quà, tính phí ship như khách mới (chị Nga xác nhận 28/10).
  # Chốt 28/10 (chị Nga): khách cũ được áp CT khách cũ HOẶC khách mới, lấy CT có khuyến mại TỐT NHẤT cho khách → bảng dưới đã gộp sẵn
@@ -468,6 +491,7 @@ RET_RULES = [
  R("hsmo-tui", 10, "1 hộp nước Hồng sâm dạng túi cùng loại + 3 hộp Trà sâm 1700 (10 gói)", True),
  R("hsmo-tui", 12, "2 hộp Nước Hồng sâm dạng túi cùng loại + 1 hộp Trà sâm 1700 (10 gói)", True),
 ]
+_split_gift_options(RET_RULES)
 for _r in RET_RULES:
     if _r["if_sku"] == "hsmo-tui":
         if _r["min_qty"] in (6, 10):
@@ -479,7 +503,7 @@ programs = {
    "valid_from": "2026-09-23", "valid_to": "2026-12-31",
    "period_display": "từ 23/09/2026 đến hết 31/12/2026",
    "rules": RULES,
-   "tier_rule": "Số lượng nằm GIỮA hai bậc → áp bậc thấp hơn gần nhất (vd lấy 3 hộp Hồng sâm lát → quà bậc 2 hộp; 5 hộp → quà bậc 4 hộp). Dòng có condition=price_objection (Hồng sâm lát 1 hộp tặng 1 hộp Trà sâm 10 gói) CHỈ áp khi khách chê đắt/chưa đủ tiền HOẶC khách CHỦ ĐỘNG hỏi CT tặng trà khi mua 1 hộp (chốt 23/10, chị Nga — CT linh động, KHÔNG tự báo). Vượt bậc cao nhất → quà bậc cao nhất + mời chuyển nhân viên xin thêm ưu đãi (big_order).",
+   "tier_rule": "Số lượng nằm GIỮA hai bậc → áp bậc thấp hơn gần nhất (vd lấy 4 hộp Hồng sâm lát → quà bậc 3 hộp; 7–9 hộp → quà bậc 6 hộp). Quà có chữ 'hoặc' = khách CHỌN 1 trong các phương án (bảng 17/11), nói đủ các phương án để khách chọn. Vượt bậc cao nhất → quà bậc cao nhất + mời chuyển nhân viên xin thêm ưu đãi (big_order).",
    "freeship_rule": "freeship=true: miễn phí ship. freeship=false: tính phí ship theo shipping. freeship=null: tài liệu để trống → nhân viên xác nhận phí ship khi lên đơn.",
    "note": "Chốt 25/09 (brief): khách hỏi giá → BÁO NGAY giá + liệu trình + các combo quà trong CÙNG 1 tin (gọi là 'Chương trình tri ân khách hàng mới'), KHÔNG cần hỏi khách mới/cũ trước. Khách TỰ nói đã từng mua ĐÚNG sản phẩm này → khách cũ (returning_customer); từng dùng sản phẩm khác → vẫn khách mới (chốt 23/10). CẤM tự suy diễn quà ngoài bảng. Thời hạn chương trình: từ 23/09/2026 đến hết 31/12/2026 (được nói khi khách hỏi hoặc khi cần tạo động lực chốt, không ép). Hết hạn → không hứa quà, chuyển nhân viên báo chương trình mới."},
  "returning_customer": {"name": "Ưu đãi KHÁCH CŨ (đã từng đặt mua sản phẩm Sâm Thái Minh) — bảng chị Nga gửi 14/10", "active": True,
@@ -534,7 +558,7 @@ need_map = {
  "tra_hang_ngay": {"label": "Khách TỰ hỏi mua trà sâm uống hằng ngày (chỉ dùng khi khách hỏi trà)", "core": "tra_1700", "alt": ["tra_nguyen_la"]},
 }
 combo_tiers_note = (f"Hồng sâm lát (giá {vnd(LAT_PRICE)}/hộp): " + "; ".join(combo_line(q) for q in LAT_COMBOS)
-                    + f"; chê đắt mua 1 hộp tặng {OBJ_GIFT}. Liệu trình khuyên dùng 3–6 tháng. Sản phẩm khác: lấy quà đúng bảng programs.new_customer.")
+                    + f"; mua 1 hộp tặng {OBJ_GIFT}; từ 10 / 15 / 50 hộp theo bảng programs.new_customer (bảng 17/11; mỗi mốc nêu 1 quà, khách xin đổi mới đưa phương án trong gift_options). Sản phẩm khác: lấy quà đúng bảng programs.new_customer.")
 customer_segments = {
  "A_con_mua_cho_bo_me": "Con cái mua cho bố mẹ/ông bà: quan tâm an toàn với bệnh nền, nguồn gốc, cách dùng đơn giản — cần thông tin dễ giải thích lại",
  "B_nguoi_cao_tuoi_tu_mua": "Người cao tuổi tự mua, có bệnh nền, hay hỏi kỹ — tư vấn chậm, chắc, xưng hô đúng (bác/ông/bà → cháu)",
@@ -612,21 +636,21 @@ scripts_approved = {
    f"(1) 1 câu dẫn: giá {vnd(LAT_PRICE)}/hộp 14 gói, dùng 14 ngày (mỗi ngày 1 gói buổi sáng), liệu trình cơ bản 3 tháng; "
    "NGAY SAU câu dẫn, xuống dòng thành 1 đoạn riêng, thêm ĐÚNG 1 trong 3 đoạn sau (chốt 25/10, chị Nga — chọn theo tình huống, không lặp đoạn đã dùng trong hội thoại): Ⓐ MẶC ĐỊNH (khách hỏi giá lần đầu, chưa rõ người dùng): 'Hồng sâm này đặc biệt phù hợp với người ngủ kém, ăn không ngon, cơ thể hay mệt mỏi, uể oải ạ. Thông thường chỉ sau khoảng 2 hộp đầu, anh/chị sẽ thấy ăn ngon miệng hơn, ngủ sâu giấc hơn, người khỏe khoắn và tỉnh táo hơn ạ.' | Ⓑ NGẮN (khách hỏi lại giá lần 2 sau khi đã nghe Ⓐ, hoặc lượt đó đã phải trả lời nhiều ý khác): 'Hồng sâm này rất hợp với người ngủ kém, ăn không ngon, hay mệt mỏi ạ. Dùng đều mỗi sáng, cơ thể sẽ dần ăn ngon, ngủ sâu và khỏe khoắn hơn ạ.' | Ⓒ MUA CHO BỐ MẸ / ÔNG BÀ / người lớn tuổi (khách nói mua cho bố, mẹ, ông bà, biếu người già): 'Bố mẹ lớn tuổi hay ngủ chập chờn, ăn kém, người mệt mỏi thì dùng Hồng sâm rất hợp ạ. Sau khoảng 2 hộp đầu, nhiều người thấy ăn ngon, ngủ sâu và khỏe khoắn hơn rõ (tùy cơ địa).' (Ⓒ đổi 'Bố mẹ' thành đúng người khách nói, vd 'Ông bà', 'Bố'). "
    "(khách đã nói rõ tình trạng/người dùng khác thì có thể thay bằng câu phù hợp tình trạng đó, vẫn ngắn 1 câu); "
-   f"(2) danh sách gói theo tháng, mỗi gói 1 dòng (giá + quà) — chốt 25/10 (chị Nga): ĐA DẠNG cách trình bày, chọn 1 trong 4 kiểu dưới, "
+   f"(2) danh sách gói 2 / 3 / 5 / 6 hộp (bảng 17/11), mỗi gói 1 dòng (giá + quà; quà có 'hoặc' = khách chọn 1) — chốt 25/10 (chị Nga): ĐA DẠNG cách trình bày, chọn 1 trong 4 kiểu dưới, "
    f"XOAY VÒNG (khách hỏi lại giá thì đổi kiểu khác), giữ NGUYÊN giá, số hộp, quà: {COMBO_STYLE_TXT}; "
    f"(3) DẪN DẮT CHỐT — ĐÚNG 1 câu hỏi cuối (chốt 25/10, chị Nga: đa dạng cách triển khai combo, chọn chiến thuật theo tình huống, XOAY VÒNG không lặp câu đã dùng): "
-   f"Ⓐ HỎI CHỌN ƯU ĐÃI (mặc định lần báo giá đầu): 'Trong 3 ưu đãi trên, anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?' | "
+   f"Ⓐ HỎI CHỌN ƯU ĐÃI (mặc định lần báo giá đầu): 'Trong các ưu đãi trên, anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?' | "
    f"Ⓑ GỢI Ý ƯU ĐÃI TỐT NHẤT (khách nói rõ tình trạng: mệt nhiều, ngủ kém lâu, có bệnh nền, mới ốm dậy — hoặc hỏi 'nên mua gói nào'): "
-   f"'Với tình trạng của anh/chị, em gợi ý combo 3 tháng ạ: đủ liệu trình cơ bản để cơ thể thay đổi rõ, lại được tặng nhiều quà nhất ({lat_rule(6)['gift']}). Em lên đơn combo 3 tháng cho anh/chị nhé?' | "
-   f"Ⓒ DẪN DẮT 1 THÁNG HAY 3 THÁNG (khách đã quan tâm, đang cân nhắc): 'Anh/chị muốn dùng thử combo 1 tháng trước, hay lấy luôn combo 3 tháng cho đủ liệu trình và nhận thêm {lat_rule(6)['gift'].split(' loại')[0]} ạ?' | "
-   f"Ⓓ BẮT ĐẦU NHẸ (khách lưỡng lự, dùng lần đầu, ngại chi nhiều): 'Lần đầu dùng anh/chị có thể bắt đầu combo 1 tháng (2 hộp) để cảm nhận trước, vẫn được tặng {lat_rule(2)['gift']}. Em lên đơn combo 1 tháng cho anh/chị nhé?' | "
-   f"Ⓔ MUA BIẾU BỐ MẸ / ÔNG BÀ: 'Với bố mẹ lớn tuổi, dùng đều 3 tháng sẽ thấy rõ sức khỏe cải thiện hơn ạ. Anh/chị lấy combo 3 tháng biếu bố mẹ luôn, vừa đủ liệu trình vừa có thêm Trà sâm làm quà nhé?' | "
+   f"'Với tình trạng của anh/chị, em gợi ý combo 6 hộp ạ: dùng đều đủ lâu để cơ thể thay đổi rõ, lại được tặng nhiều quà ({lat_rule(6)['gift']}). Em lên đơn combo 6 hộp cho anh/chị nhé?' | "
+   f"Ⓒ DẪN DẮT 2 HỘP HAY 6 HỘP (khách đã quan tâm, đang cân nhắc): 'Anh/chị muốn dùng thử combo 2 hộp trước, hay lấy luôn combo 6 hộp để dùng đều và nhận nhiều quà hơn ạ?' | "
+   f"Ⓓ BẮT ĐẦU NHẸ (khách lưỡng lự, dùng lần đầu, ngại chi nhiều): 'Lần đầu dùng anh/chị có thể bắt đầu combo 2 hộp để cảm nhận trước, vẫn được tặng {lat_rule(2)['gift']}. Em lên đơn combo 2 hộp cho anh/chị nhé?' | "
+   f"Ⓔ MUA BIẾU BỐ MẸ / ÔNG BÀ: 'Với bố mẹ lớn tuổi, dùng đều 3 tháng sẽ thấy rõ sức khỏe cải thiện hơn ạ. Anh/chị lấy combo 6 hộp biếu bố mẹ luôn, vừa dùng đều vừa có thêm quà nhé?' | "
    f"Ⓕ CHỐT NHẸ, BỎ RÀO CẢN (khách đã nghe giá mà chưa trả lời / hỏi lại lần 2): 'Anh/chị chọn combo nào thì chỉ cần nhắn em tên, số điện thoại và địa chỉ, em lên đơn ngay ạ. Hàng giao tận nơi, kiểm tra rồi mới thanh toán nên anh/chị yên tâm nhé.' "
    f"| Ⓖ HỎI NGƯỜI DÙNG (chưa biết mua cho ai): 'Anh/chị định dùng cho bản thân hay biếu người thân ạ, để em gợi ý gói phù hợp nhất cho anh/chị ạ?' "
-   f"| Ⓗ BẮT ĐẦU RỒI DÙNG TIẾP (khách cân nhắc, lần đầu biết sản phẩm): 'Nhiều anh chị bắt đầu combo 1 tháng để cảm nhận, dùng hợp thì lấy tiếp cho đủ liệu trình 3 tháng ạ. Anh/chị muốn em lên đơn combo nào ạ?' "
-   f"| Ⓘ YÊN TÂM NHẬN HÀNG (khách lo mua online): 'Bên em giao tận nhà, anh/chị nhận hàng kiểm tra rồi mới thanh toán ạ. Anh/chị chọn combo 1 tháng hay 3 tháng để em lên đơn luôn ạ?' "
+   f"| Ⓗ BẮT ĐẦU RỒI DÙNG TIẾP (khách cân nhắc, lần đầu biết sản phẩm): 'Nhiều anh chị bắt đầu combo 2 hộp để cảm nhận, dùng hợp thì lấy tiếp combo lớn hơn ạ. Anh/chị muốn em lên đơn combo nào ạ?' "
+   f"| Ⓘ YÊN TÂM NHẬN HÀNG (khách lo mua online): 'Bên em giao tận nhà, anh/chị nhận hàng kiểm tra rồi mới thanh toán ạ. Anh/chị chọn combo 2 hộp hay 6 hộp để em lên đơn luôn ạ?' "
    f"KHÔNG nói 'giảm giá / tiết kiệm'; mỗi lượt chỉ 1 chiến thuật, 1 câu hỏi. "
-   f"KHÔNG tư vấn gói lẻ 1 hộp (và quà mốc 1 hộp: {OBJ_GIFT}) trừ khi khách chê đắt hoặc muốn dùng thử."),
+   f"Mua 1 hộp (khách mới) có quà: {OBJ_GIFT} — nói khi khách hỏi mua 1 hộp / dùng thử / hỏi quà."),
  "order_after_confirm": "Chốt 15/10 (anh Huy: mượt mà, thân thiết hơn) — sau khi gửi tổng hợp đơn và khách xác nhận: 'Dạ em cảm ơn anh/chị ạ 😊 Trong ngày hôm nay bên em sẽ gọi điện lại để xác nhận đơn trước khi gửi hàng, anh/chị để ý điện thoại giúp em nhé ạ.' (xưng 'em' / 'bên em', KHÔNG nói 'sẽ có chuyên viên của Sâm Thái Minh gọi điện lại'). Nếu khách nhắn 'không cần gọi lại / cứ gửi luôn' → 'Dạ vâng, em ghi chú đóng gói và gửi hàng đi ngay cho anh/chị ạ.' (ghi rõ trong lý do HANDOFF: khách không cần gọi xác nhận). SAU ĐÓ KHÔNG chủ động nhắn thêm nội dung khác.",
  "upsell_double": ("Chốt 15/10, đổi THỨ TỰ 25/10 (chị Nga) — gửi TỔNG HỢP ĐƠN trước (tin đó KHÔNG mời thêm); khách XÁC NHẬN đúng → lượt sau: 'Dạ em đã ghi nhận đơn [x] của anh/chị rồi ạ.' + mời ĐÚNG 1 LẦN, không ép, kết bằng 'nếu anh/chị giữ đơn cũ thì em gửi đi luôn ạ'. "
    "Câu mời luôn có 1 CÂU ĐỆM nêu giá trị trước khi hỏi — XOAY VÒNG, không lặp câu đệm đã dùng trong hội thoại. "
@@ -644,13 +668,13 @@ scripts_approved = {
    "(9) 'Lấy combo nhiều hộp anh/chị vừa dùng vừa có sẵn để biếu người thân, lại được nhận thêm quà ạ.' (khi khách có nói mua biếu/mua cho nhiều người). "
    "RIÊNG chương trình MUA 15 TẶNG 1 (từ 15 hộp Hồng sâm lát, tặng 1 hộp cùng loại — khách đặt 10–14 hộp có thể mời lên 15 hộp): được dùng thêm câu "
    "'Lấy 15 hộp vừa đảm bảo đủ liệu trình cho mình dùng không bị gián đoạn, lại vừa được giá ưu đãi tiết kiệm thêm ạ.' "
-   f"Khách đặt 1 hộp Hồng sâm lát: 'Dạ em cảm ơn anh/chị đã để lại thông tin đặt hàng. Hiện bên em đang có ưu đãi {lat_rule(2)['label']} (2 hộp) giá {vnd(LAT_PRICE * 2)} được tặng ngay {lat_rule(2)['gift']}. [câu đệm] "
-   "Anh/chị có muốn lấy luôn Combo 2 hộp để dùng đủ liệu trình 1 tháng không ạ? 😊'. "
-   f"Khách đặt 2 hộp: 'Dạ anh/chị ơi, nếu anh/chị lấy luôn {lat_rule(4)['label']} (4 hộp, đủ liệu trình 2 tháng) giá {vnd(LAT_PRICE * 4)} thì được tặng kèm {lat_rule(4)['gift']}. [câu đệm] "
+   f"Khách đặt 1 hộp Hồng sâm lát: 'Dạ em cảm ơn anh/chị đã để lại thông tin đặt hàng. Hiện bên em đang có ưu đãi {combo_name(2)} giá {vnd(LAT_PRICE * 2)} được tặng {lat_rule(2)['gift']}. [câu đệm] "
+   "Anh/chị có muốn lấy luôn combo 2 hộp không ạ? 😊'. "
+   f"Khách đặt 2 hộp: 'Dạ anh/chị ơi, nếu anh/chị lấy luôn {combo_name(3)} giá {vnd(LAT_PRICE * 3)} thì được tặng {lat_rule(3)['gift']}. [câu đệm] "
    "Em đăng ký luôn combo này cho anh/chị nhé?'. "
-   f"Khách đặt 4 hộp: có thể mời {lat_rule(6)['label']} (6 hộp, đủ liệu trình cơ bản 3 tháng) giá {vnd(LAT_PRICE * 6)}, tặng {lat_rule(6)['gift']} + câu đệm. "
+   f"Khách đặt 3–4 hộp: có thể mời {combo_name(5)} giá {vnd(LAT_PRICE * 5)}, tặng {lat_rule(5)['gift']} + câu đệm. "
    "Khách đồng ý → cập nhật số lượng, giá, quà theo combo mới; từ chối → giữ đơn cũ, sang xác nhận đơn."),
- "returning_quote": "Chốt 14/10 + 23/10 — khách TỰ nói đã từng dùng/mua ĐÚNG Hồng sâm lát và hỏi mua lại Hồng sâm lát (từng dùng sản phẩm khác → báo combo khách mới): cảm ơn khách đã tin dùng lại; báo giá 1 hộp + ưu đãi tri ân khách hàng thân thiết (lấy đúng bảng programs.returning_customer, mỗi mốc 1 dòng 🎁; mua 1 hộp được chọn dầu nóng Khương Thảo Đan 10ml hoặc 1 hộp Trà sâm 1700 loại 10 gói); KHÔNG báo combo khách mới; 1 câu chốt hỏi số lượng. Chốt đơn bằng build_order customer_type=returning.",
+ "returning_quote": "Chốt 14/10 + 23/10 — khách TỰ nói đã từng dùng/mua ĐÚNG Hồng sâm lát và hỏi mua lại Hồng sâm lát (từng dùng sản phẩm khác → báo combo khách mới): cảm ơn khách đã tin dùng lại; báo giá 1 hộp + ưu đãi tri ân khách hàng thân thiết (lấy đúng bảng programs.returning_customer, mỗi mốc 1 dòng 🎁; bảng 17/11 mã 2026/TP-TBBL.HSVN-C06; quà có 'hoặc' = khách chọn 1); KHÔNG báo combo khách mới; 1 câu chốt hỏi số lượng. Chốt đơn bằng build_order customer_type=returning.",
  "origin": "Chốt 15/10 (chị Nga) — khách hỏi nguồn gốc sâm / sâm ở đâu ra: 'Dạ nguyên liệu sâm trước khi đưa vào nhà máy Thái Minh để sản xuất sẽ được kiểm soát nghiêm ngặt chất lượng đầu vào. Hồng sâm Thái Minh là công trình chuyển giao từ Viện Nghiên cứu Sâm và Dược liệu Việt Nam (VIGH), nên anh/chị hoàn toàn yên tâm về chất lượng ạ.' KHÔNG tự nhắc vườn sâm. CHỈ KHI khách hỏi THẲNG 'Thái Minh có vườn sâm không / sâm có phải tự trồng không' → 'Dạ Thái Minh có vườn trồng sâm tại Sìn Hồ – Lai Châu và Lâm Đồng ạ. Nguyên liệu sâm đưa vào sản xuất đều có nguồn gốc rõ ràng, hóa đơn chứng từ đầy đủ và được kiểm soát chặt chẽ chất lượng đầu vào ạ.' (chốt 23/10: KHÔNG nói 'toàn bộ sâm đưa vào nhà máy đều trồng ở Sìn Hồ / Lai Châu') KHÔNG BAO GIỜ nói 'toàn bộ sâm do Thái Minh tự trồng'. Website samthaiminh.com.",
  "where_buy": "Chốt 14/10 — khách hỏi mua ở đâu / nhà thuốc nào có bán: gửi link tra điểm bán https://samthaiminh.com/diem-ban, đồng thời khuyến khích đặt online qua page để được giao tận nhà và hưởng ưu đãi tốt nhất.",
  "marketplace": "Khách nói mua trên sàn rẻ hơn: bên em chỉ đảm bảo nguồn gốc, hạn dùng, bảo quản khi mua trực tiếp công ty/cửa hàng; đặt hôm nay có ưu đãi + được kiểm tra hàng; sau khi mua được chuyên viên chăm sóc và áp dụng CTKM dành riêng cho khách hàng thân thiết. Không nêu tên shop trên sàn.",
@@ -670,10 +694,10 @@ scripts_approved = {
    f"(1) câu dẫn: 'Dạ Dương Sâm Linh Đan giá {vnd(DS_PRICE)}/hộp 10 viên, mỗi ngày anh dùng 1 viên lúc 8–9 giờ tối. Liệu trình khuyên dùng 3 tháng (khoảng 9 hộp) để hiệu quả bền vững ạ.'; "
    "(2) 'Chương trình tri ân khách hàng mới:' + mỗi gói 1 dòng: " + DS_COMBO_TXT + " + dòng '✅ Miễn phí vận chuyển toàn quốc, nhận hàng kiểm tra rồi mới thanh toán'; "
    "(3) ĐÚNG 1 câu chốt: 'Anh muốn bắt đầu liệu trình 1 tháng (3 hộp) trước, hay lấy luôn liệu trình 3 tháng (9 hộp) cho đủ liệu trình cơ bản ạ?'. "
-   "KHÔNG liệt kê dòng 1 hộp, 2 hộp (chỉ nói khi khách hỏi mua lẻ / ít hộp / dùng thử / chê đắt: 1 hộp không quà, 2 hộp tặng 1 Trà sâm 1700 loại 10 gói). "
-   "Mốc 6 hộp: ƯU TIÊN báo tặng 1 chai Nước Hồng sâm mật ong; khách không thích Nước Hồng sâm mới đổi 2 hộp Bổ Gan + 1 Trà sâm 10 gói. "
+   f"KHÔNG liệt kê dòng 1 hộp, 2 hộp (chỉ nói khi khách hỏi mua lẻ / ít hộp / dùng thử / chê đắt — bảng 17/11: 1 hộp và 2 hộp đều tặng {next(x for x in RULES if x['if_sku'] == 'duongsam-10' and x['min_qty'] == 1)['gift']}). "
+   "Quà có chữ 'hoặc' = khách CHỌN 1, nói đủ các phương án (bảng 17/11). "
    "Khách mới từ 10 hộp trở lên: quà mốc 9 hộp, KHÔNG chuyển nhân viên xin thêm ưu đãi."),
- "returning_quote_duongsam": "Duyệt 21/10 — khách TỰ nói đã từng dùng ĐÚNG Dương Sâm Linh Đan (chốt 23/10: từng dùng sản phẩm khác → báo CTKM khách mới): cảm ơn anh đã tin dùng lại; báo giá 1 hộp + ưu đãi tri ân khách hàng thân thiết lấy đúng bảng programs.returning_customer (mốc 4 / 7 / 10 / 15 hộp, mỗi mốc 1 dòng 🎁; 2, 3, 6, 9 hộp quà như khách mới); 1 câu chốt hỏi số lượng; chốt đơn bằng build_order customer_type=returning.",
+ "returning_quote_duongsam": "Duyệt 21/10 — khách TỰ nói đã từng dùng ĐÚNG Dương Sâm Linh Đan (chốt 23/10: từng dùng sản phẩm khác → báo CTKM khách mới): cảm ơn anh đã tin dùng lại; báo giá 1 hộp + ưu đãi tri ân khách hàng thân thiết lấy đúng bảng programs.returning_customer (bảng 17/11 mã 2026/TP-TBBL.DSLĐ-C06: mốc 4 / 7 / 10 / 15 hộp, mỗi mốc 1 dòng 🎁; 1, 2, 3, 6, 9 hộp quà như khách mới; quà có 'hoặc' = khách chọn 1); 1 câu chốt hỏi số lượng; chốt đơn bằng build_order customer_type=returning.",
  "price_why_duongsam": "Duyệt 21/10 (chị Nga) — khách chê đắt Dương Sâm, dùng ĐÚNG 2 câu, mỗi lần 1 câu, KHÔNG chuyển sang Nước Hồng sâm: LẦN 1: 'Dạ em hiểu anh ạ. So với dùng thuốc tây hay tiêm hormone thì chi phí Dương Sâm Linh Đan nhẹ nhàng hơn nhiều, lại từ thảo dược nên anh yên tâm hơn, bồi bổ từ gốc. Tính ra mỗi ngày chỉ khoảng bằng 2 ly cà phê thôi ạ.' | LẦN 2: 'Dạ loại rẻ mà dùng vài tháng không cải thiện thì anh vừa mất tiền vừa mất thời gian ạ. Dương Sâm Linh Đan dùng khoảng 10–14 ngày nhiều anh đã thấy tỉnh táo hơn, đỡ đau lưng mỏi gối, buổi sáng chào cờ nhạy hơn ạ.' Vẫn chưa mua → soft ask SĐT 1 lần rồi cảm ơn.",
  "new_product_doubt": "Duyệt 21/10 — khách hỏi uy tín / sản phẩm mới, sợ không đúng quảng cáo: thừa nhận trước ('Vâng anh ạ, sản phẩm mới thì anh cũng cần tìm hiểu kỹ thông tin ạ'), rồi: 'Dương Sâm Linh Đan là sản phẩm được Thái Minh đầu tư rất nhiều chất xám, được sản xuất và phân phối bởi Công ty Dược phẩm Thái Minh, thương hiệu gần 15 năm, đã có nhiều sản phẩm nổi tiếng như Khương Thảo Đan, Vương Bảo, Bình Vị...' + công thức Sâm Lai Châu + Cao xương dê, 'Khỏe bên trong, mạnh bên ngoài'; dùng đủ liệu trình 3 tháng hiệu quả bền vững hơn.",
  "doctor_htk": "Duyệt 21/10 — CHỈ khi khách HỎI có bác sĩ / chuyên gia tư vấn không: 'Dạ sản phẩm Dương Sâm Linh Đan đang được các bác sĩ trực tiếp tư vấn và chia sẻ trên các kênh đài uy tín như VOV, truyền hình Quốc Phòng... ạ.' KHÔNG nêu tên bác sĩ cụ thể; KHÔNG tự nhắc bác sĩ khi khách không hỏi.",
@@ -727,7 +751,7 @@ NHS_STYLES = [("Chương trình tri ân khách hàng mới (từ 2 hộp miễn 
 NHS_STYLE_TXT = " || ".join(f"KIỂU {i + 1}: '{h}' + " + " / ".join(f"'{_nhs_style(q, k)}'" for q in (list(reversed(NHS_COMBOS)) if k == 5 else NHS_COMBOS))
                             for i, (h, k) in enumerate(NHS_STYLES))
 NHS_CLOSES = [
- ("Ⓐ HỎI CHỌN ƯU ĐÃI", "Trong 3 ưu đãi trên, anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?"),
+ ("Ⓐ HỎI CHỌN ƯU ĐÃI", "Trong các ưu đãi trên, anh/chị muốn chọn combo nào để em giữ quà cho anh/chị ạ?"),
  ("Ⓑ GỢI Ý ƯU ĐÃI TỐT NHẤT", f"Với tình trạng của anh/chị, em gợi ý combo 6 hộp ạ: dùng đều mỗi ngày được lâu, lại được tặng nhiều quà nhất ({nhs_rule(6)['gift']}). Em lên đơn combo 6 hộp cho anh/chị nhé?"),
  ("Ⓒ DẪN DẮT 2 HỘP HAY 6 HỘP", "Anh/chị muốn lấy combo 2 hộp dùng trước, hay lấy luôn combo 6 hộp để dùng đều và nhận thêm 5 hộp Trà sâm ạ?"),
  ("Ⓓ BẮT ĐẦU NHẸ", f"Lần đầu dùng anh/chị có thể bắt đầu combo 2 hộp để cảm nhận trước, vẫn được tặng {nhs_rule(2)['gift']} và miễn phí vận chuyển. Em lên đơn combo 2 hộp cho anh/chị nhé?"),

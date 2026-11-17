@@ -215,6 +215,10 @@ def _promo_active(kb, today=None):
     return bool(p.get("active")) and p.get("valid_from", "0000") <= d <= p.get("valid_to", "9999")
 
 
+def _norm_gift(x: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[()]", " ", (x or "").lower())).strip()
+
+
 def _gift_for(kb, sku, qty, today=None, price_objection=False, program="new_customer"):
     """v0.1.12: dòng có condition=price_objection (Hồng sâm lát 1 hộp — brief 25/09) CHỈ áp khi khách chê đắt.
     v0.1.16: program="returning_customer" → bảng quà khách cũ (chị Nga 14/10)."""
@@ -333,6 +337,7 @@ def build_order(items: list, name: str = None, phone: str = None, addr: str = No
                        + " Chèn [HANDOFF: khách cũ mua tiếp | SĐT | 2] CUỐI tin."),
         }
     lines_items, errors, goods_total, handoff_skus = [], [], 0, []
+    _choice = {}     # v0.5.16: sku → quà khách XIN ĐỔI (chỉ nhận nếu đúng 1 phương án trong bảng)
     for it in items or []:
         sku, qty = (it.get("sku", "") or "").strip().lower(), int(it.get("qty", 1))
         p, pkg = find_package(kb, sku)
@@ -349,6 +354,8 @@ def build_order(items: list, name: str = None, phone: str = None, addr: str = No
         goods_total += sub
         if sku in HANDOFF_SKUS:
             handoff_skus.append(sku)
+        if it.get("gift_choice"):
+            _choice[pkg["sku"]] = str(it.get("gift_choice"))
         lines_items.append({"product": p["name"], "short_name": PKG_SHORT.get(pkg["sku"]) or p.get("short_name") or p["name"],
                             "product_id": p["id"], "sku": pkg["sku"], "label": pkg["label"],
                             "unit": pkg.get("unit_name", "hộp"),
@@ -371,7 +378,15 @@ def build_order(items: list, name: str = None, phone: str = None, addr: str = No
         g = _gift_for(kb, li["sku"], li["qty"], price_objection=bool(price_objection) and customer_type == "new", program=prog_key)
         if g:
             if g.get("gift"):
-                promos.append({"sku": li["sku"], "gift": g["gift"], "tier_qty": g["min_qty"],
+                _gift, _opts = g["gift"], list(g.get("gift_options") or [])
+                _want = _norm_gift(_choice.get(li["sku"], ""))
+                if _want and _opts:
+                    _hit = next((o for o in _opts if _norm_gift(o) in _want or _want in _norm_gift(o)), None)
+                    if _hit:                     # v0.5.16: khách xin đổi quà → đúng phương án trong bảng mới đổi
+                        _opts = [_gift.split(" – ")[0]] + [o for o in _opts if o != _hit]
+                        _gift = _hit
+                promos.append({"sku": li["sku"], "gift": _gift, "tier_qty": g["min_qty"],
+                               **({"gift_options_if_customer_asks": _opts} if _opts else {}),
                                # v0.5.1 (28/10, chị Nga): khách cũ Nước Hồng sâm hưởng CT tốt nhất — ghi CT để nhân viên lên đơn đúng mã
                                "program": g.get("apply_program") or prog_key, **({"nhanh_code": g["nhanh_code"]} if g.get("nhanh_code") else {})})
             top = max(r["min_qty"] for r in kb["programs"][prog_key]["rules"] if r["if_sku"] == li["sku"])
@@ -445,7 +460,7 @@ def build_order(items: list, name: str = None, phone: str = None, addr: str = No
     upsell = None
     if lat_qty in (1, 2) and customer_type == "new":
         # v0.1.15: giá/quà lấy từ bảng khuyến mại (không ghi cứng) — 1 hộp → mời 2 hộp; 2 hộp → mời 4 hộp
-        tq = 2 if lat_qty == 1 else 4
+        tq = 2 if lat_qty == 1 else 3   # v0.5.15: bảng 17/11 — mốc 2 / 3 / 5 / 6 hộp (không còn mốc 4)
         _, lpkg = find_package(kb, "hsvn-lat-14")
         r = next((x for x in kb["programs"]["new_customer"]["rules"]
                   if x["if_sku"] == "hsvn-lat-14" and x["min_qty"] == tq and not x.get("condition")), None)
