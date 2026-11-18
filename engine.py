@@ -2871,8 +2871,25 @@ def _nhs_gift_table_txt() -> str:
             "KHÔNG dùng bảng quà cũ (Combo 1 tháng / 2 tháng / 3 tháng của Hồng sâm lát).\n")
 
 
+def _tier2_table_txt() -> str:
+    """v0.5.17 (18/11): bảng GIÁ + QUÀ mặc định Hồng sâm lát / Dương Sâm (khách mới) đưa thẳng vào lời dặn bot Nước Hồng sâm —
+    AI từng kể bảng Hồng sâm lát bằng giá 620.000đ và quà của Nước Hồng sâm."""
+    try:
+        kb = tools_core.load_kb()
+        rows = []
+        for sku, nm in (("hsvn-lat-14", "Hồng sâm lát hộp 14 gói"), ("hsvn-lat-50", "Hồng sâm lát hộp 50 gói"), ("duongsam-10", "Dương Sâm Linh Đan hộp 10 viên")):
+            pr = tools_core.find_package(kb, sku)[1]["price_retail"]
+            tiers = "; ".join(f"{r['min_qty']} hộp = {tools_core.fmt_vnd(pr * r['min_qty'])}, tặng {r['gift']}"
+                              for r in kb["programs"]["new_customer"]["rules"] if r["if_sku"] == sku and r.get("gift"))
+            rows.append(f"{nm}: {tools_core.fmt_vnd(pr)}/hộp — giá N hộp = N × {tools_core.fmt_vnd(pr)}; {tiers}")
+    except Exception:  # noqa: BLE001
+        return ""
+    return ("(q) (18/11) GIÁ + QUÀ SẢN PHẨM KHÁC (chỉ nói khi khách hỏi đúng sản phẩm đó; KHÔNG BAO GIỜ dùng giá 620.000đ hay quà Nước Hồng sâm "
+            "cho sản phẩm khác; mỗi dòng trong bảng ưu đãi phải ghi rõ đúng giá sản phẩm đó): " + " || ".join(rows) + "\n")
+
+
 if IS_NHS:
-    NHS_BLOCK = NHS_BLOCK + _nhs_gift_table_txt()
+    NHS_BLOCK = NHS_BLOCK + _nhs_gift_table_txt() + _tier2_table_txt()
 
 # v0.4.0: dòng gói Nước Hồng sâm "Combo K hộp (… túi): … – tặng …" → giá K × giá hộp 20 túi, quà đúng bảng
 _RE_NHS_LINE = re.compile(r"(?im)^(?P<pre>[^\n]*?combo\s*(?P<n>\d+)\s*hộp(?:\s*\(\s*\d+\s*túi\s*\))?\s*:?\s*)(?P<price>[\d.]+\s*(?:đ|vnđ|đồng))?(?P<mid>\s*(?:–|-)\s*tặng\s*)(?P<gift>[^\n]+)$")
@@ -2937,6 +2954,8 @@ def _fix_nhs_packages(text: str, bot_texts: list = None, user_texts: list = None
     if not IS_NHS or not text or is_returning_ctx(text, bot_texts or []):   # v0.5.0: khách cũ → bảng khách cũ, không ép quà khách mới
         return text
     text_all_users = " ".join((user_texts or [])[-3:])
+    if len(_RE_CONFIRM_BLOCK.findall(text)) >= 2:
+        return text          # v0.5.17: tin tổng hợp đơn do build_order tính (đã đúng bảng khách mới / khách cũ, quà khách đổi) → không đụng
     sku = "hsmo-chai" if PAGE_FOCUS_PRODUCT == "hsmo_chai" else "hsmo-tui"
     try:
         kb = tools_core.load_kb()
@@ -2944,7 +2963,7 @@ def _fix_nhs_packages(text: str, bot_texts: list = None, user_texts: list = None
         rules = {r["min_qty"]: r.get("gift") or "" for r in kb["programs"]["new_customer"]["rules"]
                  if r.get("if_sku") == sku and not r.get("condition")}
         rules_by = {k: {r["min_qty"]: r.get("gift") or "" for r in kb["programs"]["new_customer"]["rules"]
-                        if r.get("if_sku") == k and not r.get("condition")} for k in ("hsvn-lat-14", "duongsam-10")}
+                        if r.get("if_sku") == k and not r.get("condition")} for k in ("hsvn-lat-14", "hsvn-lat-50", "duongsam-10")}
         _alts = [o for r in kb["programs"]["new_customer"]["rules"] for o in (r.get("gift_options") or [])]
     except Exception:  # noqa: BLE001
         return text
@@ -2965,13 +2984,18 @@ def _fix_nhs_packages(text: str, bot_texts: list = None, user_texts: list = None
         n = int(m.group("n"))
         _b = max(text.rfind("\n", 0, m.start()), *[text.rfind(c + " ", 0, m.start()) for c in ".!?"])
         line = text[_b + 1: m.end()]          # câu chứa đoạn này (không lấy câu khác cùng dòng)
-        if _RE_GIFT_LAT.search(line):
-            g, nmin = _nhs_gift_for(rules_by["hsvn-lat-14"], n), 1
-        elif _RE_GIFT_DS.search(line):
-            g, nmin = _nhs_gift_for(rules_by["duongsam-10"], n), 1
+        # v0.5.17: sản phẩm của dòng = chính câu đó, không có thì dòng tiêu đề phía trên cùng đoạn ("… khi mua Hồng sâm lát:")
+        _li = text.count("\n", 0, m.start())
+        pr = _prod_of(line) or _line_ctx(_lines, _li)
+        if pr == "other" or re.search(r"khách cũ|thân thiết|tri ân khách hàng thân", line, re.I):
+            return m.group(0)
+        if pr in ("lat", "lat50", "ds"):
+            g, nmin = _nhs_gift_for(rules_by[{"lat": "hsvn-lat-14", "lat50": "hsvn-lat-50", "ds": "duongsam-10"}[pr]], n), 1
+            _skip = False
         else:
             g, nmin = _nhs_gift_for(rules, n), 2
-        if not g or n < nmin or _RE_NHS_GIFT_SKIP.search(line) \
+            _skip = bool(_RE_NHS_GIFT_SKIP.search(line))
+        if not g or n < nmin or _skip \
                 or not re.search(r"trà sâm|hồng sâm|hộp|dầu|heviho|viên|bổ gan|lọ", m.group("gift"), re.I):
             return m.group(0)
         _g0 = re.sub(r"\s+", " ", m.group("gift").lower())
@@ -2981,6 +3005,7 @@ def _fix_nhs_packages(text: str, bot_texts: list = None, user_texts: list = None
         tail = " ạ" if re.search(r"\s+ạ\s*$", gift0) else ""
         extra = gift0.count(")") - gift0.count("(")      # ngoặc đóng của câu bao ngoài "(tặng …)" → giữ lại
         return m.group("pre") + g + tail + (")" * extra if extra > 0 else "")
+    _lines = text.split("\n")
     text = _RE_NHS_GIFT_SEG.sub(_seg, text)
     # tin / đoạn bắt đầu bằng chữ thường ("mua nhiều giá hộp…") → viết hoa chữ đầu
     text = re.sub(r"(?m)^([ \t]*)(?!https?:|www\.)([a-zà-ỹđ])", lambda mm: mm.group(1) + mm.group(2).upper(), text)
@@ -3017,61 +3042,137 @@ def _trieu_norm(sent: str) -> str:
     return _RE_TRIEU.sub(_t, sent)
 
 
+# v0.5.17 (18/11, chị Nga: "báo nhầm giá Hồng sâm lát, giá 1.420.000đ, bao nhiêu hộp nhân bấy nhiêu, tương tự sản phẩm khác"):
+# AI kể bảng Hồng sâm lát mà từng dòng chỉ ghi "Mua 2 hộp (1.240.000đ): Tặng…" (lấy nhầm giá + quà Nước Hồng sâm). Dòng không nhắc tên
+# sản phẩm → trước đây lưới coi là Nước Hồng sâm. Nay xác định SẢN PHẨM của từng dòng theo chính dòng đó, không có thì theo dòng tiêu đề
+# phía trên trong cùng đoạn ("Chương trình … khi mua Hồng sâm lát:"), rồi tính giá = số hộp × giá đúng sản phẩm đó, quà đúng bảng sản phẩm đó.
+_RE_CTX_OTHER = re.compile(r"rượu|sâm tươi|trà sâm[^\n]{0,25}(?:giá|có giá)", re.I)   # giá nhiều quy cách → không tự sửa
+_RE_CTX_LS30 = re.compile(r"long sâm[^\n]{0,40}30\s*viên|long sâm[^\n]{0,25}quà biếu", re.I)
+_RE_CTX_LS = re.compile(r"long sâm", re.I)
+_RE_CTX_TSD = re.compile(r"tam sâm", re.I)
+_RE_CTX_DT = re.compile(r"đông trùng", re.I)
+_RE_CTX_LAT50 = re.compile(r"50\s*gói", re.I)
+_RE_CTX_LAT = re.compile(r"(?<![A-Za-zÀ-ỹĐđ])lát(?![A-Za-zÀ-ỹĐđ])(?!\s*(?:nữa|nua))|14\s*gói|hộp thiếc", re.I)
+_RE_CTX_DS = re.compile(r"dương sâm|dslđ|(?<!long sâm )linh đan|10\s*viên", re.I)
+_RE_CTX_NHS = re.compile(r"nước hồng sâm|nước sâm|hồng sâm (?:dạng )?(?:nước|túi)|20\s*túi|10\s*túi(?!\s*lọc)|hộp nhỏ|175\s*ml|(?<![A-Za-zÀ-ỹĐđ])chai(?![A-Za-zÀ-ỹĐđ])", re.I)
+
+
+def _prod_of(seg: str) -> str:
+    """Sản phẩm được nhắc trong đoạn chữ (chỉ xét phần TRƯỚC chữ 'tặng' — phần quà hay có tên sản phẩm khác)."""
+    pre = re.split(r"(?i)\btặng\b|quà tặng|quà:", seg or "", maxsplit=1)[0]
+    if _RE_CTX_OTHER.search(pre):
+        return "other"
+    if _RE_CTX_LS30.search(pre):
+        return "ls30"
+    if _RE_CTX_LS.search(pre):
+        return "ls"
+    if _RE_CTX_TSD.search(pre):
+        return "tsd"
+    if _RE_CTX_DT.search(pre):
+        return "dt"
+    if _RE_CTX_LAT50.search(pre):
+        return "lat50"
+    if _RE_CTX_LAT.search(pre):
+        return "lat"
+    if _RE_CTX_DS.search(pre):
+        return "ds"
+    if _RE_CTX_NHS.search(pre):
+        return "nhs"
+    return ""
+
+
+def _last_prod(before: str) -> str:
+    """Sản phẩm nhắc GẦN NHẤT trước vị trí số tiền (bỏ qua phần quà 'tặng …')."""
+    b = re.sub(r"(?i)\btặng\b[^,.;:\n]*", " ", before or "")
+    best, pos = "", -1
+    for key, rx in (("other", _RE_CTX_OTHER), ("ls30", _RE_CTX_LS30), ("ls", _RE_CTX_LS), ("tsd", _RE_CTX_TSD), ("dt", _RE_CTX_DT),
+                    ("lat50", _RE_CTX_LAT50), ("lat", _RE_CTX_LAT), ("ds", _RE_CTX_DS), ("nhs", _RE_CTX_NHS)):
+        for m in rx.finditer(b):
+            if m.start() > pos or (m.start() == pos and key == "ls30"):
+                best, pos = key, m.start()
+    return best
+
+
+def _line_ctx(lines: list, i: int) -> str:
+    """Sản phẩm của dòng i: chính dòng đó, không có thì dòng phía trên gần nhất trong cùng đoạn (dừng ở dòng trống)."""
+    for j in range(i, max(-1, i - 8), -1):
+        if j < i and not lines[j].strip():
+            break
+        pr = _prod_of(lines[j])
+        if pr:
+            return pr
+    return ""
+
+
 def _fix_nhs_prices(text: str) -> tuple:
-    """v0.5.6 / v0.5.14 (16/11, chị Nga: "giá hộp 20 túi luôn là 620k, có lúc bot nói sai"): mọi giá Nước Hồng sâm phải đúng bảng.
-    Xét từng CÂU (không bỏ cả dòng chỉ vì có chữ "mỗi ngày"): số tiền ≥ 100.000đ đứng sau "N hộp" / "x N" gần nhất → N × giá hộp;
-    đứng ngay trước "/hộp", "một hộp" → giá 1 hộp; không rõ số hộp mà không phải bội số giá hộp → giá 1 hộp.
-    Câu nhắc sản phẩm khác, phí ship, tổng tiền, trị giá quà → không đụng."""
-    if not IS_NHS or not text:
-        return text, 0
+    """v0.5.6 / v0.5.14 / v0.5.17: mọi giá trong tin bot Nước Hồng sâm phải đúng bảng — Nước Hồng sâm, Hồng sâm lát (14 / 50 gói), Dương Sâm.
+    Xét từng CÂU: số tiền ≥ 100.000đ đứng sau "N hộp" / "x N" gần nhất → N × giá hộp của ĐÚNG sản phẩm dòng đó; đứng ngay trước "/hộp",
+    "một hộp" → giá 1 hộp; không rõ số hộp mà không phải bội số giá hộp → giá 1 hộp. Tổng tiền, phí ship, trị giá quà, sản phẩm khác → không đụng."""
+    if not IS_NHS or not text or len(_RE_CONFIRM_BLOCK.findall(text)) >= 2:
+        return text, 0       # v0.5.17: tin tổng hợp đơn do build_order tính → không đụng
     try:
         kb = tools_core.load_kb()
-        P20 = tools_core.find_package(kb, "hsmo-tui")[1]["price_retail"]
-        P10 = tools_core.find_package(kb, "hsmo-tui-10")[1]["price_retail"]
-        PCH = tools_core.find_package(kb, "hsmo-chai")[1]["price_retail"]
+        P = lambda sku: tools_core.find_package(kb, sku)[1]["price_retail"]
+        P20, P10, PCH = P("hsmo-tui"), P("hsmo-tui-10"), P("hsmo-chai")
+        UNIT = {"lat": P("hsvn-lat-14"), "lat50": P("hsvn-lat-50"), "ds": P("duongsam-10"), "ls": P("longsam-6"),
+                "ls30": P("longsam-30"), "tsd": P("tamsamdan-30"), "dt": P("dongtrung-30")}
     except Exception:  # noqa: BLE001
         return text, 0
     n = [0]
 
-    def _fix_sent(sent: str) -> str:
-        if _RE_PRICE_SKIP.search(sent) or _RE_OTHER_PROD.search(sent):
+    def _fix_sent(sent: str, ctx: str) -> str:
+        pr = _prod_of(sent) or ctx
+        if _RE_PRICE_SKIP.search(sent) or pr == "other":
             return sent
         if re.search(r"hộp|combo|giá", sent, re.I) and _RE_TRIEU.search(sent):
             sent = _trieu_norm(sent)
-        is10 = bool(re.search(r"10\s*túi(?!\s*lọc)|hộp nhỏ", sent, re.I))
-        chai = bool(re.search(r"chai|175\s*ml", sent, re.I))
-        unit = PCH if chai else (P10 if is10 else P20)
-        nhs_ctx = re.search(r"nước hồng sâm|nước sâm|hồng sâm (?:dạng )?(?:nước|túi)|20\s*túi|10\s*túi(?!\s*lọc)|hộp|combo|giá", sent, re.I)
-        if not nhs_ctx:
-            return sent
+        if pr in UNIT:
+            unit = UNIT[pr]
+        else:
+            is10 = bool(re.search(r"10\s*túi(?!\s*lọc)|hộp nhỏ", sent, re.I))
+            chai = bool(re.search(r"chai|175\s*ml", sent, re.I))
+            unit = PCH if chai else (P10 if is10 else P20)
+            if not re.search(r"nước hồng sâm|nước sâm|hồng sâm (?:dạng )?(?:nước|túi)|20\s*túi|10\s*túi(?!\s*lọc)|hộp|combo|giá", sent, re.I):
+                return sent
 
         def _sub(m):
             v = _money_val(m.group(1))
             if v < 100000:                      # phí ship / số nhỏ → không đụng
                 return m.group(0)
             before = sent[:m.start()]
-            if re.search(r"trà sâm|heviho|dầu nóng|bổ gan|quà", before[-45:], re.I):
+            if re.search(r"trà sâm|heviho|dầu nóng|bổ gan|quà(?! biếu)", before[-45:], re.I):
                 return m.group(0)               # giá / trị giá của quà tặng → không đụng
+            lp = _last_prod(before)
+            if lp == "other":
+                return m.group(0)
+            if lp in UNIT:
+                uu = UNIT[lp]
+            elif lp == "nhs" and pr != "nhs":
+                uu = PCH if re.search(r"chai|175\s*ml", before[-60:], re.I) else (P10 if re.search(r"10\s*túi(?!\s*lọc)|hộp nhỏ", before[-60:], re.I) else P20)
+            else:
+                uu = unit
             qs = list(_RE_QTY_HOP.finditer(before))      # "N hộp Trà sâm" (quà) đã loại trong mẫu
             after = sent[m.end():m.end() + 14]
             if _RE_UNIT_CTX.search(after):
-                want = unit
+                want = uu
             elif qs:
-                want = int(qs[-1].group(1) or qs[-1].group(2)) * unit
-            elif v % unit == 0 and v // unit <= 30:
+                want = int(qs[-1].group(1) or qs[-1].group(2)) * uu
+            elif v % uu == 0 and v // uu <= 60:
                 return m.group(0)
             else:
-                want = unit
+                want = uu
             if v == want:
                 return m.group(0)
             n[0] += 1
             return tools_core.fmt_vnd(want)
         return _RE_MONEY.sub(_sub, sent)
 
+    lines = text.split("\n")
     out = []
-    for ln in text.split("\n"):
+    for i, ln in enumerate(lines):
+        ctx = _line_ctx(lines, i)
         parts = re.split(r"((?<=[.!?;])\s+)", ln)
-        out.append("".join(_fix_sent(x) if i % 2 == 0 else x for i, x in enumerate(parts)))
+        out.append("".join(_fix_sent(x, ctx) if k % 2 == 0 else x for k, x in enumerate(parts)))
     return "\n".join(out), n[0]
 
 

@@ -1,4 +1,17 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.16 (17/11/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.17 (18/11/2026)
+
+## v0.5.17 — giá / quà đúng sản phẩm của từng dòng (ca chị Gấu 18/11)
+- Lỗi: khách hỏi Hồng sâm lát, AI kể bảng "Mua 1 hộp (620.000đ) / 2 hộp (1.240.000đ)…" với quà Nước Hồng sâm. Các dòng không ghi tên
+  sản phẩm nên lưới giá / quà coi là Nước Hồng sâm và để lọt.
+- Nay `_prod_of` / `_line_ctx` / `_last_prod`: sản phẩm của từng dòng = chính dòng đó (phần trước chữ "tặng"), không có thì dòng tiêu đề phía
+  trên trong cùng đoạn; số tiền lấy sản phẩm nhắc gần nhất trước nó. Giá = số hộp × giá đúng sản phẩm: Nước Hồng sâm 620.000đ (10 túi 330.000đ,
+  chai 550.000đ), Hồng sâm lát 1.420.000đ (50 gói 5.000.000đ), Dương Sâm 990.000đ, Long Sâm 1.050.000đ (30 viên 4.750.000đ), Tam Sâm Đan
+  560.000đ, Đông trùng 750.000đ. Rượu, sâm tươi, Trà sâm (nhiều quy cách) không tự sửa. Quà sửa theo bảng của đúng sản phẩm dòng đó.
+- Tin tổng hợp đơn của build_order không bao giờ bị 2 lưới này sửa (trước đây đơn khách cũ có thể bị đổi quà về bảng khách mới).
+- Lời dặn NHS_BLOCK (q): bảng giá + quà mặc định Hồng sâm lát (14 / 50 gói) và Dương Sâm, "giá N hộp = N × giá 1 hộp", cấm dùng 620.000đ /
+  quà Nước Hồng sâm cho sản phẩm khác.
+- Test: test_nhs 44/44 (thêm ca 44), test_sam_12ca 17/17, test_potential_nhs 10/10.
+
 
 ## v0.5.16 — báo giá chỉ nêu 1 quà (chị Nga 17/11)
 - Bảng quà Hồng sâm lát / Dương Sâm có nhiều phương án: build_kb tách `gift` = phương án ĐẦU của bảng (quà mặc định) và `gift_options` = các phương án đổi.

@@ -580,6 +580,24 @@ def test_43_doc_het_tin_dai():
     assert "(o)" in engine.NHS_BLOCK and "ĐỌC HẾT TIN KHÁCH" in engine.NHS_BLOCK
 
 
+# 44 ─ (18/11, ca chị Gấu) bảng Hồng sâm lát mà từng dòng không ghi tên sản phẩm → giá = số hộp × 1.420.000đ, quà đúng bảng lát
+def test_44_gia_qua_theo_dong_tieu_de():
+    T = ("Hộp thiếc 14 gói có giá 1.420.000đ, mỗi ngày dùng 1 gói ạ.\n"
+         "Chương trình tri ân khách hàng mới khi mua Hồng sâm lát:\n"
+         "- Mua 1 hộp (620.000đ): Tặng 1 hộp Trà sâm 1700 (10 gói), miễn phí vận chuyển\n"
+         "- Mua 2 hộp (1.240.000đ): Tặng 1 hộp Trà sâm 1700 (10 gói), miễn phí vận chuyển\n"
+         "- Mua 3 hộp (1.860.000đ): Tặng 2 hộp Trà sâm 1700 (10 gói), miễn phí vận chuyển")
+    o = engine._fix_nhs_packages(engine._fix_nhs_prices(T)[0], [], ["Mình muốn tham khảo dòng Hồng sâm lát ạ"])
+    assert "Mua 1 hộp (1.420.000đ)" in o and "Mua 2 hộp (2.840.000đ): Tặng 1 hộp Trà sâm 1700 (20 gói), miễn phí" in o
+    assert "Mua 3 hộp (4.260.000đ): Tặng 1 hộp Trà sâm 1700 (20 gói) + 1 lọ dầu nóng" in o and "620.000đ" not in o
+    f = lambda x: engine._fix_nhs_prices(x)[0]
+    assert f("Hồng sâm lát 3 hộp 4.200.000đ, còn Nước Hồng sâm 3 hộp 1.800.000đ ạ.") == "Hồng sâm lát 3 hộp 4.260.000đ, còn Nước Hồng sâm 3 hộp 1.860.000đ ạ."
+    assert "2.970.000đ" in f("Dương Sâm Linh Đan ưu đãi:\n- 3 hộp: 1.860.000đ – tặng 2 hộp Trà sâm 1700 (10 gói)")
+    assert "1.050.000đ" in f("Long Sâm Linh Đan hộp 6 viên giá 1.000.000đ ạ.") and "4.750.000đ" in f("Long Sâm hộp quà biếu 30 viên giá 4.500.000đ ạ.")
+    assert f("Hồng sâm lát 1.420.000đ/hộp 14 gói, Nước Hồng sâm 620.000đ/hộp 20 túi") == "Hồng sâm lát 1.420.000đ/hộp 14 gói, Nước Hồng sâm 620.000đ/hộp 20 túi"
+    assert "(q)" in engine.NHS_BLOCK and "N × 1.420.000đ" in engine.NHS_BLOCK
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted((k, v) for k, v in globals().items() if k.startswith("test_")):
