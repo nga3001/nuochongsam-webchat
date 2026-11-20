@@ -1,4 +1,20 @@
-# Bot Nước Hồng sâm Thái Minh — v0.5.17 (18/11/2026)
+# Bot Nước Hồng sâm Thái Minh — v0.5.18 (20/11/2026)
+
+## v0.5.18 — không lặp ý trong cùng tin (ca Nguyễn Xuân Ánh 20/11)
+- Khách hỏi 2 ý (thanh toán + huyết áp đang uống thuốc) → AI viết câu trả lời 2 lần (vòng gọi tool trước và sau, diễn đạt khác nhau):
+  khách nhận 6 tin, thanh toán 2 lần, huyết áp 2 lần, dặn duy trì thuốc 3 lần, 2 câu hỏi.
+- `_dedupe_reply`: trong cùng tin, câu cùng chủ đề (thanh toán, duy trì thuốc, huyết áp dùng được, tiểu đường dùng được, xin SĐT) hoặc giống ≥ 60%
+  với câu trước → bỏ; câu dặn duy trì thuốc chỉ 1 lần cả hội thoại (scripts maintain_meds); tối đa 1 câu hỏi (ưu tiên câu xin SĐT).
+  Không đụng tin tổng hợp đơn, dòng liệt kê, thẻ hệ thống.
+- Không viết tắt "COD" với khách (đổi thành "nhận hàng rồi mới thanh toán").
+- Đơn vị là LƯỢT PHẢN HỒI (chị Nga 20/11: 1 lượt nhiều tin nhiều dòng): `_dedupe_reply` xét cả lượt trước khi tách tin. Nguyên nhân gốc ca này: khách nhắn tin 2 lúc bot đang soạn lượt 1, 2 lượt chạy song song, lượt 1 đã đọc cả tin 2 (lịch sử Pancake) → mọi ý trả lời 2 lần. Nay pancake_adapter `_flush`: mỗi hội thoại 1 lượt tại một thời điểm (khóa theo hội thoại); lượt sau mà mọi tin khách đã được lượt trước đọc (answered_ut, lượt trước bắt đầu sau khi tin tới) → không trả lời lần 2 (log turn_merged). Test: tests/test_turn_nhs.py.
+- Khách thả SĐT (chị Nga chốt 16/11 "theo bot lát", ca Đình Lân 20/11): PANCAKE_PHONE_STOP mặc định 1.
+  · Tin chỉ có SĐT, hoặc SĐT kèm tên / chữ đệm ("đinh lân đt 0798…", "sđt chị … gọi cho chị nhé") → `_phone_lead_only` → câu ghi nhận đã duyệt (kịch bản mục 8) + thẻ Bot + Người xử lý + giao người + chưa đọc + ghi chú, bot dừng, không nhắc nhớ.
+  · SĐT kèm câu hỏi / địa chỉ / đặt hàng → AI trả lời lượt đó, bỏ câu hỏi cuối, kết bằng câu hẹn gọi lại (`_phone_ack_tail`); sau lượt đó gắn Người xử lý, bot dừng (pancake_adapter, log phone_stop).
+  · Bot gửi tổng hợp đơn → kết bằng "Bên em sẽ gọi điện xác nhận đơn trước khi gửi hàng…", gắn Bot chốt đơn + Người xử lý, bot dừng, KHÔNG chờ khách xác nhận, KHÔNG mời lên gói (nhân viên mời khi gọi xác nhận — kịch bản mục 11 điểm 3). Chưa tự đẩy đơn Nhanh ở bước này.
+  · Bỏ thẻ "Có SĐT" (chỉ còn khi đặt PANCAKE_PHONE_STOP=0).
+- Test: test_nhs 45/45 (thêm ca 45), test_sam_12ca 17/17, test_potential_nhs 10/10, test_turn_nhs 6/6.
+
 
 ## v0.5.17 — giá / quà đúng sản phẩm của từng dòng (ca chị Gấu 18/11)
 - Lỗi: khách hỏi Hồng sâm lát, AI kể bảng "Mua 1 hộp (620.000đ) / 2 hộp (1.240.000đ)…" với quà Nước Hồng sâm. Các dòng không ghi tên

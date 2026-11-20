@@ -598,6 +598,22 @@ def test_44_gia_qua_theo_dong_tieu_de():
     assert "(q)" in engine.NHS_BLOCK and "N × 1.420.000đ" in engine.NHS_BLOCK
 
 
+# 45 ─ (20/11, ca Nguyễn Xuân Ánh) AI viết câu trả lời 2 lần trong cùng tin → mỗi ý 1 lần, dặn duy trì thuốc 1 lần cả hội thoại, 1 câu hỏi; không "COD"
+def test_45_khong_lap_y_trong_tin():
+    prev = ["Hồng sâm hỗ trợ ổn định huyết áp ạ. Anh vẫn nên duy trì thuốc theo chỉ định của bác sĩ và dùng Nước Hồng sâm cách thuốc khoảng 2 tiếng nhé ạ."]
+    ai = ("Về thanh toán, anh có 2 cách: nhận hàng kiểm tra rồi mới thanh toán, hoặc chuyển khoản trước qua tài khoản công ty ạ.\n\n"
+          "Nước Hồng sâm hỗ trợ ổn định huyết áp ạ. Anh vẫn duy trì uống thuốc theo chỉ định của bác sĩ nhé.\n\n"
+          "Anh cho em xin số điện thoại để bên em hỗ trợ giao hàng nhé ạ?\n\n"
+          "Dạ người bị huyết áp cao vẫn dùng được Nước Hồng sâm, anh cứ duy trì thuốc tây bác sĩ kê ạ.\n\n"
+          "Về phần thanh toán thì anh có thể nhận hàng kiểm tra rồi mới thanh toán, hoặc chuyển khoản trước ạ.\n\n"
+          "Anh muốn lấy combo 2 hộp hay mấy hộp ạ?")
+    out, n = engine._dedupe_reply(ai, prev)
+    assert out.count("chuyển khoản") == 1 and "duy trì" not in out and out.count("?") == 1 and "số điện thoại" in out and n >= 4
+    ok = "Dạ người tiểu đường dùng được ạ.\n\nMẹ chị đang dùng thuốc gì ạ?"
+    assert engine._dedupe_reply(ok, [])[0] == ok
+    assert "COD" not in engine._fix_banned_phrases("Cách 1: nhận hàng kiểm tra rồi thanh toán (COD).")
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted((k, v) for k, v in globals().items() if k.startswith("test_")):

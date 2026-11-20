@@ -448,7 +448,11 @@ def build_order(items: list, name: str = None, phone: str = None, addr: str = No
         lines.append(f"Quà tặng kèm: {gift_txt}")
     lines.append(f"Tổng tiền đơn hàng: {fmt_vnd(total)} ({ship_text})")
     lines.append("")
-    lines.append("Anh/chị kiểm tra giúp em thông tin đã đúng chưa ạ?")
+    if IS_NHS and os.environ.get("PANCAKE_PHONE_STOP", "1") == "1":
+        # v0.5.18 (kịch bản Nước Hồng sâm mục 10, chị Nga duyệt 16/11): không chờ khách xác nhận — nhân viên gọi xác nhận
+        lines.append("Bên em sẽ gọi điện xác nhận đơn trước khi gửi hàng, anh/chị để ý điện thoại giúp em nhé ạ.")
+    else:
+        lines.append("Anh/chị kiểm tra giúp em thông tin đã đúng chưa ạ?")
 
     handoff = None
     if handoff_skus:

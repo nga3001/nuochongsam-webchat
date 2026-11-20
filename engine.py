@@ -266,6 +266,9 @@ _FOREIGN = re.compile(
 
 
 _BANNED_FIX = [  # v0.1.21 (16/10): lưới chặn cuối — cụm anh Huy cấm mà AI vẫn lỡ viết
+    # v0.5.18 (20/11): không viết tắt với khách — "COD"
+    (re.compile(r"\s*\(\s*COD\s*\)", re.I), ""),
+    (re.compile(r"(?<![A-Za-z])COD(?![A-Za-z])"), "nhận hàng rồi mới thanh toán"),
     # v0.5.8 (30/10, chị Nga chạy thật): thành ngữ viết thiếu chữ; tên viện sai; quà Trà sâm bị gán công dụng
     (re.compile(r"([Tt])iền nào(?! của)\s+nấy", re.I), r"\1iền nào của nấy"),
     # v0.5.8: "phân phối chính hãng trực tiếp từ công ty" — không nói công ty nào → nêu rõ
@@ -1596,6 +1599,94 @@ def _drop_repeats_core(text: str, transcript: list, ask_price: bool = False) -> 
     if not out:            # đừng để rỗng — giữ bản gốc
         return text, 0
     return "\n\n".join(out), dropped
+
+
+# v0.5.18 (20/11, ca Nguyễn Xuân Ánh): khách hỏi 2 ý ("thanh toán thế nào", "huyết áp cao uống thuốc tây hằng ngày") → AI viết câu trả lời
+# 2 LẦN (vòng gọi tool trước + vòng sau, diễn đạt khác nhau) → khách nhận 6 tin: thanh toán 2 lần, huyết áp 2 lần, dặn duy trì thuốc 3 lần, 2 câu hỏi.
+_TOPIC_RX = [
+    ("pay", re.compile(r"thanh toán|chuyển khoản", re.I), re.compile(r"chuyển khoản|kiểm tra rồi|nhận hàng", re.I)),
+    ("meds", re.compile(r"duy trì|vẫn (?:uống|dùng) thuốc", re.I), re.compile(r"thuốc", re.I)),
+    ("bp", re.compile(r"huyết áp", re.I), re.compile(r"dùng được|ổn định huyết áp|điều hòa tuần hoàn", re.I)),
+    ("dm", re.compile(r"tiểu đường|đường huyết", re.I), re.compile(r"dùng được|trước ăn|kiểm soát", re.I)),
+    ("phone", re.compile(r"số điện thoại|sđt", re.I), re.compile(r"xin|cho em|để lại|gửi", re.I)),
+]
+
+
+def _topic_of(sent: str) -> set:
+    return {k for k, a, b in _TOPIC_RX if a.search(sent) and b.search(sent)}
+
+
+def _dedupe_reply(text: str, bot_texts: list) -> tuple:
+    """Bỏ câu nói LẠI cùng một ý trong CÙNG tin trả lời (cùng chủ đề hoặc giống ≥ 60%); câu dặn duy trì thuốc chỉ 1 lần cả hội thoại;
+    tối đa 1 câu hỏi (ưu tiên câu xin SĐT, không thì câu hỏi cuối). Không đụng tin tổng hợp đơn, dòng combo, thẻ hệ thống."""
+    import difflib
+    if not IS_NHS or not text or len(_RE_CONFIRM_BLOCK.findall(text)) >= 2:
+        return text, 0
+    said_meds = any(re.search(r"duy trì", b or "", re.I) and re.search(r"thuốc", b or "", re.I) for b in bot_texts or [])
+    seen_topics, seen_norm, n = set(), [], 0
+    paras = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
+    out_paras = []
+    for p in paras:
+        if re.search(r"\[(?:HANDOFF|IMG|QR)", p) or _RE_COMBO_ROW.search(p) or re.search(r"(?m)^\s*[-•🎁✅🌿]", p):
+            seen_topics |= _topic_of(p)          # đoạn liệt kê / thẻ hệ thống: giữ nguyên nhưng ghi nhận ý đã nói
+            seen_norm.append(_norm_rep(p))
+            out_paras.append(p)
+            continue
+        keep = []
+        for snt in re.split(r"(?<=[.!?…])\s+", p):
+            if not snt.strip():
+                continue
+            tp = _topic_of(snt)
+            nz = _norm_rep(snt)
+            _old = seen_topics | ({"meds"} if said_meds else set())
+            dup = (tp and tp <= _old) or \
+                  (len(nz) > 30 and any(difflib.SequenceMatcher(None, nz, q).ratio() >= 0.6 for q in seen_norm))
+            if dup and not snt.rstrip().endswith("?"):
+                n += 1
+                continue
+            seen_topics |= tp
+            seen_norm.append(nz)
+            keep.append(snt)
+        if keep:
+            out_paras.append(" ".join(keep))
+    # tối đa 1 câu hỏi
+    qs = [(i, s_) for i, pp in enumerate(out_paras) for s_ in re.split(r"(?<=[.!?…])\s+", pp) if s_.rstrip().endswith("?")]
+    if len(qs) > 1:
+        keep_q = next((s_ for _i, s_ in qs if "phone" in _topic_of(s_)), qs[-1][1])
+        for i, s_ in qs:
+            if s_ is keep_q or s_ == keep_q:
+                continue
+            out_paras[i] = " ".join(x for x in re.split(r"(?<=[.!?…])\s+", out_paras[i]) if x != s_).strip()
+            n += 1
+        out_paras = [pp for pp in out_paras if pp.strip()]
+    if not out_paras:
+        return text, 0
+    return "\n\n".join(out_paras), n
+
+
+PHONE_ACK_TAIL = "Bên em sẽ gọi lại cho anh/chị sớm nhất để tư vấn và lên đơn, anh/chị để ý điện thoại giúp em nhé ạ."
+
+
+def _phone_ack_tail(text: str, last_user: str) -> tuple:
+    """v0.5.18 (chị Nga chốt 16/11): khách vừa để SĐT hợp lệ → sau lượt này bot DỪNG, nhân viên gọi. Bỏ câu hỏi cuối (không còn ai
+    hỏi tiếp trên chat) và kết bằng câu hẹn gọi lại. Không áp với tin tổng hợp đơn (đã có câu gọi xác nhận) / tin báo số sai."""
+    if not IS_NHS or not text or os.environ.get("PANCAKE_PHONE_STOP", "1") != "1":
+        return text, 0
+    if not _RE_VALID_PHONE.search(last_user or "") or len(_RE_CONFIRM_BLOCK.findall(text)) >= 2:
+        return text, 0
+    if re.search(r"gọi (?:lại|điện)|liên hệ lại|để ý điện thoại", text, re.I) or re.search(r"chưa đúng|chưa chính xác|kiểm tra lại", text, re.I):
+        return text, 0
+    paras = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
+    out = []
+    for p in paras:
+        if re.search(r"\[(?:HANDOFF|IMG|QR)", p) or re.search(r"(?m)^\s*[-•🎁✅🌿]", p):
+            out.append(p)
+            continue
+        ks = [x for x in re.split(r"(?<=[.!?…])\s+", p) if x.strip() and not x.rstrip().endswith("?")]
+        if ks:
+            out.append(" ".join(ks))
+    out.append(PHONE_ACK_TAIL)
+    return "\n\n".join(out), 1
 
 
 def split_messages(text: str, max_parts: int = 4) -> list:
@@ -4854,6 +4945,12 @@ def _chat_impl(history: list, model_key: str = None, profile: str = None, channe
         text, _dups = _drop_repeats(text, transcript_orig)
         if _dups:
             debug["repeat_dropped"] = _dups
+        text, _dd = _dedupe_reply(text, [str(m.get("text") or "") for m in transcript_orig if m.get("role") == "assistant"])
+        if _dd:
+            debug["same_reply_dedup"] = _dd   # v0.5.18: không nói 1 ý 2 lần trong cùng tin, 1 câu hỏi
+        text, _pa = _phone_ack_tail(text, (user_texts_real or [""])[-1])
+        if _pa:
+            debug["phone_ack_tail"] = True    # v0.5.18: khách để SĐT → kết bằng câu hẹn gọi lại (bot dừng sau lượt này)
         ended = bool(_RE_END.search(text))
         if ended:
             text = _RE_END.sub("", text).strip()

@@ -199,7 +199,9 @@ ORDER_CANCELLED = {"-1", "6", "7", "5", "4"}
 ORDER_CONFIRMED = {"1", "2", "3", "11", "17", "20"}
 BATCH_SECONDS = float(os.environ.get("PANCAKE_BATCH_SECONDS", "10"))   # v0.5.14 (16/11, theo bot lát v0.1.134): trả lời sau 10 giây
 BATCH_FIRST_SECONDS = float(os.environ.get("PANCAKE_BATCH_FIRST_SECONDS", "10"))   # v0.5.14: cả tin đầu cũng 10 giây
-PHONE_STOP = os.environ.get("PANCAKE_PHONE_STOP", "0") == "1"   # v0.1.22: mặc định khách gửi SĐT bot VẪN chat tiếp (1 = kiểu cũ: dừng, giao người)
+# v0.5.18 (20/11, chị Nga chốt 16/11 "theo bot lát"): khách thả SĐT → bot trả lời lượt đó, gắn "Người xử lý" rồi DỪNG, nhân viên gọi.
+# Bot gửi tổng hợp đơn → "Bot chốt đơn" + "Người xử lý", dừng, không chờ khách xác nhận. (0 = kiểu cũ: bot chat tiếp, thẻ "Có SĐT")
+PHONE_STOP = os.environ.get("PANCAKE_PHONE_STOP", "1") == "1"
 # (trước v0.1.22: 60 giây) Sâm v0.1.12 (chị Nga 25/09, nhắc lại 13/10): phản hồi sau 1 phút
 # v0.5.22 A6: nghỉ 1,5–2 giây giữa các tin nhiều đoạn — bắn liền 2-4 tin nhìn rõ là máy
 PART_GAP = max(0.0, float(os.environ.get("PANCAKE_PART_GAP", "1.5")))
@@ -346,9 +348,9 @@ TAG_POTENTIAL = os.environ.get("PANCAKE_TAG_POTENTIAL", "KH tiềm năng")
 # v0.5.22 A3: FB #551 — khách chặn page / xoá hội thoại / hết cửa sổ: không gửi được nữa
 TAG_UNREACH = os.environ.get("PANCAKE_TAG_UNREACH", "Ko gửi được")
 # v0.5.22 A7: khách gửi TRẦN SĐT → 1 câu ghi nhận rồi giao người NGAY (không chờ nhịp 30 phút)
-PHONE_ACK = os.environ.get("PANCAKE_PHONE_ACK") or (
-    "Dạ em nhận được số điện thoại của anh/chị rồi ạ. Chuyên viên tư vấn bên em sẽ gọi lại cho anh/chị "
-    "sớm nhất có thể, anh/chị để ý điện thoại giúp em nhé ạ!")   # v0.1.21: bỏ "Dược sĩ" (anh Huy chốt 14/10)
+PHONE_ACK = os.environ.get("PANCAKE_PHONE_ACK") or (   # v0.5.18: câu đã duyệt (kịch bản Nước Hồng sâm mục 8, 16/11)
+    "Dạ em đã nhận được thông tin của anh/chị ạ. Bên em sẽ gọi lại cho anh/chị sớm nhất để tư vấn và lên đơn, "
+    "anh/chị để ý điện thoại giúp em nhé ạ.")
 
 # ---- v0.5.27 (phần B, anh Na chốt 28/08): NHỊP THEO NGUỒN + CỬA SỔ THEO CA ----
 # Nguồn ca lấy từ API conversations (field ad_ids / post_id — dò 29/08, xem _src_loop).
@@ -1495,7 +1497,7 @@ def _enqueue(conv_id, text, meta, imgs=None):
             b["texts"].append(text)
             b["timer"].cancel()
         else:
-            b = _batches[conv_id] = {"texts": [text], "meta": meta}
+            b = _batches[conv_id] = {"texts": [text], "meta": meta, "t0": time.time()}
         if imgs:
             b.setdefault("imgs", []).extend(imgs)
             b["imgs"] = b["imgs"][:3]
@@ -1510,6 +1512,14 @@ def _enqueue(conv_id, text, meta, imgs=None):
     return len(b["texts"])
 
 
+_conv_locks = {}      # v0.5.18: mỗi hội thoại chỉ 1 lượt trả lời chạy cùng lúc
+_conv_locks_guard = threading.Lock()
+
+
+def _norm_ut(t: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", (t or "").lower())).strip()
+
+
 def _flush(conv_id):
     try:
         db.set_setting("bot_replied:" + str(conv_id), "1")   # v0.1.22: từ lượt sau chờ BATCH_SECONDS (30s)
@@ -1519,11 +1529,27 @@ def _flush(conv_id):
         b = _batches.pop(conv_id, None)
     if not b:
         return
-    try:
-        res = _respond(conv_id, "\n".join(b["texts"]), b["meta"], images=b.get("imgs"))
-        db.log_webhook("reply", json.dumps(res, ensure_ascii=False))
-    except Exception as ex:  # noqa: BLE001
-        db.log_webhook("error", f"flush {conv_id}: {ex}")
+    # v0.5.18 (20/11, ca Nguyễn Xuân Ánh): khách nhắn tin 2 trong lúc bot đang soạn trả lời tin 1 → trước đây 2 lượt chạy SONG SONG,
+    # lượt 1 đọc lịch sử Pancake đã có cả tin 2 nên trả lời cả 2 ý, lượt 2 lại trả lời cả 2 ý lần nữa → khách nhận mọi ý 2 lần.
+    # Nay: mỗi hội thoại 1 lượt tại một thời điểm; lượt sau mà mọi tin khách đã được lượt trước đọc và trả lời → bỏ.
+    with _conv_locks_guard:
+        lk = _conv_locks.setdefault(str(conv_id), threading.Lock())
+    with lk:
+        try:
+            _st = json.loads(db.get_setting("answered_ut:" + str(conv_id)) or "{}")
+            done, t_prev = set(_st.get("ut") or []), float(_st.get("t") or 0)
+        except Exception:  # noqa: BLE001
+            done, t_prev = set(), 0.0
+        mine = [_norm_ut(x) for t in b["texts"] for x in str(t).split("\n") if _norm_ut(x)]
+        # chỉ bỏ khi lượt trước BẮT ĐẦU SAU lúc tin này tới (lượt trước chắc chắn đã đọc tin này), không bỏ tin khách nhắn lại về sau
+        if mine and done and all(x in done for x in mine) and t_prev >= float(b.get("t0") or 0) and not b.get("imgs"):
+            db.log_webhook("turn_merged", f"{conv_id}: tin khách đã được trả lời trong lượt trước (bot đọc cả tin này) — không trả lời lần 2")
+            return
+        try:
+            res = _respond(conv_id, "\n".join(b["texts"]), b["meta"], images=b.get("imgs"))
+            db.log_webhook("reply", json.dumps(res, ensure_ascii=False))
+        except Exception as ex:  # noqa: BLE001
+            db.log_webhook("error", f"flush {conv_id}: {ex}")
 
 
 # ================================ XỬ LÝ LÕI ================================
@@ -1666,8 +1692,8 @@ def handle_event(payload: dict) -> dict:
     is_new = db.ab_in(conv_id, grp, bool(_phones))
     if _phones:
         ab_save_phones(conv_id, grp, _phones)
-        if grp == "bot":
-            _phone_lead(conv_id, _phones[-1])
+        if grp == "bot" and not PHONE_STOP:
+            _phone_lead(conv_id, _phones[-1])   # kiểu cũ (PANCAKE_PHONE_STOP=0): thẻ "Có SĐT", bot chat tiếp
     if db.pancake_is_test(conv_id):
         db.ab_contaminate(conv_id)   # hội thoại thử không được tính vào số liệu A/B
     # v0.5.19 (anh Na chốt 27/08): khách gửi ẢNH/TỆP thì bot CỐ Ý không đoán nội dung mà
@@ -1736,7 +1762,7 @@ def handle_event(payload: dict) -> dict:
         return _attach_handoff(conv_id, att, meta)   # tệp/video hoặc ảnh không lấy được link
     # v0.5.22 A7: khách gửi TRẦN SĐT — chuyển người NGAY, không chờ nhịp 1 (30 phút)
     if not att:
-        bp = _bare_phone(text)
+        bp = _bare_phone(text) or _phone_lead_only(text, ((meta.get("customer") or {}).get("name") or ""))
         if bp and PHONE_STOP:
             return _phone_handoff(conv_id, bp, meta, text)
         # v0.1.22 (chị Nga 16/10): khách gửi SĐT mà còn thiếu thông tin → bot VẪN chat tiếp
@@ -1984,6 +2010,15 @@ def _respond(conv_id: str, text: str, meta: dict, images: list = None) -> dict:
                       "KHÔNG xin lại SĐT/địa chỉ, KHÔNG báo giá lại")
     if _extra:
         profile = "; ".join(([profile] if profile else []) + _extra)
+    try:   # v0.5.18: ghi các tin khách mà lượt này ĐỌC (từ sau tin bot cuối) — lượt sau trùng tin này thì không trả lời lại
+        _last_a = max([i for i, m in enumerate(history) if m.get("role") == "assistant"] or [-1])
+        _ut = []
+        for m in history[_last_a + 1:]:
+            if m.get("role") == "user":
+                _ut += [_norm_ut(x) for x in str(m.get("content") or "").split("\n") if _norm_ut(x)]
+        db.set_setting("answered_ut:" + str(conv_id), json.dumps({"t": time.time(), "ut": _ut[-20:]}, ensure_ascii=False))
+    except Exception:  # noqa: BLE001
+        pass
     result = engine.chat(history, profile=profile, channel="messenger",
                          focus=focus or None, focus_source=focus_src)
 
@@ -2151,6 +2186,30 @@ def _respond(conv_id: str, text: str, meta: dict, images: list = None) -> dict:
             nt = _handoff_note(handoffs)
             if nt:
                 note(conv_id, nt)
+    # v0.5.18 (chị Nga chốt 16/11, theo bot lát): khách đã để SĐT hợp lệ / bot vừa gửi tổng hợp đơn → gắn thẻ và DỪNG, nhân viên gọi.
+    try:
+        _rep0 = result.get("reply") or ""
+        _is_sum = len(engine._RE_CONFIRM_BLOCK.findall(_rep0)) >= 2
+        if PHONE_STOP and any(x in ("ok", "img") for x in sent) and (_is_sum or find_phones(text)) \
+                and not any((h.get("level") or 2) >= 2 for h in handoffs):
+            _ph = (find_phones(text) or [""])[-1]
+            if _is_sum:
+                add_tag(conv_id, TAG_BY_LEVEL[1])
+                db.set_setting("order_done:" + str(conv_id), f"{time.time():.0f}")
+            add_tag(conv_id, TAG_BY_LEVEL[2])
+            assign(conv_id)
+            mark_unread(conv_id)
+            _keep_unread(conv_id)
+            _rs = "Bot đã gửi tổng hợp đơn — gọi khách xác nhận đơn, lên đơn" if _is_sum else "Khách để SĐT — gọi lại tư vấn, lên đơn"
+            note(conv_id, _handoff_note([{"level": 1 if _is_sum else 2, "reason": _rs, "phone": _ph}]))
+            db.add_handoff(local_id, "pancake", _rs, _ph, 1 if _is_sum else 2)
+            if _ph:
+                db.add_lead(local_id, "pancake", _ph, _rs)
+            db.pancake_mark_returned(conv_id, 2)
+            _fu_clear(conv_id)
+            db.log_webhook("phone_stop", f"{conv_id}: {_rs} → gắn thẻ, bot dừng")
+    except Exception as ex:  # noqa: BLE001
+        db.log_webhook("error", f"phone_stop {conv_id}: {ex}")
     # v0.1.81 (25/10, chị Nga): bot vừa gửi TỔNG HỢP ĐƠN (chưa chốt) → hẹn 10 phút; khách im → bot tự ghi nhận đơn + mời lên gói
     try:
         _rep = result.get("reply") or ""
@@ -2611,6 +2670,26 @@ def _bare_phone(text: str) -> str:
         return ""
     left = _RE_PHONE.sub("", text or "")
     if re.sub(r"[\W_\d]+", "", left, flags=re.UNICODE):
+        return ""
+    return ph[0]
+
+
+_RE_PL_FILLER = re.compile(r"(?i)(?<![A-Za-zÀ-ỹĐđ])(?:đt|dt|sđt|sdt|số|so|điện thoại|dien thoai|zalo|zl|tên|ten|là|la|của|cua|em|e|anh|a|chị|chi|c|"
+                           r"cô|chú|bác|mình|minh|tôi|toi|t|gọi|goi|cho|nhé|nhe|nha|ạ|a|liên hệ|lh|tư vấn|tv|đây|day|ok|oke|ib|inbox|"
+                           r"call|hotline|sdt:|đt:)(?![A-Za-zÀ-ỹĐđ])")
+
+
+def _phone_lead_only(text: str, cust_name: str = "") -> str:
+    """v0.5.18 (20/11, ca Đình Lân "đinh lân đt 0798851374"): tin chỉ gồm SĐT + tên / chữ đệm ("đt", "sđt", "gọi cho chị") → như tin trần SĐT."""
+    ph = find_phones(text)
+    if len(ph) != 1 or "?" in (text or ""):
+        return ""
+    left = _RE_PHONE.sub(" ", text or "")
+    for w in re.findall(r"\w+", cust_name or "", flags=re.UNICODE):
+        left = re.sub(r"(?i)(?<![A-Za-zÀ-ỹĐđ])" + re.escape(w) + r"(?![A-Za-zÀ-ỹĐđ])", " ", left)
+    left = _RE_PL_FILLER.sub(" ", left)
+    words = re.findall(r"[A-Za-zÀ-ỹĐđ]+", left)
+    if len(words) > 3 or re.search(r"(?i)phường|xã|quận|huyện|tỉnh|đường|phố|thôn|ngõ|hộp|combo|lấy|mua|đặt", left):
         return ""
     return ph[0]
 
